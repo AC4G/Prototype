@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Confirm your email!</h1>
+    <p>Follow this link: </p>
+    <a href="https://127.0.0.1:8000/email/verification/{{ userId }}/{{ verification_key }}">- Verification -</a>
+{% endblock %}

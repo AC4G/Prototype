@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <a href="{{ path('home') }}">
+        <p><- back to homepage</p>
+    </a>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1>Log In</h1>
+                {% if error %}
+                    <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+                {{ form(login_form) }}
+                <p>
+                    You don't have an account? Go to
+                    <a href="{{ path('registration') }}">Registration</a>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

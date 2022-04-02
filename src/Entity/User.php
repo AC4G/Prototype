@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserRolesRepository;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
@@ -12,7 +14,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  * @ORM\Table(name="user", uniqueConstraints={@ORM\UniqueConstraint(name="email_UNIQUE", columns={"email"}), @ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="nickname_UNIQUE", columns={"nickname"})})
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
-class User implements PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @var int
@@ -64,6 +66,12 @@ class User implements PasswordAuthenticatedUserInterface
      * @ORM\Column(name="creation_date", type="datetime", nullable=false)
      */
     private DateTime $creationDate;
+
+
+    /**
+     *
+     */
+    private array $roles;
 
     public function getId(): ?int
     {
@@ -142,5 +150,28 @@ class User implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
 
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function eraseCredentials()
+    {
+        // TODO: Implement eraseCredentials() method.
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->getNickname();
+    }
 }

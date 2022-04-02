@@ -92,6 +92,11 @@ class RegistrationController extends AbstractController
                 if (!array_key_exists('email', $errors)) {
                     $this->registrationService->giveUserARole($this->registrationService->getUser());
                     $this->registrationService->flushUserRegistrationKey();
+
+                    /*
+                     *   only for debugging purpose <4/2/2022 6:35PM AC4G>
+                     *   $errors = $this->registrationService->getErrors();
+                    */
                 }
 
                 if (count($errors) < 1) {

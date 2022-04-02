@@ -22,8 +22,6 @@ final class RegistrationService
         'saving' => 'An error occurred while saving, please try again in a few seconds.'
     ];
     private UserRegistrationKey $registrationKey;
-    private UserRoles $userRoles;
-    private RoleIdent $roleIdent;
 
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
@@ -78,8 +76,6 @@ final class RegistrationService
             $this->errors[] = $this->createError('saving', 'roleIdent_entity');
         }
 
-        $this->roleIdent = $roleIdent;
-
         if (count($this->errors) < 1) {
             $userRoles = new UserRoles();
 
@@ -93,8 +89,6 @@ final class RegistrationService
             } catch (Exception $e) {
                     $this->errors[] = $this->createError('saving', 'userRoles_entity');
             }
-
-            $this->userRoles = $userRoles;
         }
     }
 

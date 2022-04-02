@@ -21,11 +21,8 @@ use App\Repository\UserRegistrationKeyRepository as KeyRepository;
 class RegistrationController extends AbstractController
 {
     public function __construct(
-        private RoleIdentRepository $roleIdentRepository,
         private RegistrationService $registrationService,
-        private UserRolesRepository $userRolesRepository,
         private UserRepository $userRepository,
-        private KeyRepository $keyRepository,
         private EmailService $emailService
     )
     {
@@ -74,13 +71,13 @@ class RegistrationController extends AbstractController
                 $expire = new DateTime('+ 30 days');
 
                 $registrationCookie = new CookieService();
-                $cookie = $registrationCookie('userId', $this->registrationService->getUserId(true), $expire);
+                $cookie = $registrationCookie('userId', (string)$this->registrationService->getUser()->getId(), $expire);
 
                 $response = $this->redirectToRoute('registration_success');
                 $response->headers->setCookie($cookie);
 
                 $this->emailService->createEmail($user->getEmail(), 'Email verification', 'website/email/registration/index.html.twig', [
-                    'userId' => $this->registrationService->getUserId(),
+                    'userId' => $this->registrationService->getUser()->getId(),
                     'verification_key' => $this->registrationService->getUserRegistrationKey()->getKey(),
                 ]);
 
@@ -89,17 +86,18 @@ class RegistrationController extends AbstractController
                 $errors = $this->emailService->getError();
 
                 if (array_key_exists('email', $errors)) {
-                    $this->keyRepository->deleteEntry($this->registrationService->getUserRegistrationKey());
                     $this->userRepository->deleteEntry($user);
-                    $this->userRolesRepository->deleteEntry($this->registrationService->getUserRoles());
-                    $this->roleIdentRepository->deleteEntry($this->registrationService->getRoleIdent());
+                }
+
+                if (!array_key_exists('email', $errors)) {
+                    $this->registrationService->giveUserARole($this->registrationService->getUser());
+                    $this->registrationService->flushUserRegistrationKey();
                 }
 
                 if (count($errors) < 1) {
                     return $response;
                 }
             }
-
         }
 
         return $this->render('website/registration/index.html.twig', [

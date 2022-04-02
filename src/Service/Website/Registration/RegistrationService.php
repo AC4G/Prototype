@@ -16,7 +16,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class RegistrationService
 {
-    private int $id;
+    private User $user;
     private array $errors = [];
     private array $errorSet = [
         'saving' => 'An error occurred while saving, please try again in a few seconds.'
@@ -57,16 +57,14 @@ final class RegistrationService
             $this->errors[] = $this->createError('saving', 'user_entity');
         }
 
-        $this->id = $user->getId();
+        $this->user = $user;
 
-        if (!is_null($this->id)) {
-            $this->id = $user->getId();
-            $this->giveUserARole($user);
+        if (!is_null($this->user->getId())) {
             $this->giveUserAVerificationKey($user);
         }
     }
 
-    private function giveUserARole(
+    public function giveUserARole(
         User $user
     ): void
     {
@@ -75,7 +73,7 @@ final class RegistrationService
             ->setRoleName(json_encode(['ROLE_USER']));
 
         try {
-            $this->roleIdentRepository->persistAndFlushEntity($roleIdent);
+            $this->roleIdentRepository->persistEntity($roleIdent);
         } catch (Exception $e) {
             $this->errors[] = $this->createError('saving', 'roleIdent_entity');
         }
@@ -91,7 +89,7 @@ final class RegistrationService
             ;
 
             try {
-                $this->userRolesRepository->persistAndFlushEntity($userRoles);
+                $this->userRolesRepository->persistEntity($userRoles);
             } catch (Exception $e) {
                     $this->errors[] = $this->createError('saving', 'userRoles_entity');
             }
@@ -114,7 +112,7 @@ final class RegistrationService
             ->setExpireDate(new DateTime('+ 10 Days'));
 
         try {
-            $this->keyRepository->persistAndFlushEntity($userRegistrationKey);
+            $this->keyRepository->persistEntity($userRegistrationKey);
         } catch (Exception $e) {
             $this->errors[] = $this->createError('saving', 'registrationKey_entity');
         }
@@ -140,24 +138,13 @@ final class RegistrationService
         return $this->errors;
     }
 
-    public function getUserId(
-        bool $returnString = false
-    ): int|string
+    public function getUser(): User
     {
-        if ($returnString === true) {
-            return (string)$this->id;
-        }
-
-        return $this->id;
+        return $this->user;
     }
 
-    public function getUserRoles(): ?UserRoles
+    public function flushUserRegistrationKey()
     {
-        return $this->userRoles;
-    }
-
-    public function getRoleIdent(): ?RoleIdent
-    {
-        return $this->roleIdent;
+        $this->keyRepository->flushEntity();
     }
 }

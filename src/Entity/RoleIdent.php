@@ -33,12 +33,12 @@ class RoleIdent
         return $this->id;
     }
 
-    public function getRoleName(): ?string
+    public function getRoles(): ?string
     {
         return $this->roles;
     }
 
-    public function setRoleName(string $roles): self
+    public function setRoles(string $roles): self
     {
         $this->roles = $roles;
 

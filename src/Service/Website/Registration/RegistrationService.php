@@ -68,7 +68,7 @@ final class RegistrationService
     {
         $roleIdent = new RoleIdent();
         $roleIdent
-            ->setRoleName(json_encode(['ROLE_USER']));
+            ->setRoles(json_encode(['ROLE_USER']));
 
         try {
             $this->roleIdentRepository->persistEntity($roleIdent);

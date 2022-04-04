@@ -8,11 +8,5 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class EmailController extends AbstractController
 {
-    /**
-     * @Route("/email/verification/{userId}/{key}", name="email_verification", methods={"GET"})
-     */
-    public function emailVerification(): Response
-    {
-        return new Response();
-    }
+
 }

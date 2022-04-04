@@ -5,6 +5,8 @@ namespace App\Entity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRolesRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
@@ -16,6 +18,11 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    public function __construct()
+    {
+        $this->roles = new ArrayCollection();
+    }
+
     /**
      * @var int
      *
@@ -69,9 +76,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 
     /**
-     *
+     * @ORM\OneToMany(targetEntity="UserRoles", mappedBy="user")
      */
-    private array $roles;
+    private Collection $roles;
 
     public function getId(): ?int
     {
@@ -152,17 +159,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        $roles[] = 'ROLE_USER';
+        $collection = $this->roles->toArray();
+        $this->roles = $collection[0]['roleIdent']['roles'];
 
-        return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-
-        return $this;
+        return $this->roles;
     }
 
     public function eraseCredentials()

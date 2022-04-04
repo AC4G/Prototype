@@ -8,10 +8,10 @@ use App\Entity\User;
 use App\Entity\UserRoles;
 use App\Entity\RoleIdent;
 use App\Repository\UserRepository;
-use App\Entity\UserRegistrationKey;
+use App\Entity\Token;
 use App\Repository\RoleIdentRepository;
 use App\Repository\UserRolesRepository;
-use App\Repository\UserRegistrationKeyRepository as KeyRepository;
+use App\Repository\TokenRepository as KeyRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class RegistrationService
@@ -21,7 +21,7 @@ final class RegistrationService
     private array $errorSet = [
         'saving' => 'An error occurred while saving, please try again in a few seconds.'
     ];
-    private UserRegistrationKey $registrationKey;
+    private Token $registrationKey;
 
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
@@ -68,7 +68,7 @@ final class RegistrationService
     {
         $roleIdent = new RoleIdent();
         $roleIdent
-            ->setRoles(json_encode(['ROLE_USER']));
+            ->setRoles(json_encode('ROLE_USER'));
 
         try {
             $this->roleIdentRepository->persistEntity($roleIdent);
@@ -98,7 +98,7 @@ final class RegistrationService
     {
         $key = bin2hex(random_bytes(64));
 
-        $userRegistrationKey = new UserRegistrationKey();
+        $userRegistrationKey = new Token();
 
         $userRegistrationKey
             ->setUser($user)
@@ -122,7 +122,7 @@ final class RegistrationService
         return $this->errorSet[$key] . ' Area: ' . $area;
     }
 
-    public function getUserRegistrationKey(): ?UserRegistrationKey
+    public function getUserRegistrationKey(): ?Token
     {
         return $this->registrationKey;
     }

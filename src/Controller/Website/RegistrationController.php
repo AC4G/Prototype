@@ -16,7 +16,7 @@ use App\Form\Registration\RegistrationFormType;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Registration\RegistrationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Repository\UserRegistrationKeyRepository as KeyRepository;
+use App\Repository\TokenRepository as KeyRepository;
 
 class RegistrationController extends AbstractController
 {
@@ -70,11 +70,7 @@ class RegistrationController extends AbstractController
             if(count($errors) < 1) {
                 $expire = new DateTime('+ 30 days');
 
-                $registrationCookie = new CookieService();
-                $cookie = $registrationCookie('userId', (string)$this->registrationService->getUser()->getId(), $expire);
-
-                $response = $this->redirectToRoute('registration_success');
-                $response->headers->setCookie($cookie);
+                $response = $this->redirectToRoute('login');
 
                 $this->emailService->createEmail($user->getEmail(), 'Email verification', 'website/email/registration/index.html.twig', [
                     'userId' => $this->registrationService->getUser()->getId(),
@@ -100,6 +96,8 @@ class RegistrationController extends AbstractController
                 }
 
                 if (count($errors) < 1) {
+                    $this->addFlash('success', 'Please follow the link in your Email to verify it.');
+
                     return $response;
                 }
             }

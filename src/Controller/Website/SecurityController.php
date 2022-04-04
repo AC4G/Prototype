@@ -2,15 +2,13 @@
 
 namespace App\Controller\Website;
 
-use App\Entity\User;
-use App\Form\Login\LoginFormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-class LoginController extends AbstractController
+class SecurityController extends AbstractController
 {
     public function __construct(
         private AuthenticationUtils $authenticationUtils
@@ -21,24 +19,13 @@ class LoginController extends AbstractController
     /**
      * @Route("/login", name="login")
      */
-    public function login(Request $request): Response
+    public function loginAction(): Response
     {
-        $user = new User();
-
-        $form = $this->createForm(LoginFormType::class, $user);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-        }
-
         $lastUsername = $this->authenticationUtils->getLastUsername();
 
         $error = $this->authenticationUtils->getLastAuthenticationError();
 
         return $this->render('website/login/index.html.twig', [
-            'login_form' => $form->createView(),
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
@@ -47,8 +34,16 @@ class LoginController extends AbstractController
     /**
      * @Route("/login/success", name="login_success")
      */
-    public function loginSuccess()
+    public function loginSuccess(): Response
     {
+        return $this->render('website/login/success.html.twig');
+    }
 
+    /**
+     * @Route("/logout", name="logout")
+     */
+    public function logoutAction()
+    {
+        //logout automatically
     }
 }

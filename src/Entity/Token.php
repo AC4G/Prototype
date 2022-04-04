@@ -3,16 +3,15 @@
 namespace App\Entity;
 
 use DateTime;
-use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * UserRegistrationKey
+ * Token
  *
- * @ORM\Table(name="user_registration_key", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="user_id_UNIQUE", columns={"user_id"}), @ORM\UniqueConstraint(name="key_UNIQUE", columns={"verification_key"})}, indexes={@ORM\Index(name="fk_User_Id_Key", columns={"user_id"})})
- * @ORM\Entity(repositoryClass="App\Repository\UserRegistrationKeyRepository")
+ * @ORM\Table(name="token", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="user_id_UNIQUE", columns={"user_id"}), @ORM\UniqueConstraint(name="token_UNIQUE", columns={"token"})}, indexes={@ORM\Index(name="fk_User_Id_Token_Type", columns={"user_id", "token", "token_type"})})
+ * @ORM\Entity(repositoryClass="App\Repository\TokenRepository")
  */
-class UserRegistrationKey
+class Token
 {
     /**
      * @var int
@@ -36,9 +35,16 @@ class UserRegistrationKey
     /**
      * @var string
      *
-     * @ORM\Column(name="verification_key", type="string", length=255, nullable=false)
+     * @ORM\Column(name="token", type="string", length=255, nullable=false)
      */
-    private string $key;
+    private string $token;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="token_type", type="text", nullable=false)
+     */
+    private string $type;
 
     /**
      * @var DateTime
@@ -64,14 +70,26 @@ class UserRegistrationKey
         return $this;
     }
 
-    public function getKey(): ?string
+    public function getToken(): ?string
     {
-        return $this->key;
+        return $this->token;
     }
 
-    public function setKey(string $key): self
+    public function setToken(string $token): self
     {
-        $this->key = $key;
+        $this->token = $token;
+
+        return $this;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }

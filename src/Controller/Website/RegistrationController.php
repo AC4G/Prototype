@@ -2,25 +2,24 @@
 
 namespace App\Controller\Website;
 
-use App\Repository\RoleIdentRepository;
-use App\Repository\UserRolesRepository;
 use DateTime;
 use Exception;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\Cookie\CookieService;
 use App\Service\Website\Email\EmailService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Form\Registration\RegistrationFormType;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Registration\RegistrationService;
+use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Repository\TokenRepository as KeyRepository;
 
-class RegistrationController extends AbstractController
+final class RegistrationController extends AbstractController
 {
     public function __construct(
+        private VerifyEmailHelperInterface $verifyEmailHelper,
         private RegistrationService $registrationService,
         private UserRepository $userRepository,
         private EmailService $emailService
@@ -72,9 +71,17 @@ class RegistrationController extends AbstractController
 
                 $response = $this->redirectToRoute('login');
 
+                $userId = $this->registrationService->getUser()->getId();
+
+                $signatureComponents = $this->verifyEmailHelper->generateSignature(
+                    'verify_email',
+                    (string)$userId,
+                    $user->getEmail(),
+                    ['id' => $userId]
+                );
+
                 $this->emailService->createEmail($user->getEmail(), 'Email verification', 'website/email/registration/index.html.twig', [
-                    'userId' => $this->registrationService->getUser()->getId(),
-                    'verification_token' => $this->registrationService->getToken()->getToken(),
+                    'verify_url' => $signatureComponents->getSignedUrl(),
                 ]);
 
                 $this->emailService->sendEmail();
@@ -107,5 +114,46 @@ class RegistrationController extends AbstractController
             'registration_form' => $form->createView(),
             'errors' => $errors,
         ]);
+    }
+
+    /**
+     * @Route("/verify", name="verify_email")
+     */
+    public function verifyEmail(
+        Request $request
+    )
+    {
+        $user = $this->userRepository->find($request->query->get('id'));
+
+        if (is_null($user)) {
+            $this->addFlash('success', 'You are already verified!');
+
+            return $this->redirectToRoute('login');
+        }
+
+        $emailVerified = $user->getEmailVerified();
+
+        if (!is_null($emailVerified)) {
+            $this->redirectToRoute('login');
+        }
+
+        try {
+            $this->verifyEmailHelper->validateEmailConfirmation(
+                $request->getUri(),
+                (string)$user->getId(),
+                $user->getEmail()
+            );
+        } catch (VerifyEmailExceptionInterface $e) {
+            $this->addFlash('error', $e->getReason());
+
+            return $this->redirectToRoute('login');
+        }
+
+        $user->setEmailVerified(new DateTime());
+        $this->userRepository->flushEntity();
+
+        $this->addFlash('success', 'Email verified! You can now log in to your account.');
+
+        return $this->redirectToRoute('login');
     }
 }

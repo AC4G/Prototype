@@ -11,7 +11,7 @@ use App\Repository\UserRepository;
 use App\Entity\Token;
 use App\Repository\RoleIdentRepository;
 use App\Repository\UserRolesRepository;
-use App\Repository\TokenRepository as KeyRepository;
+use App\Repository\TokenRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class RegistrationService
@@ -21,14 +21,14 @@ final class RegistrationService
     private array $errorSet = [
         'saving' => 'An error occurred while saving, please try again in a few seconds.'
     ];
-    private Token $registrationKey;
+    private Token $registrationToken;
 
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
         private RoleIdentRepository $roleIdentRepository,
         private UserRolesRepository $userRolesRepository,
         private UserRepository $userRepository,
-        private KeyRepository $keyRepository
+        private TokenRepository $tokenRepository
     )
     {
     }
@@ -98,20 +98,21 @@ final class RegistrationService
     {
         $key = bin2hex(random_bytes(64));
 
-        $userRegistrationKey = new Token();
+        $token = new Token();
 
-        $userRegistrationKey
+        $token
             ->setUser($user)
-            ->setKey($key)
+            ->setToken($key)
+            ->setType("email_verification")
             ->setExpireDate(new DateTime('+ 10 Days'));
 
         try {
-            $this->keyRepository->persistEntity($userRegistrationKey);
+            $this->tokenRepository->persistEntity($token);
         } catch (Exception $e) {
             $this->errors[] = $this->createError('saving', 'registrationKey_entity');
         }
 
-        $this->registrationKey = $userRegistrationKey;
+        $this->registrationToken = $token;
     }
 
     private function createError(
@@ -122,9 +123,9 @@ final class RegistrationService
         return $this->errorSet[$key] . ' Area: ' . $area;
     }
 
-    public function getUserRegistrationKey(): ?Token
+    public function getToken(): ?Token
     {
-        return $this->registrationKey;
+        return $this->registrationToken;
     }
 
     public function getErrors(): array
@@ -137,8 +138,8 @@ final class RegistrationService
         return $this->user;
     }
 
-    public function flushUserRegistrationKey()
+    public function flushToken()
     {
-        $this->keyRepository->flushEntity();
+        $this->tokenRepository->flushEntity();
     }
 }

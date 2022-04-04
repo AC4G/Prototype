@@ -74,7 +74,7 @@ class RegistrationController extends AbstractController
 
                 $this->emailService->createEmail($user->getEmail(), 'Email verification', 'website/email/registration/index.html.twig', [
                     'userId' => $this->registrationService->getUser()->getId(),
-                    'verification_key' => $this->registrationService->getUserRegistrationKey()->getKey(),
+                    'verification_token' => $this->registrationService->getToken()->getToken(),
                 ]);
 
                 $this->emailService->sendEmail();
@@ -87,7 +87,7 @@ class RegistrationController extends AbstractController
 
                 if (!array_key_exists('email', $errors)) {
                     $this->registrationService->giveUserARole($this->registrationService->getUser());
-                    $this->registrationService->flushUserRegistrationKey();
+                    $this->registrationService->flushToken();
 
                     /*
                      *   only for debugging purpose <4/2/2022 6:35PM AC4G>
@@ -107,34 +107,5 @@ class RegistrationController extends AbstractController
             'registration_form' => $form->createView(),
             'errors' => $errors,
         ]);
-    }
-
-    /**
-     * @Route("/registration/success", name="registration_success", methods={"GET"})
-     */
-    public function registrationSuccess(
-        Request $request
-    ): Response
-    {
-        if (!$request->cookies->has('userId')) {
-            return $this->redirectToRoute('login');
-        }
-
-        $user = $this->userRepository->findOneBy(['id' => (int)$request->cookies->get('userId')]);
-
-        if (is_null($user)) {
-            return $this->redirectToRoute('login');
-        }
-
-        $verified = $user->getEmailVerified();
-
-        if (!is_null($verified)) {
-            $response = $this->redirectToRoute('login');
-            $response->headers->clearCookie('userId');
-
-            return $response;
-        }
-
-        return $this->render('website/registration/success.html.twig');
     }
 }

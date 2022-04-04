@@ -42,7 +42,7 @@ class Token
     /**
      * @var string
      *
-     * @ORM\Column(name="token_type", type="text", nullable=false)
+     * @ORM\Column(name="token_type", type="text", length=255, nullable=false)
      */
     private string $type;
 

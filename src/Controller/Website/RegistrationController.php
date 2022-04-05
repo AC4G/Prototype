@@ -12,9 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Form\Registration\RegistrationFormType;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Registration\RegistrationService;
-use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 final class RegistrationController extends AbstractController
 {

@@ -24,23 +24,23 @@ class RoleIdent
     /**
      * @var string
      *
-     * @ORM\Column(name="roles", type="text", length=0, nullable=false)
+     * @ORM\Column(name="role_name", type="string", length=255, nullable=false)
      */
-    private string $roles;
+    private string $roleName;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getRoles(): ?string
+    public function getRoleName(): ?string
     {
-        return $this->roles;
+        return $this->roleName;
     }
 
-    public function setRoles(string $roles): self
+    public function setRoleName(string $roleName): self
     {
-        $this->roles = $roles;
+        $this->roleName = $roleName;
 
         return $this;
     }

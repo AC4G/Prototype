@@ -62,9 +62,13 @@ final class RegistrationService
         User $user
     ): void
     {
-        $roleIdent = new RoleIdent();
-        $roleIdent
-            ->setRoles(json_encode(['ROLE_USER']));
+        $roleIdent = $this->roleIdentRepository->findOneBy(['roleName' => 'ROLE_USER']);
+
+        if (is_null($roleIdent)) {
+            $roleIdent = new RoleIdent();
+            $roleIdent
+                ->setRoleName('ROLE_USER');
+        }
 
         try {
             $this->roleIdentRepository->persistEntity($roleIdent);

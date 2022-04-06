@@ -2,17 +2,18 @@
 
 namespace App\Controller\Website;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-final class HomeController extends AbstractController
+class DashboardController extends AbstractController
 {
     /**
-     * @Route("/", name="home")
+     * @Route("/dashboard", name="dashboard")
      */
-    public function showHomeTemplate(): Response
+    public function showDashboard(): Response
     {
-        return $this->render('website/home/index.html.twig');
+        return new Response();
     }
 }

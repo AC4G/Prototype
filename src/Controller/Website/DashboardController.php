@@ -31,4 +31,20 @@ class DashboardController extends AbstractController
     {
         return $this->render('website/dashboard/account.html.twig', $this->dashboardService->addDefaultParameter($this->getUser())->getParameter());
     }
+
+    /**
+     * @Route("/dashboard/items", name="dashboard_items")
+     */
+    public function showItems(): Response
+    {
+        return $this->render('website/dashboard/items.html.twig', $this->dashboardService->addDefaultParameter($this->getUser())->getParameter());
+    }
+
+    /**
+     * @Route("/dashboard/inventory", name="dashboard_inventory")
+     */
+    public function showInventory(): Response
+    {
+        return $this->render('website/dashboard/inventory.html.twig', $this->dashboardService->addDefaultParameter($this->getUser())->getParameter());
+    }
 }

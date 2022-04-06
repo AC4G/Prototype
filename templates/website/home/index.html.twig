@@ -2,7 +2,9 @@
 
 {% block body %}
     <h1>Home</h1>
-    <a href="{{ path('login') }}">Log In</a>
+    {% if not is_granted('IS_AUTHENTICATED_FULLY') %}
+        <a href="{{ path('login') }}">Log In</a>
+    {% endif %}
 
     <a href="{{ path('dashboard') }}">Dashboard</a>
 {% endblock %}

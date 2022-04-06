@@ -25,6 +25,12 @@ class SecurityController extends AbstractController
      */
     public function loginAction(): Response
     {
+        $securityContext = $this->container->get('security.authorization_checker');
+
+        if ($securityContext->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $this->redirectToRoute('home');
+        }
+
         $lastUsername = $this->authenticationUtils->getLastUsername();
 
         $error = $this->authenticationUtils->getLastAuthenticationError();

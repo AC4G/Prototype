@@ -5,11 +5,15 @@ namespace App\Controller\Website;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    use TargetPathTrait;
+
     public function __construct(
         private AuthenticationUtils $authenticationUtils
     )
@@ -19,9 +23,7 @@ class SecurityController extends AbstractController
     /**
      * @Route("/login", name="login")
      */
-    public function loginAction(
-        Request $request
-    ): Response
+    public function loginAction(): Response
     {
         $lastUsername = $this->authenticationUtils->getLastUsername();
 
@@ -31,14 +33,6 @@ class SecurityController extends AbstractController
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
-    }
-
-    /**
-     * @Route("/login/success", name="login_success")
-     */
-    public function loginSuccess(): Response
-    {
-        return $this->render('website/login/success.html.twig');
     }
 
     /**

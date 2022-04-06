@@ -25,7 +25,7 @@ security:
                 target: home
 
             login_throttling:
-                max_attempts: 3
+                max_attempts: 10
                 interval: '5 minutes'
 
 

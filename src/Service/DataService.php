@@ -6,7 +6,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class DataService
 {
-    private array $encodedData = [];
+    private array $processedData = [];
 
     public function __construct(
         private NormalizerInterface $normalizer
@@ -14,37 +14,75 @@ class DataService
     {
     }
 
-    public function buildUnifiedDataCollection(array $dataCollection, array $keys, array $unsetKeys, string $unsetParameter, bool $json = true): mixed
+    public function convertObjectToArray(array $dataCollection): self
     {
-        foreach ($dataCollection as $item => &$content) {
-            $content = $this->normalizer->normalize($content);
+        foreach ($dataCollection as  $item) {
+            $this->processedData[] = $this->normalizer->normalize($item);
+        }
 
-            foreach ($content as $key => $value) {
-                foreach ($keys as $searchKey) {
-                    if ($key === $searchKey) {
-                        $content[$key] = json_decode($value);
+        return $this;
+    }
+
+    public function removeProperties(array $properties): self
+    {
+        foreach ($this->processedData as $itemKey => &$item) {
+            foreach ($properties as $property) {
+                foreach ($item as $key => $parameter) {
+                    if ($key === $property) {
+                        unset($item[$key]);
                     }
                 }
+            }
+        }
 
+        return $this;
+    }
 
-                if ($key === $unsetParameter && count($unsetKeys) > 0) {
-                    foreach ($value as $secondKey => $secondValue) {
-                        foreach ($unsetKeys as $unsetKey) {
-                            if ($secondKey === $unsetKey) {
-                                unset($content[$key][$secondKey]);
+    public function rebuildPropertyArray(string $key, array $requieredParameters): self
+    {
+        $newProperty = [];
+
+        foreach ($this->processedData as $itemKey => $item) {
+            foreach ($item as $propertyKey => $property) {
+                if ($key === $propertyKey) {
+                    foreach ($property as $secondPropertyKey => $parameter) {
+                        foreach ($requieredParameters as $requieredParameter) {
+                            if ($secondPropertyKey === $requieredParameter) {
+                                $newProperty = [$secondPropertyKey => $parameter];
                             }
                         }
                     }
                 }
+            }
 
-                $this->encodedData[$item] = $content;
+            $this->processedData[$itemKey][$key] = $newProperty;
+        }
+
+        return $this;
+    }
+
+    public function convertPropertiesToJson(array $propertiesForConverting): self
+    {
+        foreach ($this->processedData as $itemKey => $item) {
+            foreach ($item as $propertyKey => $property) {
+                foreach ($propertiesForConverting as $propertyForConverting) {
+                    if ($property === $propertyForConverting) {
+                        $item[$propertyKey] = json_decode($property);
+                    }
+                }
             }
         }
 
-        if($json) {
-            return json_encode($this->encodedData);
-        }
+        return $this;
+    }
 
-        return $this->encodedData;
+    public function getJson(): ?string
+    {
+        return json_encode($this->processedData);
+    }
+
+    public function getArray(): ?array
+    {
+        return $this->processedData;
     }
 }

@@ -63,10 +63,10 @@ class DataService
 
     public function convertPropertiesToJson(array $propertiesForConverting): self
     {
-        foreach ($this->processedData as $itemKey => $item) {
+        foreach ($this->processedData as $itemKey => &$item) {
             foreach ($item as $propertyKey => $property) {
                 foreach ($propertiesForConverting as $propertyForConverting) {
-                    if ($property === $propertyForConverting) {
+                    if ($propertyKey === $propertyForConverting) {
                         $item[$propertyKey] = json_decode($property);
                     }
                 }

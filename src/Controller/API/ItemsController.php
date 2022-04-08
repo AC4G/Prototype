@@ -24,21 +24,13 @@ final class ItemsController extends AbstractController
     {
         $data = $this->itemRepository->findAll();
 
-        $json = $this->dataService->buildUnifiedDataCollection($data, [
-            'parameter',
+        $json = $this->dataService->convertObjectToArray($data)->rebuildPropertyArray('user', [
+            'nickname',
+        ])->removeProperties([
             'path',
-        ], [
-            'email',
-            'password',
-            'private',
-            'emailVerified',
-            'creationDate',
-            'roles',
-            'userIdentifier',
-            '__initializer__',
-            '__cloner__',
-            '__isInitialized__',
-        ], 'user', true);
+        ])->convertPropertiesToJson([
+            'parameter',
+        ])->getJson();
 
         return new Response($json);
     }

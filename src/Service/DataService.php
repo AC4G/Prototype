@@ -6,7 +6,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class DataService
 {
-    private array $processedData = [];
+    private array $processedData;
 
     public function __construct(
         private NormalizerInterface $normalizer

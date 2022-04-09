@@ -23,7 +23,7 @@ class ItemsService
 
     public function getItemDependentOnProperty(
         string $property
-    ): ?Item
+    ): null|Item|array
     {
         if (is_numeric($property)) {
             return $this->itemRepository->findOneBy(['id' => (int)$property]);
@@ -35,7 +35,7 @@ class ItemsService
             return null;
         }
 
-        return $this->itemRepository->findOneBy(['user' => $user]);
+        return $this->itemRepository->findBy(['user' => $user]);
     }
 
     public function updateItem(

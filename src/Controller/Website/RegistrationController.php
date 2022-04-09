@@ -7,6 +7,7 @@ use Exception;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Website\Email\EmailService;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Form\Registration\RegistrationFormType;
@@ -22,7 +23,8 @@ final class RegistrationController extends AbstractController
         private VerifyEmailHelperInterface $verifyEmailHelper,
         private RegistrationService $registrationService,
         private UserRepository $userRepository,
-        private EmailService $emailService
+        private EmailService $emailService,
+        private Security $security
     )
     {
     }
@@ -35,6 +37,10 @@ final class RegistrationController extends AbstractController
         Request $request
     ): Response
     {
+        if ($this->security->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $this->redirectToRoute('home');
+        }
+
         $user = new User();
         $errors = [];
 

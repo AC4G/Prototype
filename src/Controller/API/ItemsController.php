@@ -73,9 +73,9 @@ final class ItemsController extends AbstractController
             }
 
             $processedItem = $this->dataService
-                ->convertObjectToArray([
-                    $item
-                ])
+                ->convertObjectToArray(
+                    count($item) === 1 ? [$item] : $item
+                )
                 ->rebuildPropertyArray('user', [
                     'nickname',
                 ])
@@ -85,6 +85,8 @@ final class ItemsController extends AbstractController
                     'path',
                 ])
                 ->getArray();
+
+            //dd($processedItem);
 
             return new JsonResponse(
                 $processedItem,

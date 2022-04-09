@@ -2,6 +2,7 @@
 
 namespace App\Controller\Website;
 
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,7 +16,8 @@ class SecurityController extends AbstractController
     use TargetPathTrait;
 
     public function __construct(
-        private AuthenticationUtils $authenticationUtils
+        private AuthenticationUtils $authenticationUtils,
+        private Security $security
     )
     {
     }
@@ -25,6 +27,10 @@ class SecurityController extends AbstractController
      */
     public function loginAction(): Response
     {
+        if ($this->security->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $this->redirectToRoute('home');
+        }
+
         $lastUsername = $this->authenticationUtils->getLastUsername();
 
         $error = $this->authenticationUtils->getLastAuthenticationError();

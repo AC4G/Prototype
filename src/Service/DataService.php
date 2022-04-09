@@ -14,18 +14,22 @@ class DataService
     {
     }
 
-    public function convertObjectToArray(array $dataCollection): self
+    public function convertObjectToArray(
+        array $dataCollection
+    ): self
     {
-        foreach ($dataCollection as  $item) {
+        foreach ($dataCollection as $item) {
             $this->processedData[] = $this->normalizer->normalize($item);
         }
 
         return $this;
     }
 
-    public function removeProperties(array $properties): self
+    public function removeProperties(
+        array $properties
+    ): self
     {
-        foreach ($this->processedData as $itemKey => &$item) {
+        foreach ($this->processedData as &$item) {
             foreach ($properties as $property) {
                 foreach ($item as $key => $parameter) {
                     if ($key === $property) {
@@ -38,7 +42,10 @@ class DataService
         return $this;
     }
 
-    public function rebuildPropertyArray(string $key, array $requieredParameters): self
+    public function rebuildPropertyArray(
+        string $key,
+        array $requieredParameters
+    ): self
     {
         $newProperty = [];
 
@@ -63,7 +70,7 @@ class DataService
 
     public function convertPropertiesToJson(array $propertiesForConverting): self
     {
-        foreach ($this->processedData as $itemKey => &$item) {
+        foreach ($this->processedData as &$item) {
             foreach ($item as $propertyKey => $property) {
                 foreach ($propertiesForConverting as $propertyForConverting) {
                     if ($propertyKey === $propertyForConverting) {

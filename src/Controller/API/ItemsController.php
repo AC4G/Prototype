@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 
+use App\Entity\Item;
 use App\Service\DataService;
 use App\Service\API\Items\ItemsService;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,14 +53,14 @@ final class ItemsController extends AbstractController
         if ($request->isMethod('GET')) {
             $item = $this->itemsService->getItemDependentOnProperty($property);
 
-            if (is_null($item)) {
+            if (!$item instanceof Item && !is_array($item)) {
                 $data = [
                     'errors' => [
                         'status' => 406,
                         'source' => [
                           'pointer' => $request->getUri()
                         ],
-                        'massage' => is_numeric($property) ? 'Item not found' : 'User not exist or hasn\'t created an Item yet!'
+                        'message' => is_numeric($property) ? 'Item not found' : 'User not exist or hasn\'t created an Item yet!'
                     ]
                 ];
 
@@ -74,7 +75,7 @@ final class ItemsController extends AbstractController
 
             $processedItem = $this->dataService
                 ->convertObjectToArray(
-                    count($item) === 1 ? [$item] : $item
+                    is_array($item) ? $item : [$item]
                 )
                 ->rebuildPropertyArray('user', [
                     'nickname',
@@ -85,8 +86,6 @@ final class ItemsController extends AbstractController
                     'path',
                 ])
                 ->getArray();
-
-            //dd($processedItem);
 
             return new JsonResponse(
                 $processedItem,

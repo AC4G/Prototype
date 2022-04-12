@@ -2,14 +2,18 @@
 
 namespace App\Service\API\Items;
 
-use App\Entity\User;
 use App\Entity\Item;
 use App\Repository\UserRepository;
 use App\Repository\ItemRepository;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class ItemsService
 {
     public function __construct(
+        private DenormalizerInterface $denormalize,
+        private NormalizerInterface $normalizer,
         private ItemRepository $itemRepository,
         private UserRepository $userRepository
     )
@@ -40,11 +44,47 @@ class ItemsService
 
     public function updateItem(
         string $property,
-        array $parameter
+        array $newParameter
     ): ?Item
     {
-        //TODO: update script with lot of foreach:)
+        $item = $this->itemRepository->findOneBy(['id' => $property]);
 
-        return null;
+        if (is_null($item)) {
+            return null;
+        }
+
+        $normalizedItem = $this->normalizer->normalize($item);
+
+        foreach ($newParameter as $key => $parameter) {
+            if ($key === 'user' || $key === 'creationDate' || $key === 'path') {
+                continue;
+            }
+
+            if ($key === 'parameter' && array_key_exists($key, $normalizedItem)) {
+                $data = json_decode($normalizedItem[$key], true);
+
+                foreach ($parameter as $subParameterKey => $secondParameter) {
+                    $data[$subParameterKey] = $secondParameter;
+                }
+
+                $normalizedItem[$key] = json_encode($data);
+
+                continue;
+            }
+
+            if (array_key_exists($key, $normalizedItem)) {
+                $normalizedItem[$key] = $parameter;
+            }
+        }
+
+        $serializer = new Serializer([$this->denormalize]);
+
+        $item = $serializer->denormalize($normalizedItem, Item::class);
+
+
+        //TODO: find out, why it don't update entry
+        $this->itemRepository->flushEntity();
+
+        return $item;
     }
 }

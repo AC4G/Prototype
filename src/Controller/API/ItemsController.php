@@ -87,23 +87,102 @@ final class ItemsController extends AbstractController
                 ])
                 ->getArray();
 
-            return new JsonResponse(
+            return (new JsonResponse(
                 $processedItem,
                 200,
+                [
+                    'application/json'
+                ]
+            ));
+        }
+
+        if (!is_numeric($property)) {
+            $data = [
+                'errors' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'For updating item the property must by ID not the NAME'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406,
                 [
                     'application/json'
                 ]
             );
         }
 
-        $item = $this->itemsService->updateItem($property, [
-            'name' => 'Jojo',
-            'gameName' => 'Hi',
-            'parameter' => [
-                'lvl' => 128
-            ]
-        ]);
+        $json = $request->getContent();
 
-        return new Response();
+        $newParameter = json_decode($json, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $data = [
+                'errors' => [
+                    'status' => 400,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'No valid JSON. Please do it right!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                400,
+                [
+                    'application/json'
+                ]
+            );
+        }
+
+        $item = $this->itemsService->updateItem($property, $newParameter);
+
+
+        if (!$item instanceof Item) {
+            $data = [
+                'errors' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'Item not found'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406,
+                [
+                    'application/json'
+                ]
+            );
+        }
+
+        $processedItem = $this->dataService
+            ->convertObjectToArray(
+                [$item]
+            )
+            ->rebuildPropertyArray('user', [
+                'nickname',
+            ])
+            ->convertPropertiesToJson([
+                'parameter',
+            ])->removeProperties([
+                'path',
+            ])
+            ->getArray();
+
+        return new JsonResponse(
+            $processedItem,
+            202,
+            [
+                'application/json'
+            ]
+        );
     }
 }

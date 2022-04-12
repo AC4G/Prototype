@@ -146,7 +146,7 @@ final class ItemsController extends AbstractController
         if (!$item instanceof Item) {
             $data = [
                 'errors' => [
-                    'status' => 406,
+                    'status' => 404,
                     'source' => [
                         'pointer' => $request->getUri()
                     ],
@@ -156,7 +156,7 @@ final class ItemsController extends AbstractController
 
             return new JsonResponse(
                 $data,
-                406,
+                404,
                 [
                     'application/json'
                 ]

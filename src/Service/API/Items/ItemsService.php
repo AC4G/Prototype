@@ -56,11 +56,11 @@ class ItemsService
         $normalizedItem = $this->normalizer->normalize($item);
 
         foreach ($newParameter as $key => $parameter) {
-            if ($key === 'user' || $key === 'creationDate' || $key === 'path') {
+            if ($key === 'id' || $key === 'user' || $key === 'creationDate' || $key === 'path') {
                 continue;
             }
 
-            if ($key === 'parameter' && array_key_exists($key, $normalizedItem)) {
+            if ($key === 'parameter') {
                 $data = json_decode($normalizedItem[$key], true);
 
                 foreach ($parameter as $subParameterKey => $secondParameter) {
@@ -80,7 +80,6 @@ class ItemsService
         $serializer = new Serializer([$this->denormalize]);
 
         $item = $serializer->denormalize($normalizedItem, Item::class);
-
 
         //TODO: find out, why it don't update entry
         $this->itemRepository->flushEntity();

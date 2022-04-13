@@ -15,11 +15,15 @@ class DataService
     }
 
     public function convertObjectToArray(
-        array $dataCollection
+        array|object $dataCollection
     ): self
     {
-        foreach ($dataCollection as $item) {
-            $this->processedData[] = $this->normalizer->normalize($item);
+        if (is_object($dataCollection)) {
+            $dataCollection = [$dataCollection];
+        }
+
+        foreach ($dataCollection as $object) {
+            $this->processedData[] = $this->normalizer->normalize($object);
         }
 
         return $this;
@@ -29,11 +33,11 @@ class DataService
         array $properties
     ): self
     {
-        foreach ($this->processedData as &$item) {
+        foreach ($this->processedData as &$object) {
             foreach ($properties as $property) {
-                foreach ($item as $key => $parameter) {
+                foreach ($object as $key => $parameter) {
                     if ($key === $property) {
-                        unset($item[$key]);
+                        unset($object[$key]);
                     }
                 }
             }
@@ -49,8 +53,8 @@ class DataService
     {
         $newProperty = [];
 
-        foreach ($this->processedData as $itemKey => $item) {
-            foreach ($item as $propertyKey => $property) {
+        foreach ($this->processedData as $objectKey => $object) {
+            foreach ($object as $propertyKey => $property) {
                 if ($key === $propertyKey) {
                     foreach ($property as $secondPropertyKey => $parameter) {
                         foreach ($requieredParameters as $requieredParameter) {
@@ -62,7 +66,7 @@ class DataService
                 }
             }
 
-            $this->processedData[$itemKey][$key] = $newProperty;
+            $this->processedData[$objectKey][$key] = $newProperty;
         }
 
         return $this;
@@ -70,11 +74,11 @@ class DataService
 
     public function convertPropertiesToJson(array $propertiesForConverting): self
     {
-        foreach ($this->processedData as &$item) {
-            foreach ($item as $propertyKey => $property) {
+        foreach ($this->processedData as &$object) {
+            foreach ($object as $propertyKey => $property) {
                 foreach ($propertiesForConverting as $propertyForConverting) {
                     if ($propertyKey === $propertyForConverting) {
-                        $item[$propertyKey] = json_decode($property);
+                        $object[$propertyKey] = json_decode($property);
                     }
                 }
             }

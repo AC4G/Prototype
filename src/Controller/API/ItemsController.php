@@ -85,6 +85,10 @@ final class ItemsController extends AbstractController
                 ])
                 ->getArray();
 
+            if (count($processedItem) === 1) {
+                $processedItem = $processedItem[0];
+            }
+
             return (new JsonResponse(
                 $processedItem,
                 200,
@@ -171,7 +175,7 @@ final class ItemsController extends AbstractController
             ])->removeProperties([
                 'path',
             ])
-            ->getArray();
+            ->getArray()[0];
 
         return new JsonResponse(
             $processedItem,

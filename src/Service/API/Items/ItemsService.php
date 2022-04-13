@@ -2,17 +2,15 @@
 
 namespace App\Service\API\Items;
 
+use DateTime;
 use App\Entity\Item;
 use App\Repository\UserRepository;
 use App\Repository\ItemRepository;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class ItemsService
 {
     public function __construct(
-        private DenormalizerInterface $denormalize,
         private NormalizerInterface $normalizer,
         private ItemRepository $itemRepository,
         private UserRepository $userRepository
@@ -77,10 +75,18 @@ class ItemsService
             }
         }
 
-        $item
-            ->setName($normalizedItem['name'])
-            ->setGameName($normalizedItem['gameName'])
-            ->setParameter($normalizedItem['parameter']);
+        foreach ($normalizedItem as $key => $parameter) {
+            if ($key === 'id' || $key === 'user') {
+                continue;
+            }
+
+            if ($key === 'creationDate') {
+                $parameter = new DateTime($parameter);
+            }
+
+            $method = 'set' . ucfirst($key);
+            $item->$method($parameter);
+        }
 
         $this->itemRepository->flushEntity();
 

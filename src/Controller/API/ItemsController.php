@@ -26,7 +26,7 @@ final class ItemsController extends AbstractController
      */
     public function showItems(): Response
     {
-        $processedData = $this->dataService
+        $data = $this->dataService
             ->convertObjectToArray($this->itemsService->getItems())
             ->rebuildPropertyArray('user', [
                 'nickname',
@@ -39,7 +39,13 @@ final class ItemsController extends AbstractController
             ])
             ->getArray();
 
-        return new JsonResponse($processedData);
+        return new JsonResponse(
+            $data,
+            200,
+            [
+                'application/json'
+            ]
+        );
     }
 
     /**
@@ -56,7 +62,7 @@ final class ItemsController extends AbstractController
             if (!$item instanceof Item && !is_array($item)) {
                 $data = [
                     'errors' => [
-                        'status' => is_numeric($property) ? 404 : 406,
+                        'status' => 404,
                         'source' => [
                           'pointer' => $request->getUri()
                         ],
@@ -66,7 +72,7 @@ final class ItemsController extends AbstractController
 
                 return new JsonResponse(
                     $data,
-                    is_numeric($property) ? 404 : 406,
+                    404,
                     [
                         'application/json'
                     ]
@@ -89,13 +95,13 @@ final class ItemsController extends AbstractController
                 $processedItem = $processedItem[0];
             }
 
-            return (new JsonResponse(
+            return new JsonResponse(
                 $processedItem,
                 200,
                 [
                     'application/json'
                 ]
-            ));
+            );
         }
 
         if (!is_numeric($property)) {

@@ -80,7 +80,7 @@ class ItemsService
                 continue;
             }
 
-            if ($key === 'creationDate') {
+            if (str_contains($key, 'Date')) {
                 $parameter = new DateTime($parameter);
             }
 

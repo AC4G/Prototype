@@ -74,9 +74,7 @@ final class ItemsController extends AbstractController
             }
 
             $processedItem = $this->dataService
-                ->convertObjectToArray(
-                    is_array($item) ? $item : [$item]
-                )
+                ->convertObjectToArray($item)
                 ->rebuildPropertyArray('user', [
                     'nickname',
                 ])
@@ -164,9 +162,7 @@ final class ItemsController extends AbstractController
         }
 
         $processedItem = $this->dataService
-            ->convertObjectToArray(
-                [$item]
-            )
+            ->convertObjectToArray($item)
             ->rebuildPropertyArray('user', [
                 'nickname',
             ])

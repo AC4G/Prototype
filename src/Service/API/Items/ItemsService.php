@@ -77,11 +77,11 @@ class ItemsService
             }
         }
 
-        $serializer = new Serializer([$this->denormalize]);
+        $item
+            ->setName($normalizedItem['name'])
+            ->setGameName($normalizedItem['gameName'])
+            ->setParameter($normalizedItem['parameter']);
 
-        $item = $serializer->denormalize($normalizedItem, Item::class);
-
-        //TODO: find out, why it don't update entry
         $this->itemRepository->flushEntity();
 
         return $item;

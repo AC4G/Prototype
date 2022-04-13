@@ -56,7 +56,7 @@ final class ItemsController extends AbstractController
             if (!$item instanceof Item && !is_array($item)) {
                 $data = [
                     'errors' => [
-                        'status' => 406,
+                        'status' => is_numeric($property) ? 404 : 406,
                         'source' => [
                           'pointer' => $request->getUri()
                         ],
@@ -66,7 +66,7 @@ final class ItemsController extends AbstractController
 
                 return new JsonResponse(
                     $data,
-                    406,
+                    is_numeric($property) ? 404 : 406,
                     [
                         'application/json'
                     ]

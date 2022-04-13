@@ -87,7 +87,7 @@ final class RegistrationService
             try {
                 $this->userRolesRepository->persistEntity($userRoles);
             } catch (Exception $e) {
-                    $this->errors[] = $this->createError('saving', 'userRoles_entity');
+                $this->errors[] = $this->createError('saving', 'userRoles_entity');
             }
         }
     }

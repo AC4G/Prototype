@@ -40,18 +40,14 @@ final class ItemsController extends AbstractController
             ->getArray();
 
         return new JsonResponse(
-            $data,
-            200,
-            [
-                'application/json'
-            ]
+            $data
         );
     }
 
     /**
      * @Route("/api/items/{property}", name="api_items_by_identifier", methods={"GET", "PATCH"})
      */
-    public function item(
+    public function processItem(
         Request $request,
         string $property
     ): ?Response
@@ -72,10 +68,7 @@ final class ItemsController extends AbstractController
 
                 return new JsonResponse(
                     $data,
-                    404,
-                    [
-                        'application/json'
-                    ]
+                    404
                 );
             }
 
@@ -96,11 +89,7 @@ final class ItemsController extends AbstractController
             }
 
             return new JsonResponse(
-                $processedItem,
-                200,
-                [
-                    'application/json'
-                ]
+                $processedItem
             );
         }
 
@@ -117,10 +106,7 @@ final class ItemsController extends AbstractController
 
             return new JsonResponse(
                 $data,
-                406,
-                [
-                    'application/json'
-                ]
+                406
             );
         }
 
@@ -141,10 +127,7 @@ final class ItemsController extends AbstractController
 
             return new JsonResponse(
                 $data,
-                400,
-                [
-                    'application/json'
-                ]
+                400
             );
         }
 
@@ -164,10 +147,7 @@ final class ItemsController extends AbstractController
 
             return new JsonResponse(
                 $data,
-                404,
-                [
-                    'application/json'
-                ]
+                404
             );
         }
 
@@ -185,10 +165,7 @@ final class ItemsController extends AbstractController
 
         return new JsonResponse(
             $processedItem,
-            202,
-            [
-                'application/json'
-            ]
+            202
         );
     }
 }

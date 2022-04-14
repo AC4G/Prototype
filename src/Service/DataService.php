@@ -48,7 +48,7 @@ class DataService
 
     public function rebuildPropertyArray(
         string $key,
-        array $requieredParameters
+        array $requiredParameters
     ): self
     {
         $newProperty = [];
@@ -57,9 +57,9 @@ class DataService
             foreach ($object as $propertyKey => $property) {
                 if ($key === $propertyKey) {
                     foreach ($property as $secondPropertyKey => $parameter) {
-                        foreach ($requieredParameters as $requieredParameter) {
-                            if ($secondPropertyKey === $requieredParameter) {
-                                $newProperty = [$secondPropertyKey => $parameter];
+                        foreach ($requiredParameters as $requiredParameter) {
+                            if ($secondPropertyKey === $requiredParameter) {
+                                $newProperty[$secondPropertyKey] = $parameter;
                             }
                         }
                     }
@@ -72,7 +72,9 @@ class DataService
         return $this;
     }
 
-    public function convertPropertiesToJson(array $propertiesForConverting): self
+    public function convertPropertiesToJson(
+        array $propertiesForConverting
+    ): self
     {
         foreach ($this->processedData as &$object) {
             foreach ($object as $propertyKey => $property) {

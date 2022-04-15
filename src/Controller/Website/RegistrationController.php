@@ -73,8 +73,6 @@ final class RegistrationController extends AbstractController
             }
 
             if(count($errors) < 1) {
-                $expire = new DateTime('+ 30 days');
-
                 $response = $this->redirectToRoute('login');
 
                 $userId = $this->registrationService->getUser()->getId();
@@ -100,7 +98,6 @@ final class RegistrationController extends AbstractController
 
                 if (!array_key_exists('email', $errors)) {
                     $this->registrationService->giveUserARole($this->registrationService->getUser());
-                    $this->registrationService->flushToken();
 
                     /*
                      *   only for debugging purpose <4/2/2022 6:35PM AC4G>

@@ -5,11 +5,9 @@ namespace App\Service\Website\Registration;
 use DateTime;
 use Exception;
 use App\Entity\User;
-use App\Entity\Token;
 use App\Entity\UserRoles;
 use App\Entity\RoleIdent;
 use App\Repository\UserRepository;
-use App\Repository\TokenRepository;
 use App\Repository\RoleIdentRepository;
 use App\Repository\UserRolesRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -21,13 +19,11 @@ final class RegistrationService
     private array $errorSet = [
         'saving' => 'An error occurred while saving, please try again in a few seconds.'
     ];
-    private Token $registrationToken;
 
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
         private RoleIdentRepository $roleIdentRepository,
         private UserRolesRepository $userRolesRepository,
-        private TokenRepository $tokenRepository,
         private UserRepository $userRepository
     )
     {
@@ -110,8 +106,5 @@ final class RegistrationService
         return $this->user;
     }
 
-    public function flushToken()
-    {
-        $this->tokenRepository->flushEntity();
-    }
+
 }

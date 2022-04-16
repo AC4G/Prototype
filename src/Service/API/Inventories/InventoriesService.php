@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class InventoriesService
 {
-    private array $message;
+    private array $message = [];
 
     public function __construct(
         private InventoryRepository $inventoryRepository,
@@ -39,21 +39,33 @@ class InventoriesService
     )
     {
         if (!array_key_exists('id', $parameter)) {
-            $this->message[] = 'JSON not contain id from item';
+            $this->message['id'] = 'JSON not contain id from item';
         }
 
         if (!array_key_exists('amount', $parameter)) {
-            $this->message[] = 'JSON not contain amount of items';
+            $this->message['amount'] = 'JSON not contain amount of items';
         }
 
         $user = $this->userRepository->findOneBy((is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]));
 
         if (is_null($user)) {
-            $this->message[] = 'User not exists!';
+            $this->message['user'] = 'User not exists!';
         }
 
         if (count($this->message) < 1) {
 
         }
     }
+
+    public function hasMessages(): bool
+    {
+        return count($this->message) > 0;
+    }
+
+    public function getMessages(): array
+    {
+        return $this->message;
+    }
+
+
 }

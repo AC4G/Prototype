@@ -71,7 +71,7 @@ class InventoryController
                         'source' => [
                             'pointer' => $request->getUri()
                         ],
-                        'message' => is_null($inventory) ? 'User not exists' : 'User has not an item in inventory yet!'
+                        'messages' => is_null($inventory) ? 'User not exists' : 'User has not an item in inventory yet!'
                     ]
                 ];
 
@@ -108,6 +108,25 @@ class InventoryController
         if ($request->isMethod('PATCH')) {
             $this->inventoriesService->updateInventory($parameter, $property);
 
+            if ($this->inventoriesService->hasMessages()) {
+                $messages = $this->inventoriesService->getMessages();
+
+                $data = [
+                    'errors' => [
+                        'status' => array_key_exists('user', $messages) ? 404 : 406,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'messages' => $messages
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    array_key_exists('user', $messages) ? 404 : 406
+                );
+            }
+
             $data = [
                 'notification' => [
                     'status' => 202,
@@ -123,7 +142,6 @@ class InventoryController
                 202
             );
         }
-
 
         return new JsonResponse();
     }

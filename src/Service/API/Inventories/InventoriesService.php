@@ -52,7 +52,9 @@ class InventoriesService
             $this->message['user'] = 'User not exists!';
         }
 
-        if (count($this->message) < 1) {
+        if (count($this->message) === 0) {
+
+
 
         }
     }

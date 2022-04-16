@@ -143,6 +143,8 @@ class InventoryController
             );
         }
 
+
+
         return new JsonResponse();
     }
 

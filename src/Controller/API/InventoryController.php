@@ -2,16 +2,20 @@
 
 namespace App\Controller\API;
 
+use App\Entity\Inventory;
 use App\Service\DataService;
 use App\Repository\InventoryRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Service\API\Inventories\InventoriesService;
 
 class InventoryController
 {
     public function __construct(
         private InventoryRepository $inventoryRepository,
+        private InventoriesService $inventoriesService,
         private DataService $dataService
     )
     {
@@ -24,11 +28,11 @@ class InventoryController
     {
         //TODO:only for admins ->authentication via jwt
 
-        $data = $this->inventoryRepository->findAll();
+        $inventory = $this->inventoryRepository->findAll();
 
-        if (count($data) > 0) {
-            $data = $this->dataService
-                ->convertObjectToArray($data)
+        if (count($inventory) > 0) {
+            $inventory = $this->dataService
+                ->convertObjectToArray($inventory)
                 ->rebuildPropertyArray('user', [
                     'id',
                     'nickname'
@@ -45,16 +49,84 @@ class InventoryController
         }
 
         return new JsonResponse(
-            $data
+            $inventory
         );
     }
 
     /**
      * @Route("/api/inventories/{property}", name="api_inventories_by_property", methods={"GET", "POST", "PATCH"})
      */
-    public function processInventory(): Response
+    public function processInventory(
+        Request $request,
+        string $property
+    ): Response
     {
+        if ($request->isMethod('GET')) {
+            $inventory = $this->inventoriesService->showInventoryByProperty($property);
+
+            if (is_null($inventory) || count($inventory) === 0) {
+                $data = [
+                    'errors' => [
+                        'status' => 404,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' => is_null($inventory) ? 'User not exists' : 'User has not an item in inventory yet!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    404
+                );
+            }
+
+            $data = $this->dataService
+                ->convertObjectToArray($inventory)
+                ->rebuildPropertyArray('user', [
+                    'id',
+                    'nickname'
+                ])
+                ->rebuildPropertyArray('item', [
+                    'id',
+                    'name',
+                    'gameName'
+                ])
+                ->convertPropertiesToJson([
+                    'parameter'
+                ])
+                ->getArray();
+
+            return new JsonResponse(
+                $data
+            );
+        }
+
+        $json = $request->getContent();
+        $parameter = json_decode($json, true);
+
+        if ($request->isMethod('PATCH')) {
+            $this->inventoriesService->updateInventory($parameter, $property);
+
+            $data = [
+                'notification' => [
+                    'status' => 202,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'Inventory updated'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                202
+            );
+        }
+
 
         return new JsonResponse();
     }
+
+
 }

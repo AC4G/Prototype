@@ -52,9 +52,9 @@ final class ItemsController extends AbstractController
         string $property
     ): ?Response
     {
-        if ($request->isMethod('GET')) {
-            $item = $this->itemsService->getItemDependentOnProperty($property);
+        $item = $this->itemsService->getItemDependentOnProperty($property);
 
+        if ($request->isMethod('GET')) {
             if (!$item instanceof Item && !is_array($item)) {
                 $data = [
                     'errors' => [
@@ -62,7 +62,7 @@ final class ItemsController extends AbstractController
                         'source' => [
                           'pointer' => $request->getUri()
                         ],
-                        'message' => is_numeric($property) ? 'Item not found' : 'User not exist or hasn\'t created an Item yet!'
+                        'message' => is_numeric($property) ? 'Item not found' : 'User not exist or has not created an Item yet!'
                     ]
                 ];
 
@@ -83,10 +83,6 @@ final class ItemsController extends AbstractController
                     'path',
                 ])
                 ->getArray();
-
-            if (count($processedItem) === 1) {
-                $processedItem = $processedItem[0];
-            }
 
             return new JsonResponse(
                 $processedItem
@@ -168,4 +164,6 @@ final class ItemsController extends AbstractController
             202
         );
     }
+
+
 }

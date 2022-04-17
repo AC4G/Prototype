@@ -37,7 +37,8 @@ final class ItemsController extends AbstractController
             ->convertPropertiesToJson([
                 'parameter',
             ])
-            ->getArray();
+            ->getArray()
+        ;
 
         return new JsonResponse(
             $data
@@ -82,7 +83,8 @@ final class ItemsController extends AbstractController
                 ])->removeProperties([
                     'path',
                 ])
-                ->getArray();
+                ->getArray()
+            ;
 
             return new JsonResponse(
                 $processedItem
@@ -157,7 +159,8 @@ final class ItemsController extends AbstractController
             ])->removeProperties([
                 'path',
             ])
-            ->getArray()[0];
+            ->getArray()[0]
+        ;
 
         return new JsonResponse(
             $processedItem,

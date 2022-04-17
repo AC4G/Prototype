@@ -45,7 +45,8 @@ class InventoryController
                 ->convertPropertiesToJson([
                     'parameter'
                 ])
-                ->getArray();
+                ->getArray()
+            ;
         }
 
         return new JsonResponse(
@@ -95,7 +96,8 @@ class InventoryController
                 ->convertPropertiesToJson([
                     'parameter'
                 ])
-                ->getArray();
+                ->getArray()
+            ;
 
             return new JsonResponse(
                 $data
@@ -142,6 +144,7 @@ class InventoryController
                 202
             );
         }
+
 
 
 

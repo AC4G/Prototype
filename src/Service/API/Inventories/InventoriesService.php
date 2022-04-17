@@ -2,10 +2,11 @@
 
 namespace App\Service\API\Inventories;
 
-use App\Entity\Inventory;
+use DateTime;
+use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
 use App\Repository\InventoryRepository;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class InventoriesService
 {
@@ -13,7 +14,9 @@ class InventoriesService
 
     public function __construct(
         private InventoryRepository $inventoryRepository,
-        private UserRepository $userRepository
+        private NormalizerInterface $normalizer,
+        private UserRepository $userRepository,
+        private ItemRepository $itemRepository
     )
     {
     }
@@ -38,8 +41,8 @@ class InventoriesService
         string $property
     )
     {
-        if (!array_key_exists('id', $parameter)) {
-            $this->message['id'] = 'JSON not contain id from item';
+        if (!array_key_exists('itemId', $parameter)) {
+            $this->message['itemId'] = 'JSON not contain itemId from item';
         }
 
         if (!array_key_exists('amount', $parameter)) {
@@ -50,13 +53,54 @@ class InventoriesService
 
         if (is_null($user)) {
             $this->message['user'] = 'User not exists!';
+            return;
         }
 
-        if (count($this->message) === 0) {
+        $item = $this->itemRepository->findOneBy(['id' => $parameter['itemId']]);
 
-
-
+        if (is_null($item)) {
+            $this->message['item'] = sprintf('Item with id %s do not exists', $parameter['itemId']);
+            return;
         }
+
+        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+
+        if (is_null($inventory)) {
+            $this->message['inventory'] = 'User does not have this item. Please use POST method to add item!';
+            return;
+        }
+
+        $inventory->setAmount(
+            $inventory->getAmount() + $parameter['amount']
+        );
+
+
+        if (!array_key_exists('parameter', $parameter)) {
+            $this->inventoryRepository->flushEntity();
+            return;
+        }
+
+        $parameters = json_decode($inventory->getParameter(), true);
+
+        foreach ($parameter as $parameterKey => $parameterValue) {
+            if ($parameterKey === 'parameter') {
+                foreach ($parameterValue as $secondKey => $value) {
+                    foreach ($parameters as $key => $oldValue) {
+                        if ($secondKey === $key) {
+                            $parameters[$key] = is_numeric($value) ? $oldValue + $value : $value;
+
+                            continue 2;
+                        }
+
+                        $parameters[$secondKey] = $value;
+                    }
+                }
+            }
+        }
+
+        $inventory->setParameter(json_encode($parameters));
+
+        $this->inventoryRepository->flushEntity();
     }
 
     public function hasMessages(): bool

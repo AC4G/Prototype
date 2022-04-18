@@ -2,7 +2,6 @@
 
 namespace App\Controller\API;
 
-use App\Entity\Inventory;
 use App\Service\DataService;
 use App\Repository\InventoryRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -174,7 +173,7 @@ class InventoryController
 
             $data = [
                 'errors' => [
-                    'status' => array_key_exists('user', $messages) ? 404 : 406,
+                    'status' => (array_key_exists('user', $messages) || array_key_exists('item', $messages)) ? 404 : 406,
                     'source' => [
                         'pointer' => $request->getUri()
                     ],
@@ -184,7 +183,7 @@ class InventoryController
 
             return new JsonResponse(
                 $data,
-                array_key_exists('user', $messages) ? 404 : 406
+                (array_key_exists('user', $messages) || array_key_exists('item', $messages)) ? 404 : 406
             );
         }
 

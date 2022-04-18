@@ -51,7 +51,7 @@ class InventoriesService
         $inventory = $this->inventoryRepository->findOneBy(['user' => $data['user'], 'item' => $data['item']]);
 
         if (is_null($inventory)) {
-            $this->message['inventory'] = 'User does not have this item. Please use POST method to add item!';
+            $this->message['inventory'] = 'User does not has this item. Please use POST method to add item!';
             return;
         }
 

@@ -2,12 +2,10 @@
 
 namespace App\Service\API\Inventories;
 
-use DateTime;
 use App\Entity\Inventory;
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
 use App\Repository\InventoryRepository;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class InventoriesService
 {
@@ -15,7 +13,6 @@ class InventoriesService
 
     public function __construct(
         private InventoryRepository $inventoryRepository,
-        private NormalizerInterface $normalizer,
         private UserRepository $userRepository,
         private ItemRepository $itemRepository
     )

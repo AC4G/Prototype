@@ -58,7 +58,7 @@ final class ItemsController extends AbstractController
         if ($request->isMethod('GET')) {
             if (!$item instanceof Item && !is_array($item)) {
                 $data = [
-                    'errors' => [
+                    'error' => [
                         'status' => 404,
                         'source' => [
                           'pointer' => $request->getUri()
@@ -93,7 +93,7 @@ final class ItemsController extends AbstractController
 
         if (!is_numeric($property)) {
             $data = [
-                'errors' => [
+                'error' => [
                     'status' => 406,
                     'source' => [
                         'pointer' => $request->getUri()
@@ -114,7 +114,7 @@ final class ItemsController extends AbstractController
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             $data = [
-                'errors' => [
+                'error' => [
                     'status' => 400,
                     'source' => [
                         'pointer' => $request->getUri()
@@ -134,7 +134,7 @@ final class ItemsController extends AbstractController
 
         if (!$item instanceof Item) {
             $data = [
-                'errors' => [
+                'error' => [
                     'status' => 404,
                     'source' => [
                         'pointer' => $request->getUri()

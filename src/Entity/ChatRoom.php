@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * ChatRoom
  *
- * @ORM\Table(name="chat_room", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"})})
+ * @ORM\Table(name="chat_room", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"})}, indexes={@ORM\Index(name="fk_chat_room_member_chat_room_type1_idx", columns={"room_type_id"})})
  * @ORM\Entity(repositoryClass="App\Repository\ChatRoomRepository")
  */
 class ChatRoom
@@ -31,9 +31,33 @@ class ChatRoom
     /**
      * @var string|null
      *
-     * @ORM\Column(name=" settings", type="text", length=0, nullable=true)
+     * @ORM\Column(name="settings", type="text", length=0, nullable=true)
      */
     private ?string $settings;
+
+    /**
+     * @var int
+     *
+     * @ORM\ManyToOne(targetEntity="ChatRoomType")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="room_type_id", referencedColumnName="id")
+     * })
+     */
+    private int $typeId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=255, nullable=false)
+     */
+    private string $name;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="parameter", type="text", length=0, nullable=true)
+     */
+    private ?string $parameter;
 
     public function getId(): ?int
     {
@@ -60,6 +84,42 @@ class ChatRoom
     public function setSettings(?string $settings): self
     {
         $this->settings = $settings;
+
+        return $this;
+    }
+
+    public function getTypeId(): int
+    {
+        return $this->typeId;
+    }
+
+    public function setTypeId(int $typeId): self
+    {
+        $this->typeId = $typeId;
+
+        return $this;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getParameter(): ?string
+    {
+        return $this->parameter;
+    }
+
+    public function setParameter(?string $parameter): self
+    {
+        $this->parameter = $parameter;
 
         return $this;
     }

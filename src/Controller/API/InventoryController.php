@@ -69,7 +69,7 @@ class InventoryController
 
             if (is_null($inventory) || count($inventory) === 0) {
                 $data = [
-                    'errors' => [
+                    'error' => [
                         'status' => 404,
                         'source' => [
                             'pointer' => $request->getUri()
@@ -114,7 +114,7 @@ class InventoryController
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             $data = [
-                'errors' => [
+                'error' => [
                     'status' => 400,
                     'source' => [
                         'pointer' => $request->getUri()
@@ -136,7 +136,7 @@ class InventoryController
                 $messages = $this->inventoriesService->getMessages();
 
                 $data = [
-                    'errors' => [
+                    'error' => [
                         'status' => array_key_exists('user', $messages) ? 404 : 406,
                         'source' => [
                             'pointer' => $request->getUri()
@@ -172,7 +172,7 @@ class InventoryController
             $messages = $this->inventoriesService->getMessages();
 
             $data = [
-                'errors' => [
+                'error' => [
                     'status' => (array_key_exists('user', $messages) || array_key_exists('item', $messages)) ? 404 : 406,
                     'source' => [
                         'pointer' => $request->getUri()

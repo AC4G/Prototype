@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * ChatRoomMember
  *
- * @ORM\Table(name="chat_room_member", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="room_id_user_id_UNIQUE", columns={"user_id", "chat_room_id"})}, indexes={@ORM\Index(name="fk_chat_room_member_chat_room_type1_idx", columns={"room_type_id"}), @ORM\Index(name="fk_chat_room_user1_idx", columns={"user_id"}), @ORM\Index(name="fk_chat_room_member_chat_room1_idx", columns={"chat_room_id"})})
+ * @ORM\Table(name="chat_room_member", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="room_id_user_id_UNIQUE", columns={"user_id", "chat_room_id"})}, indexes={@ORM\Index(name="fk_chat_room_user1_idx", columns={"user_id"}), @ORM\Index(name="fk_chat_room_member_chat_room1_idx", columns={"chat_room_id"})})
  * @ORM\Entity(repositoryClass="App\Repository\ChatRoomMemberRepository")
  */
 class ChatRoomMember
@@ -23,16 +23,6 @@ class ChatRoomMember
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private int $id;
-
-    /**
-     * @var ChatRoomType
-     *
-     * @ORM\ManyToOne(targetEntity="ChatRoomType")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="room_type_id", referencedColumnName="id")
-     * })
-     */
-    private ChatRoomType $roomType;
 
     /**
      * @var ChatRoom
@@ -57,18 +47,6 @@ class ChatRoomMember
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getRoomType(): ?ChatRoomType
-    {
-        return $this->roomType;
-    }
-
-    public function setRoomType(?ChatRoomType $roomType): self
-    {
-        $this->roomType = $roomType;
-
-        return $this;
     }
 
     public function getChatRoom(): ?ChatRoom

@@ -24,21 +24,41 @@ final class ItemsController extends AbstractController
     /**
      * @Route("/api/items", name="api_items", methods={"GET"})
      */
-    public function showItems(): Response
+    public function showItems(
+        Request $request
+    ): Response
     {
-        $data = $this->dataService
-            ->convertObjectToArray($this->itemsService->getItems())
-            ->rebuildPropertyArray('user', [
-                'nickname',
-            ])
-            ->removeProperties([
-                'path',
-            ])
-            ->convertPropertiesToJson([
-                'parameter',
-            ])
-            ->getArray()
-        ;
+        $items = $this->itemsService->getItems();
+
+        if (count($items) > 0) {
+            $data = $this->dataService
+                ->convertObjectToArray($items)
+                ->rebuildPropertyArray('user', [
+                    'nickname',
+                ])
+                ->removeProperties([
+                    'path',
+                ])
+                ->convertPropertiesToJson([
+                    'parameter',
+                ])
+                ->getArray()
+            ;
+
+            return new JsonResponse(
+                $data
+            );
+        }
+
+        $data = [
+            'response' => [
+                'status' => 200,
+                'source' => [
+                    'pointer' => $request->getUri()
+                ],
+                'message' => 'Not one item stored. Maybe next time..'
+            ]
+        ];
 
         return new JsonResponse(
             $data

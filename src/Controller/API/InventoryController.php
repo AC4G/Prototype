@@ -23,14 +23,16 @@ class InventoryController
     /**
      * @Route("/api/inventories", name="api_inventories", methods={"GET"})
      */
-    public function showInventories(): Response
+    public function showInventories(
+        Request $request
+    ): Response
     {
         //TODO:only for admins ->authentication via jwt
 
         $inventory = $this->inventoryRepository->findAll();
 
         if (count($inventory) > 0) {
-            $inventory = $this->dataService
+            $data = $this->dataService
                 ->convertObjectToArray($inventory)
                 ->rebuildPropertyArray('user', [
                     'id',
@@ -49,10 +51,22 @@ class InventoryController
                 ])
                 ->getArray()
             ;
+
+            return new JsonResponse(
+                $data
+            );
         }
 
+        $data = [
+            'status' => 200,
+            'source' => [
+                'pointer' => $request->getUri()
+            ],
+            'message' => 'No inventories here, maybe next time...'
+        ];
+
         return new JsonResponse(
-            $inventory
+            $data
         );
     }
 

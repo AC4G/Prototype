@@ -8,6 +8,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ChatController
 {
+    public function __construct()
+    {
+    }
+
     /**
      * @Route("/api/chat", name="api_chat", methods={"POST"})
      */
@@ -34,7 +38,7 @@ class ChatController
         //TODO: PUT -> request body: json -> "add": {userId} (if type = private only two user in room at all), "settings": {}, "parameter": {}, "name": "foo"
         //TODO: PUT -> request attached image -> image path; Response -> json: room with changes
 
-        //TODO: DELETE -> delete everything: room and other dependencies
+        //TODO: DELETE -> delete everything: room and other dependencies with chat
 
         return new JsonResponse();
     }
@@ -47,6 +51,12 @@ class ChatController
     ): Response
     {
         //TODO: everything with jwt oauth2.0
+
+        //TODO: GET -> show all messages, latest first
+
+        //TODO: POST -> add new message ; json -> "userId": {id}, "message": {message}, "time": {time}, file
+
+        //TODO: DELETE -> delete all messages
 
         return new JsonResponse();
     }

@@ -45,9 +45,7 @@ class ItemsService
         array $newParameter
     ): ?Item
     {
-        //TODO: if property int than find by id otherwise find by user
-
-        $item = $this->itemRepository->findOneBy(['id' => $property]);
+        $item = $this->itemRepository->findOneBy(['id' => (int)$property]);
 
         if (is_null($item)) {
             return null;

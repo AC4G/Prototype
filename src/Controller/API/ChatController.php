@@ -13,6 +13,8 @@ class ChatController
      */
     public function chat(): Response
     {
+        //TODO: everything with jwt oauth2.0
+
         //TODO: POST -> create room // Body-> userId, type // Response -> json: id, userId
 
         return new JsonResponse();
@@ -25,6 +27,8 @@ class ChatController
         int $id
     ): Response
     {
+        //TODO: everything with jwt oauth2.0
+
         //TODO: GET -> json: shows all room settings and parameter, type and separate api link for room image
 
         //TODO: PUT -> request body: json -> "add": {userId} (if type = private only two user in room at all), "settings": {}, "parameter": {}, "name": "foo"
@@ -42,6 +46,8 @@ class ChatController
         int $id
     ): Response
     {
+        //TODO: everything with jwt oauth2.0
+
         return new JsonResponse();
     }
 
@@ -53,6 +59,8 @@ class ChatController
         int $messageId
     ): Response
     {
+        //TODO: everything with jwt oauth2.0
+
         return new JsonResponse();
     }
 }

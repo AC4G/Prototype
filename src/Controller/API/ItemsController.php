@@ -34,6 +34,7 @@ final class ItemsController extends AbstractController
             $data = $this->dataService
                 ->convertObjectToArray($items)
                 ->rebuildPropertyArray('user', [
+                    'id',
                     'nickname',
                 ])
                 ->removeProperties([
@@ -98,6 +99,7 @@ final class ItemsController extends AbstractController
             $processedItem = $this->dataService
                 ->convertObjectToArray($item)
                 ->rebuildPropertyArray('user', [
+                    'id',
                     'nickname',
                 ])
                 ->convertPropertiesToJson([
@@ -151,9 +153,24 @@ final class ItemsController extends AbstractController
             );
         }
 
-        $item = $this->itemsService->updateItem($property, $newParameter);
+        if (!is_numeric($property)) {
+            $data = [
+                'error' => [
+                    'status' => 400,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'Property must be id for the PUT method!'
+                ]
+            ];
 
-        //TODO: if property not numeric message -> User not exists
+            return new JsonResponse(
+                $data,
+                400
+            );
+        }
+
+        $item = $this->itemsService->updateItem($property, $newParameter);
 
         if (!$item instanceof Item) {
             $data = [
@@ -175,6 +192,7 @@ final class ItemsController extends AbstractController
         $processedItem = $this->dataService
             ->convertObjectToArray($item)
             ->rebuildPropertyArray('user', [
+                'id',
                 'nickname',
             ])
             ->convertPropertiesToJson([

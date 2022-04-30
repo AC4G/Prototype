@@ -66,13 +66,15 @@ final class ItemsController extends AbstractController
     }
 
     /**
-     * @Route("/api/items/{property}", name="api_items_by_identifier", methods={"GET", "PATCH"})
+     * @Route("/api/items/{property}", name="api_items_by_identifier", methods={"GET", "PUT"})
      */
     public function processItem(
         Request $request,
         string $property
     ): ?Response
     {
+        //TODO: PUT -> only with
+
         $item = $this->itemsService->getItemDependentOnProperty($property);
 
         if ($request->isMethod('GET')) {
@@ -151,6 +153,7 @@ final class ItemsController extends AbstractController
 
         $item = $this->itemsService->updateItem($property, $newParameter);
 
+        //TODO: if property not numeric message -> User not exists
 
         if (!$item instanceof Item) {
             $data = [

@@ -78,6 +78,8 @@ class InventoryController
         string $property
     ): Response
     {
+        //TODO: if user is private, than access only with jwt oauth2.0 and post put only with oauth2.0
+
         if ($request->isMethod('GET')) {
             $inventory = $this->inventoriesService->getInventoryByProperty($property);
 

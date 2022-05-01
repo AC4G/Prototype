@@ -36,21 +36,21 @@ class ChatRoom
     private ?string $settings;
 
     /**
-     * @var int
+     * @var ChatRoomType
      *
      * @ORM\ManyToOne(targetEntity="ChatRoomType")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="room_type_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="room_type_id", referencedColumnName="id", onDelete="SET NULL")
      * })
      */
-    private int $typeId;
+    private ChatRoomType $type;
 
     /**
-     * @var string
+     * @var null|string
      *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
+     * @ORM\Column(name="name", type="string", length=255, nullable=true)
      */
-    private string $name;
+    private ?string $name;
 
     /**
      * @var string|null
@@ -88,19 +88,19 @@ class ChatRoom
         return $this;
     }
 
-    public function getTypeId(): int
+    public function getType(): ChatRoomType
     {
-        return $this->typeId;
+        return $this->type;
     }
 
-    public function setTypeId(int $typeId): self
+    public function setType(ChatRoomType $type): self
     {
-        $this->typeId = $typeId;
+        $this->type = $type;
 
         return $this;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

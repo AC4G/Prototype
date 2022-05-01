@@ -2,26 +2,154 @@
 
 namespace App\Controller\API;
 
+use App\Service\DataService;
+use App\Repository\UserRepository;
+use App\Service\API\Chat\ChatService;
+use App\Repository\ChatRoomMemberRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ChatController
 {
-    public function __construct()
+    public function __construct(
+        private ChatRoomMemberRepository $chatRoomMemberRepository,
+        private UserRepository $userRepository,
+        private ChatService $chatService,
+        private DataService $dataService
+    )
     {
     }
 
     /**
      * @Route("/api/chat", name="api_chat", methods={"POST"})
      */
-    public function chat(): Response
+    public function chat(
+        Request $request
+    ): Response
     {
         //TODO: everything with jwt oauth2.0
 
         //TODO: POST -> create room // Body-> userId, type // Response -> json: id, userId
 
-        return new JsonResponse();
+        $json = $request->getContent();
+        $parameter = json_decode($json, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $data = [
+                'error' => [
+                    'status' => 400,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'No valid JSON. Please do it right!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                400
+            );
+        }
+
+        if (!array_key_exists('userId', $parameter) && !array_key_exists('type', $parameter)) {
+            $data = [
+                'error' => [
+                    'status' => 400,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'userId and type aren\'t included in json!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                400
+            );
+        }
+
+
+        if (!array_key_exists('userId', $parameter) || !array_key_exists('type', $parameter)) {
+            $data = [
+                'error' => [
+                    'status' => 400,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => (!array_key_exists('userId', $parameter)) ? 'userId isn\'t included in json!' : 'type isn\'t included in json!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                400
+            );
+        }
+
+        $user = $this->userRepository->findOneBy(['id' => $parameter['userId']]);
+
+        if (is_null($user)) {
+            $data = [
+                'error' => [
+                    'status' => 400,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => sprintf('User with id: %s not exists!', $parameter['userId'])
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                400
+            );
+        }
+
+        $room = $this->chatService->createRoom($parameter, $user);
+
+        if (is_null($room)) {
+            $data = [
+                'error' => [
+                    'status' => 400,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'Something went wrong. Try it one more time!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                400
+            );
+        }
+
+        $data['room'] = $this->dataService
+            ->convertObjectToArray($room)
+            ->rebuildArrayToOneValue('type', 'type')
+            ->getArray()
+        ;
+
+        $this->dataService->reset();
+
+        $roomMembers = $this->chatRoomMemberRepository->findBy(['chatRoomId' => $room->getId()]);
+
+        $data['members'] = $this->dataService
+            ->convertObjectToArray($roomMembers)
+            ->removeProperties([
+                'id',
+                'chatRoom'
+            ])
+            ->rebuildPropertyArray('user', [
+                'id',
+                'nickname'
+            ])
+            ->getArray()
+        ;
+
+        return new JsonResponse($data);
     }
 
     /**

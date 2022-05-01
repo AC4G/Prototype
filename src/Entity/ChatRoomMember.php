@@ -25,14 +25,11 @@ class ChatRoomMember
     private int $id;
 
     /**
-     * @var ChatRoom
+     * @var int
      *
-     * @ORM\ManyToOne(targetEntity="ChatRoom")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="chat_room_id", referencedColumnName="id")
-     * })
+     * @ORM\Column(name="chat_room_id", type="integer", length=255, nullable=false)
      */
-    private ChatRoom $chatRoom;
+    private int $chatRoomId;
 
     /**
      * @var User
@@ -49,14 +46,14 @@ class ChatRoomMember
         return $this->id;
     }
 
-    public function getChatRoom(): ?ChatRoom
+    public function getChatRoom(): ?int
     {
-        return $this->chatRoom;
+        return $this->chatRoomId;
     }
 
-    public function setChatRoom(?ChatRoom $chatRoom): self
+    public function setChatRoom(?int $chatRoomId): self
     {
-        $this->chatRoom = $chatRoom;
+        $this->chatRoomId = $chatRoomId;
 
         return $this;
     }

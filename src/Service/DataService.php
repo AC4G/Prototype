@@ -89,6 +89,33 @@ class DataService
         return $this;
     }
 
+    public function rebuildArrayToOneValue(
+        string $key,
+        string $valueKey
+    ): self
+    {
+        foreach ($this->processedData as &$object) {
+            foreach ($object as $propertyKey => $property) {
+                if ($propertyKey === $key) {
+                    foreach ($property as $secondKey => $value) {
+                        if ($secondKey === $valueKey) {
+                            $object[$propertyKey] = $value;
+
+                            continue 3;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    public function reset()
+    {
+        $this->processedData = [];
+    }
+
     public function getJson(): ?string
     {
         return json_encode($this->processedData);

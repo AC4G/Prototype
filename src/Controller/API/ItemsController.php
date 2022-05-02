@@ -4,7 +4,6 @@ namespace App\Controller\API;
 
 
 use App\Entity\Item;
-use App\Service\DataService;
 use App\Service\API\Items\ItemsService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,8 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class ItemsController extends AbstractController
 {
     public function __construct(
-        private ItemsService $itemsService,
-        private DataService $dataService
+        private ItemsService $itemsService
     )
     {
     }
@@ -31,23 +29,8 @@ final class ItemsController extends AbstractController
         $items = $this->itemsService->getItems();
 
         if (count($items) > 0) {
-            $data = $this->dataService
-                ->convertObjectToArray($items)
-                ->rebuildPropertyArray('user', [
-                    'id',
-                    'nickname',
-                ])
-                ->removeProperties([
-                    'path',
-                ])
-                ->convertPropertiesToJson([
-                    'parameter',
-                ])
-                ->getArray()
-            ;
-
             return new JsonResponse(
-                $data
+                $this->itemsService->prepareData($items)
             );
         }
 
@@ -96,22 +79,8 @@ final class ItemsController extends AbstractController
                 );
             }
 
-            $processedItem = $this->dataService
-                ->convertObjectToArray($item)
-                ->rebuildPropertyArray('user', [
-                    'id',
-                    'nickname',
-                ])
-                ->convertPropertiesToJson([
-                    'parameter',
-                ])->removeProperties([
-                    'path',
-                ])
-                ->getArray()
-            ;
-
             return new JsonResponse(
-                $processedItem
+                $this->itemsService->prepareData($item)
             );
         }
 
@@ -189,22 +158,8 @@ final class ItemsController extends AbstractController
             );
         }
 
-        $processedItem = $this->dataService
-            ->convertObjectToArray($item)
-            ->rebuildPropertyArray('user', [
-                'id',
-                'nickname',
-            ])
-            ->convertPropertiesToJson([
-                'parameter',
-            ])->removeProperties([
-                'path',
-            ])
-            ->getArray()[0]
-        ;
-
         return new JsonResponse(
-            $processedItem,
+            $this->itemsService->prepareData($item)[0],
             202
         );
     }

@@ -88,7 +88,24 @@ class ChatController
             );
         }
 
-        $user = $this->userRepository->findOneBy(['id' => $parameter['userId']]);
+        if (!is_numeric($parameter['userId'])) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'userId isn\'t numeric!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
+        $user = $this->userRepository->findOneBy(['id' => (int)$parameter['userId']]);
 
         if (is_null($user)) {
             $data = [
@@ -126,28 +143,20 @@ class ChatController
             );
         }
 
-        $data['room'] = $this->dataService
-            ->convertObjectToArray($room)
-            ->rebuildArrayToOneValue('type', 'type')
-            ->getArray()
-        ;
-
-        $this->dataService->reset();
+        $convertedData = $this->dataService->convertObjectToArray($room);
+        $data['room'] = $this->dataService->rebuildArrayToOneValue($convertedData, 'type', 'type');
 
         $roomMembers = $this->chatRoomMemberRepository->findBy(['chatRoomId' => $room->getId()]);
 
-        $data['members'] = $this->dataService
-            ->convertObjectToArray($roomMembers)
-            ->removeProperties([
-                'id',
-                'chatRoom'
-            ])
-            ->rebuildPropertyArray('user', [
-                'id',
-                'nickname'
-            ])
-            ->getArray()
-        ;
+        $convertedData = $this->dataService->convertObjectToArray($roomMembers);
+        $data['member'] = $this->dataService->removeProperties($convertedData, [
+            'id',
+            'chatRoom'
+        ]);
+        $data['member'] = $this->dataService->rebuildPropertyArray($data['member'], 'user', [
+            'id',
+            'nickname'
+        ]);
 
         return new JsonResponse($data);
     }

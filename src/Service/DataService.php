@@ -6,8 +6,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class DataService
 {
-    private array $processedData;
-
     public function __construct(
         private NormalizerInterface $normalizer
     )
@@ -15,25 +13,28 @@ class DataService
     }
 
     public function convertObjectToArray(
-        array|object $dataCollection
-    ): self
+        array|object $data
+    ): array
     {
-        if (is_object($dataCollection)) {
-            $dataCollection = [$dataCollection];
+        $convertedData = [];
+
+        if (is_object($data)) {
+            $data = [$data];
         }
 
-        foreach ($dataCollection as $object) {
-            $this->processedData[] = $this->normalizer->normalize($object);
+        foreach ($data as $object) {
+            $convertedData[] = $this->normalizer->normalize($object);
         }
 
-        return $this;
+        return $convertedData;
     }
 
     public function removeProperties(
+        array $data,
         array $properties
-    ): self
+    ): array
     {
-        foreach ($this->processedData as &$object) {
+        foreach ($data as &$object) {
             foreach ($properties as $property) {
                 foreach ($object as $key => $parameter) {
                     if ($key === $property) {
@@ -43,17 +44,18 @@ class DataService
             }
         }
 
-        return $this;
+        return $data;
     }
 
     public function rebuildPropertyArray(
+        array $data,
         string $key,
         array $requiredParameters
-    ): self
+    ): array
     {
         $newProperty = [];
 
-        foreach ($this->processedData as $objectKey => $object) {
+        foreach ($data as $objectKey => $object) {
             foreach ($object as $propertyKey => $property) {
                 if ($key === $propertyKey) {
                     foreach ($property as $secondPropertyKey => $parameter) {
@@ -66,17 +68,18 @@ class DataService
                 }
             }
 
-            $this->processedData[$objectKey][$key] = $newProperty;
+            $data[$objectKey][$key] = $newProperty;
         }
 
-        return $this;
+        return $data;
     }
 
     public function convertPropertiesToJson(
+        array $data,
         array $propertiesForConverting
-    ): self
+    ): array
     {
-        foreach ($this->processedData as &$object) {
+        foreach ($data as &$object) {
             foreach ($object as $propertyKey => $property) {
                 foreach ($propertiesForConverting as $propertyForConverting) {
                     if ($propertyKey === $propertyForConverting) {
@@ -86,45 +89,30 @@ class DataService
             }
         }
 
-        return $this;
+        return $data;
     }
 
     public function rebuildArrayToOneValue(
+        array $data,
         string $key,
         string $valueKey
-    ): self
+    ): array
     {
-        foreach ($this->processedData as &$object) {
+        foreach ($data as &$object) {
             foreach ($object as $propertyKey => $property) {
                 if ($propertyKey === $key) {
                     foreach ($property as $secondKey => $value) {
                         if ($secondKey === $valueKey) {
                             $object[$propertyKey] = $value;
 
-                            continue 3;
+                            continue 2;
                         }
                     }
                 }
             }
         }
 
-        return $this;
+        return $data;
     }
-
-    public function reset()
-    {
-        $this->processedData = [];
-    }
-
-    public function getJson(): ?string
-    {
-        return json_encode($this->processedData);
-    }
-
-    public function getArray(): ?array
-    {
-        return $this->processedData;
-    }
-
 
 }

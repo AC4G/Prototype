@@ -3,6 +3,7 @@
 namespace App\Service\API\Inventories;
 
 use App\Entity\Inventory;
+use App\Service\DataService;
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
 use App\Repository\InventoryRepository;
@@ -14,7 +15,8 @@ class InventoriesService
     public function __construct(
         private InventoryRepository $inventoryRepository,
         private UserRepository $userRepository,
-        private ItemRepository $itemRepository
+        private ItemRepository $itemRepository,
+        private DataService $dataService
     )
     {
     }
@@ -155,6 +157,28 @@ class InventoriesService
             'user' => $user,
             'item' => $item
         ];
+    }
+
+    public function prepareInventories(
+        array|object $inventory
+    ): array
+    {
+        $data = $this->dataService->convertObjectToArray($inventory);
+        $data = $this->dataService->rebuildPropertyArray($data, 'user', [
+            'id',
+            'nickname'
+        ]);
+        $data = $this->dataService->rebuildPropertyArray($data, 'item', [
+            'id',
+            'name',
+            'gameName'
+        ]);
+        $data = $this->dataService->convertPropertiesToJson($data, [
+            'parameter'
+        ]);
+        return $this->dataService->removeProperties($data, [
+            'id'
+        ]);
     }
 
     public function hasMessages(): bool

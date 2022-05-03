@@ -14,8 +14,7 @@ class InventoryController
 {
     public function __construct(
         private InventoryRepository $inventoryRepository,
-        private InventoriesService $inventoriesService,
-        private DataService $dataService
+        private InventoriesService $inventoriesService
     )
     {
     }
@@ -32,28 +31,8 @@ class InventoryController
         $inventory = $this->inventoryRepository->findAll();
 
         if (count($inventory) > 0) {
-            $data = $this->dataService
-                ->convertObjectToArray($inventory)
-                ->rebuildPropertyArray('user', [
-                    'id',
-                    'nickname'
-                ])
-                ->rebuildPropertyArray('item', [
-                    'id',
-                    'name',
-                    'gameName'
-                ])
-                ->convertPropertiesToJson([
-                    'parameter'
-                ])
-                ->removeProperties([
-                    'id'
-                ])
-                ->getArray()
-            ;
-
             return new JsonResponse(
-                $data
+                $this->inventoriesService->prepareInventories($inventory)
             );
         }
 
@@ -100,28 +79,10 @@ class InventoryController
                 );
             }
 
-            $data = $this->dataService
-                ->convertObjectToArray($inventory)
-                ->rebuildPropertyArray('user', [
-                    'id',
-                    'nickname'
-                ])
-                ->rebuildPropertyArray('item', [
-                    'id',
-                    'name',
-                    'gameName'
-                ])
-                ->convertPropertiesToJson([
-                    'parameter'
-                ])
-                ->removeProperties([
-                    'id'
-                ])
-                ->getArray()
-            ;
+
 
             return new JsonResponse(
-                $data
+                $this->inventoriesService->prepareInventories($inventory)
             );
         }
 

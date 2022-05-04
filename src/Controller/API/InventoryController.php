@@ -116,7 +116,7 @@ class InventoryController
         }
 
         if (!array_key_exists('itemId', $parameter) && !array_key_exists('parameter', $parameter)) {
-            $messages['amount'] = 'JSON not contain amount of items and parameter. On of them are necessary!';
+            $messages['other'] = 'JSON not contain amount of items and parameter. On of them are necessary!';
         }
 
         if (count($messages) > 0) {

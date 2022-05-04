@@ -176,24 +176,23 @@ class InventoryController
 
         $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
 
-        if (is_null($inventory)) {
-            $data = [
-                'error' => [
-                    'status' => 404,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'message' =>  'User does not has this item in inventory. Please use POST method to add item!'
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                404
-            );
-        }
-
         if ($request->isMethod('PUT')) {
+            if (is_null($inventory)) {
+                $data = [
+                    'error' => [
+                        'status' => 404,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  'User does not has this item in inventory. Please use POST method to add item!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    404
+                );
+            }
 
             $this->inventoriesService->updateInventory($parameter, $inventory);
 
@@ -209,6 +208,23 @@ class InventoryController
 
             return new JsonResponse(
                 $data
+            );
+        }
+
+        if (!is_null($inventory)) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('User already has that item with id %s. For update use PUT method', $parameter['itemId'])
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
             );
         }
 

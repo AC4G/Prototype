@@ -50,20 +50,24 @@ class InventoriesService
 
         $parameters = json_decode($inventory->getParameter(), true);
 
-        foreach ($parameter as $parameterKey => $parameterValue) {
-            if ($parameterKey === 'parameter') {
-                foreach ($parameterValue as $secondKey => $value) {
-                    foreach ($parameters as $key => $oldValue) {
-                        if ($secondKey === $key) {
-                            $parameters[$key] = is_numeric($value) ? $oldValue + $value : $value;
+        $newParameters = $parameter['parameter'];
 
-                            continue 2;
-                        }
+        if (count($parameters) > 0) {
+            foreach ($newParameters as $parameterKey => $newValue) {
+                foreach ($parameters as $key => $oldValue) {
+                    if ($parameterKey === $key) {
+                        $parameters[$parameterKey] = is_numeric($oldValue) ? $oldValue + $newValue : $newValue;
 
-                        $parameters[$secondKey] = $value;
+                        continue 2;
                     }
+
+                    $parameters[$parameterKey] = $newValue;
                 }
             }
+        }
+
+        if (!count($parameters) > 0) {
+            $parameters = $newParameters;
         }
 
         $inventory->setParameter(json_encode($parameters));

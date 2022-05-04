@@ -2,7 +2,8 @@
 
 namespace App\Controller\API;
 
-use App\Service\DataService;
+use App\Repository\ItemRepository;
+use App\Repository\UserRepository;
 use App\Repository\InventoryRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +15,9 @@ class InventoryController
 {
     public function __construct(
         private InventoryRepository $inventoryRepository,
-        private InventoriesService $inventoriesService
+        private InventoriesService $inventoriesService,
+        private UserRepository $userRepository,
+        private ItemRepository $itemRepository
     )
     {
     }
@@ -79,8 +82,6 @@ class InventoryController
                 );
             }
 
-
-
             return new JsonResponse(
                 $this->inventoriesService->prepareInventories($inventory)
             );
@@ -106,27 +107,95 @@ class InventoryController
             );
         }
 
+        //PUT POST starts from here
+
+        $messages = [];
+
+        if (!array_key_exists('itemId', $parameter)) {
+            $messages['itemId'] = 'JSON not contain itemId from item';
+        }
+
+        if (!array_key_exists('itemId', $parameter) && !array_key_exists('parameter', $parameter)) {
+            $messages['amount'] = 'JSON not contain amount of items and parameter. On of them are necessary!';
+        }
+
+        if (count($messages) > 0) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'messages' => $messages
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
+        $user = $this->userRepository->findOneBy((is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]));
+
+        if (is_null($user)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => is_numeric($property) ? sprintf('User with id %s don\'t exists!', $property) : sprintf('User %s don\'t exists!', $property)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        $item = $this->itemRepository->findOneBy(['id' => (int)$parameter['itemId']]);
+
+        if (is_null($item)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => is_numeric($parameter['itemId']) ? sprintf('Item with id %s don\'t exists', $parameter['itemId']) : sprintf('Item id must be numeric and not like that %s', $parameter['itemId'])
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+
+        if (is_null($inventory)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  'User does not has this item in inventory. Please use POST method to add item!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
         if ($request->isMethod('PUT')) {
-            $this->inventoriesService->updateInventory($parameter, $property);
 
-            if ($this->inventoriesService->hasMessages()) {
-                $messages = $this->inventoriesService->getMessages();
-
-                $data = [
-                    'error' => [
-                        'status' => array_key_exists('user', $messages) ? 404 : 406,
-                        'source' => [
-                            'pointer' => $request->getUri()
-                        ],
-                        'messages' => $messages
-                    ]
-                ];
-
-                return new JsonResponse(
-                    $data,
-                    array_key_exists('user', $messages) ? 404 : 406
-                );
-            }
+            $this->inventoriesService->updateInventory($parameter, $inventory);
 
             $data = [
                 'notification' => [
@@ -143,26 +212,7 @@ class InventoryController
             );
         }
 
-        $this->inventoriesService->createEntryInInventory($parameter, $property);
-
-        if ($this->inventoriesService->hasMessages()) {
-            $messages = $this->inventoriesService->getMessages();
-
-            $data = [
-                'error' => [
-                    'status' => (array_key_exists('user', $messages) || array_key_exists('item', $messages)) ? 404 : 406,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'messages' => $messages
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                (array_key_exists('user', $messages) || array_key_exists('item', $messages)) ? 404 : 406
-            );
-        }
+        $this->inventoriesService->createEntryInInventory($parameter, $user, $item);
 
         $data = [
             'notification' => [

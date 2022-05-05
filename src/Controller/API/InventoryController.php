@@ -126,6 +126,23 @@ class InventoryController
             );
         }
 
+        if (!array_key_exists('itemId', $parameter)) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'Json not contain itemId'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
         //PUT POST starts from here
 
         $item = $this->itemRepository->findOneBy(['id' => (int)$parameter['itemId']]);
@@ -299,5 +316,124 @@ class InventoryController
         );
     }
 
+    /**
+     * @Route("/api/inventories/{property}/{itemId}/parameters", name="api_inventories_item_by_id_remove_parameters", methods={"DELETE"}, requirements={"itemId" = "\d+"})
+     */
+    public function deleteParameter(
+        Request $request,
+        string $property,
+        int $itemId
+    ): Response
+    {
+        $item = $this->itemRepository->findOneBy(['id' => $itemId]);
+
+        if (is_null($item)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('Item with id %s don\'t exists!', $itemId)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        $user = $this->userRepository->findOneBy(is_numeric($property)? ['id' => (int)$property] : ['nickname' => $property]);
+
+        if (is_null($user)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  is_numeric($property) ? sprintf('User with id %s don\'t exists', $property) : sprintf('User %s don\'t exists', $property)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        $parameters = json_decode($request->getContent(), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  'Invalid json!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
+        if (!count($parameters) > 0) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  'Not even passed a parameter for delete. Nothing changed!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
+        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+
+        if (is_null($inventory)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('User don\'t has item with id %s in inventory', $itemId)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        $this->inventoriesService->deleteParameter($inventory, $parameters);
+
+        $data = [
+            'notification' => [
+                'status' => 200,
+                'source' => [
+                    'pointer' => $request->getUri()
+                ],
+                'message' => sprintf('Inventory parameter from user %s and item %d successfully removed', $property, $itemId)
+            ]
+        ];
+
+        return new JsonResponse(
+            $data,
+            200
+        );
+    }
 
 }

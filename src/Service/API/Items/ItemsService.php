@@ -5,7 +5,6 @@ namespace App\Service\API\Items;
 use DateTime;
 use App\Entity\Item;
 use App\Service\DataService;
-use App\Repository\UserRepository;
 use App\Repository\ItemRepository;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -75,6 +74,27 @@ class ItemsService
         $this->itemRepository->flushEntity();
 
         return $item;
+    }
+
+    public function deleteParameter(
+        array $parameters,
+        Item $item
+    )
+    {
+        $allParameters = json_decode($item->getParameter(), true);
+
+        $cleanedParameter = [];
+
+        foreach ($parameters as $parameterKey => $value) {
+            foreach ($allParameters as $key => $oldValue) {
+                if ($parameterKey !== $key) {
+                    $cleanedParameter[$key] = $oldValue;
+                }
+            }
+        }
+
+        $item->setParameter(json_encode($cleanedParameter));
+        $this->itemRepository->flushEntity();
     }
 
     public function prepareData(

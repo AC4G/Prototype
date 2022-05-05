@@ -162,7 +162,7 @@ class ChatController
     }
 
     /**
-     * @Route("/api/chat/{id}", name="api_chat_by_id", methods={"GET", "PUT", "DELETE"}, requirements={"id" = "\d+"})
+     * @Route("/api/chat/{id}", name="api_chat_by_id", methods={"GET", "PATCH", "DELETE"}, requirements={"id" = "\d+"})
      */
     public function chatById(
         int $id
@@ -199,7 +199,7 @@ class ChatController
     }
 
     /**
-     * @Route("/api/chat/{id}/messages/{messageId}", name="api_chat_by_id_message_by_id", methods={"GET", "PUT", "DELETE"}, requirements={"id" = "\d+", "messageId" = "\d+"})
+     * @Route("/api/chat/{id}/messages/{messageId}", name="api_chat_by_id_message_by_id", methods={"GET", "PATCH", "DELETE"}, requirements={"id" = "\d+", "messageId" = "\d+"})
      */
     public function chatByIdMessageById(
         int $id,

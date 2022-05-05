@@ -54,7 +54,7 @@ final class ItemsController extends AbstractController
     }
 
     /**
-     * @Route("/api/items/{property}", name="api_items_by_identifier", methods={"GET", "PUT"})
+     * @Route("/api/items/{property}", name="api_items_by_identifier", methods={"GET", "PATCH"})
      */
     public function processItem(
         Request $request,
@@ -64,18 +64,43 @@ final class ItemsController extends AbstractController
         //TODO: PUT -> only with oauth
 
         if ($request->isMethod('GET')) {
-            $user = $this->userRepository->findOneBy(is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]);
+            $item = '';
 
-            $item = $this->itemRepository->findBy(['user' => $user]);
+            if (!is_numeric($property)) {
+                $user = $this->userRepository->findOneBy(['nickname' => $property]);
 
-            if (!is_array($item)) {
+                if (is_null($user)) {
+                    $data = [
+                        'error' => [
+                            'status' => 404,
+                            'source' => [
+                                'pointer' => $request->getUri()
+                            ],
+                            'message' => 'User not exist!'
+                        ]
+                    ];
+
+                    return new JsonResponse(
+                        $data,
+                        404
+                    );
+                }
+
+                $item = $this->itemRepository->findBy(['user' => $user]);
+            }
+
+            if (is_numeric($property)) {
+                $item = $this->itemRepository->findOneBy(['id' => (int)$property]);
+            }
+
+            if (is_null($item)) {
                 $data = [
                     'error' => [
                         'status' => 404,
                         'source' => [
                           'pointer' => $request->getUri()
                         ],
-                        'message' => is_numeric($property) ? 'Item not found' : 'User not exist or has not created an Item yet!'
+                        'message' => 'Item not found'
                     ]
                 ];
 
@@ -83,6 +108,25 @@ final class ItemsController extends AbstractController
                     $data,
                     404
                 );
+            }
+
+            if (is_array($item)) {
+                if (!count($item) > 0) {
+                    $data = [
+                        'error' => [
+                            'status' => 400,
+                            'source' => [
+                                'pointer' => $request->getUri()
+                            ],
+                            'message' => 'User hasn\'t an item yet!'
+                        ]
+                    ];
+
+                    return new JsonResponse(
+                        $data,
+                        400
+                    );
+                }
             }
 
             return new JsonResponse(
@@ -148,6 +192,89 @@ final class ItemsController extends AbstractController
         return new JsonResponse(
             $this->itemsService->prepareData($item)[0],
             202
+        );
+    }
+
+    /**
+     * @Route("/api/items/{id}/parameters", name="api_item_by_id_remove_parameters", methods={"DELETE"}, requirements={"id" = "\d+"})
+     */
+    public function deleteParameter(
+        Request $request,
+        int $id
+    ): Response
+    {
+        //TODO: only with oauth
+
+        $item = $this->itemRepository->findOneBy(['id' => $id]);
+
+        if (is_null($item)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'Item not found'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        $parameters = json_decode($request->getContent(), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'Invalid json!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
+        if (!count($parameters) > 0) {
+            $data = [
+                'error' => [
+                    'status' => 400,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'Not even passed a parameter for delete. Nothing changed!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                400
+            );
+        }
+
+        $this->itemsService->deleteParameter($parameters, $item);
+
+        $data = [
+            'notification' => [
+                'status' => 200,
+                'source' => [
+                    'pointer' => $request->getUri()
+                ],
+                'message' => sprintf('Parameter successfully removed from item %s', $id)
+            ]
+        ];
+
+        return new JsonResponse(
+            $data,
+            200
         );
     }
 

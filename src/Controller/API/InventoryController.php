@@ -53,7 +53,7 @@ class InventoryController
     }
 
     /**
-     * @Route("/api/inventories/{property}", name="api_inventories_by_property", methods={"GET", "POST", "PUT", "DELETE"})
+     * @Route("/api/inventories/{property}", name="api_inventories_by_property", methods={"GET", "POST", "PATCH", "DELETE"})
      */
     public function processInventory(
         Request $request,
@@ -212,7 +212,7 @@ class InventoryController
             );
         }
 
-        if ($request->isMethod('PUT')) {
+        if ($request->isMethod('PATCH')) {
             if (is_null($inventory)) {
                 $data = [
                     'error' => [

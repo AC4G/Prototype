@@ -53,7 +53,7 @@ class InventoryController
     }
 
     /**
-     * @Route("/api/inventories/{property}", name="api_inventories_by_property", methods={"GET", "POST", "PUT"})
+     * @Route("/api/inventories/{property}", name="api_inventories_by_property", methods={"GET", "POST", "PUT", "DELETE"})
      */
     public function processInventory(
         Request $request,
@@ -62,23 +62,42 @@ class InventoryController
     {
         //TODO: if user is private, than access only with jwt oauth2.0 and post put only with oauth2.0
 
-        if ($request->isMethod('GET')) {
-            $inventory = $this->inventoriesService->getInventoryByProperty($property);
+        $user = $this->userRepository->findOneBy((is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]));
 
-            if (is_null($inventory) || count($inventory) === 0) {
+        if (is_null($user)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => is_numeric($property) ? sprintf('User with id %s don\'t exists!', $property) : sprintf('User %s don\'t exists!', $property)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        if ($request->isMethod('GET')) {
+            $inventory = $this->inventoryRepository->findBy(['user' => $user]);
+
+            if (!count($inventory) > 0) {
                 $data = [
                     'error' => [
-                        'status' => 404,
+                        'status' => 400,
                         'source' => [
                             'pointer' => $request->getUri()
                         ],
-                        'messages' => is_null($inventory) ? 'User not exists' : 'User has not an item in inventory yet!'
+                        'message' => 'User has not an item in inventory yet!'
                     ]
                 ];
 
                 return new JsonResponse(
                     $data,
-                    404
+                    400
                 );
             }
 
@@ -109,6 +128,63 @@ class InventoryController
 
         //PUT POST starts from here
 
+        $item = $this->itemRepository->findOneBy(['id' => (int)$parameter['itemId']]);
+
+        if (is_null($item)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => is_numeric($parameter['itemId']) ? sprintf('Item with id %s don\'t exists', $parameter['itemId']) : sprintf('Item id must be numeric and not like that %s', $parameter['itemId'])
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+
+        if ($request->isMethod('DELETE')) {
+            if (is_null($inventory)) {
+                $data = [
+                    'error' => [
+                        'status' => 404,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  sprintf('User has no item with id %s in inventory', $parameter['itemId'])
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    404
+                );
+            }
+
+            $this->inventoryRepository->deleteEntry($inventory);
+
+            $data = [
+                'notification' => [
+                    'status' => 200,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'Item successfully removed from inventory'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                200
+            );
+        }
+
         $messages = [];
 
         if (!array_key_exists('itemId', $parameter)) {
@@ -135,46 +211,6 @@ class InventoryController
                 406
             );
         }
-
-        $user = $this->userRepository->findOneBy((is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]));
-
-        if (is_null($user)) {
-            $data = [
-                'error' => [
-                    'status' => 404,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'message' => is_numeric($property) ? sprintf('User with id %s don\'t exists!', $property) : sprintf('User %s don\'t exists!', $property)
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                404
-            );
-        }
-
-        $item = $this->itemRepository->findOneBy(['id' => (int)$parameter['itemId']]);
-
-        if (is_null($item)) {
-            $data = [
-                'error' => [
-                    'status' => 404,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'message' => is_numeric($parameter['itemId']) ? sprintf('Item with id %s don\'t exists', $parameter['itemId']) : sprintf('Item id must be numeric and not like that %s', $parameter['itemId'])
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                404
-            );
-        }
-
-        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
 
         if ($request->isMethod('PUT')) {
             if (is_null($inventory)) {
@@ -219,6 +255,23 @@ class InventoryController
                         'pointer' => $request->getUri()
                     ],
                     'message' =>  sprintf('User already has that item with id %s. For update use PUT method', $parameter['itemId'])
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
+        if (!array_key_exists('amount', $parameter)) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  'Amount is required with POST method'
                 ]
             ];
 

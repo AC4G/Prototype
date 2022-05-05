@@ -77,6 +77,27 @@ class InventoriesService
         $this->inventoryRepository->flushEntity();
     }
 
+    public function deleteParameter(
+        Inventory $inventory,
+        array $parameters
+    )
+    {
+        $allParameters = json_decode($inventory->getParameter(), true);
+
+        $cleanedParameter = [];
+
+        foreach ($parameters as $parameterKey => $value) {
+            foreach ($allParameters as $key => $oldValue) {
+                if ($parameterKey !== $key) {
+                    $cleanedParameter[$key] = $oldValue;
+                }
+            }
+        }
+
+        $inventory->setParameter(json_encode($cleanedParameter));
+        $this->inventoryRepository->flushEntity();
+    }
+
     public function prepareInventories(
         array|object $inventory
     ): array

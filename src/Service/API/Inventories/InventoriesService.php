@@ -6,32 +6,15 @@ use App\Entity\User;
 use App\Entity\Item;
 use App\Entity\Inventory;
 use App\Service\DataService;
-use App\Repository\UserRepository;
 use App\Repository\InventoryRepository;
 
 class InventoriesService
 {
     public function __construct(
         private InventoryRepository $inventoryRepository,
-        private UserRepository $userRepository,
         private DataService $dataService
     )
     {
-    }
-
-    public function getInventoryByProperty(
-        string $property
-    ): ?array
-    {
-        if (is_numeric($property)) {
-            $user = $this->userRepository->findOneBy(['id' => (int)$property]);
-
-            return (is_null($user)) ? null : $this->inventoryRepository->findBy(['user' => $user]);
-        }
-
-        $user = $this->userRepository->findOneBy(['nickname' => $property]);
-
-        return (is_null($user)) ? null : $this->inventoryRepository->findBy(['user' => $user]);
     }
 
     public function updateInventory(

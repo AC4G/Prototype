@@ -14,7 +14,6 @@ class ItemsService
     public function __construct(
         private NormalizerInterface $normalizer,
         private ItemRepository $itemRepository,
-        private UserRepository $userRepository,
         private DataService $dataService
     )
     {
@@ -23,23 +22,6 @@ class ItemsService
     public function getItems(): ?array
     {
         return $this->itemRepository->findAll();
-    }
-
-    public function getItemDependentOnProperty(
-        string $property
-    ): null|Item|array
-    {
-        if (is_numeric($property)) {
-            return $this->itemRepository->findOneBy(['id' => (int)$property]);
-        }
-
-        $user = $this->userRepository->findOneBy(['nickname' => $property]);
-
-        if (is_null($user)) {
-            return null;
-        }
-
-        return $this->itemRepository->findBy(['user' => $user]);
     }
 
     public function updateItem(

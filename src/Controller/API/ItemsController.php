@@ -4,6 +4,8 @@ namespace App\Controller\API;
 
 
 use App\Entity\Item;
+use App\Repository\ItemRepository;
+use App\Repository\UserRepository;
 use App\Service\API\Items\ItemsService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +16,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class ItemsController extends AbstractController
 {
     public function __construct(
-        private ItemsService $itemsService
+        private UserRepository $userRepository,
+        private ItemRepository $itemRepository,
+        private ItemsService $itemsService,
     )
     {
     }
@@ -57,12 +61,14 @@ final class ItemsController extends AbstractController
         string $property
     ): ?Response
     {
-        //TODO: PUT -> only with
-
-        $item = $this->itemsService->getItemDependentOnProperty($property);
+        //TODO: PUT -> only with oauth
 
         if ($request->isMethod('GET')) {
-            if (!$item instanceof Item && !is_array($item)) {
+            $user = $this->userRepository->findOneBy(is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]);
+
+            $item = $this->itemRepository->findBy(['user' => $user]);
+
+            if (!is_array($item)) {
                 $data = [
                     'error' => [
                         'status' => 404,
@@ -84,26 +90,7 @@ final class ItemsController extends AbstractController
             );
         }
 
-        if (!is_numeric($property)) {
-            $data = [
-                'error' => [
-                    'status' => 406,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'message' => 'For updating item the property must by ID not the NAME'
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                406
-            );
-        }
-
-        $json = $request->getContent();
-
-        $newParameter = json_decode($json, true);
+        $newParameter = json_decode($request->getContent(), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             $data = [
@@ -129,7 +116,7 @@ final class ItemsController extends AbstractController
                     'source' => [
                         'pointer' => $request->getUri()
                     ],
-                    'message' => 'Property must be id for the PUT method!'
+                    'message' => 'For the PUT method the property must be numeric!'
                 ]
             ];
 

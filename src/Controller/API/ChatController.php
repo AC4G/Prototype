@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Service\DataService;
 use App\Repository\UserRepository;
 use App\Service\API\Chat\ChatService;
+use App\Repository\ChatRoomRepository;
 use App\Repository\ChatRoomMemberRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +15,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class ChatController
 {
     public function __construct(
-        private ChatRoomMemberRepository $chatRoomMemberRepository,
+        private ChatRoomMemberRepository $roomMemberRepository,
+        private ChatRoomRepository $chatRoomRepository,
         private UserRepository $userRepository,
         private ChatService $chatService,
         private DataService $dataService
@@ -30,8 +32,6 @@ class ChatController
     ): Response
     {
         //TODO: everything with jwt oauth2.0
-
-        //TODO: POST -> create room // Body-> userId, type // Response -> json: id, userId
 
         $json = $request->getContent();
         $parameter = json_decode($json, true);
@@ -146,7 +146,7 @@ class ChatController
         $convertedData = $this->dataService->convertObjectToArray($room);
         $data['room'] = $this->dataService->rebuildArrayToOneValue($convertedData, 'type', 'type');
 
-        $roomMembers = $this->chatRoomMemberRepository->findBy(['chatRoomId' => $room->getId()]);
+        $roomMembers = $this->roomMemberRepository->findBy(['chatRoomId' => $room->getId()]);
 
         $convertedData = $this->dataService->convertObjectToArray($roomMembers);
         $data['member'] = $this->dataService->removeProperties($convertedData, [
@@ -165,6 +165,7 @@ class ChatController
      * @Route("/api/chat/{id}", name="api_chat_by_id", methods={"GET", "PATCH", "DELETE"}, requirements={"id" = "\d+"})
      */
     public function chatById(
+        Request $request,
         int $id
     ): Response
     {
@@ -176,6 +177,43 @@ class ChatController
         //TODO: PUT -> request attached image -> image path; Response -> json: room with changes
 
         //TODO: DELETE -> delete everything: room and other dependencies with chat
+
+        if ($request->isMethod('DELETE')) {
+            $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
+
+            if (is_null($room)) {
+                $data = [
+                    'error' => [
+                        'status' => 404,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  sprintf('Room with id %s don\'t exists', $id)
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    404
+                );
+            }
+
+            $this->chatService->deleteRoomAndDependencies($room);
+
+            $data = [
+                'notification' => [
+                    'status' => 200,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'Room and dependencies were deleted!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data
+            );
+        }
 
         return new JsonResponse();
     }

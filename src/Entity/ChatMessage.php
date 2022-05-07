@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  * ChatMessage
  *
  * @ORM\Table(name="chat_message", indexes={@ORM\Index(name="fk_chat_message_chat_room1_idx", columns={"room_id"}), @ORM\Index(name="fk_chat_message_user1_idx", columns={"user_id"})})
- * @ORM\Entity(repositoryClass="App\Repository\ChatMessageRepository")
+ * @ORM\Entity(repositoryClass="ChatRoomMessageRepository")
  */
 class ChatMessage
 {

@@ -11,7 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ChatMessage[]    findAll()
  * @method ChatMessage[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ChatMessageRepository extends AbstractRepository
+class ChatRoomMessageRepository extends AbstractRepository
 {
     public function __construct(
         ManagerRegistry $registry

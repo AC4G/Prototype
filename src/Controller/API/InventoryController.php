@@ -202,24 +202,14 @@ class InventoryController
             );
         }
 
-        $messages = [];
-
-        if (!array_key_exists('itemId', $parameter)) {
-            $messages['itemId'] = 'JSON not contain itemId from item';
-        }
-
-        if (!array_key_exists('itemId', $parameter) && !array_key_exists('parameter', $parameter)) {
-            $messages['other'] = 'JSON not contain amount of items and parameter. On of them are necessary!';
-        }
-
-        if (count($messages) > 0) {
+        if (!array_key_exists('amount', $parameter) && !array_key_exists('parameter', $parameter)) {
             $data = [
                 'error' => [
                     'status' => 406,
                     'source' => [
                         'pointer' => $request->getUri()
                     ],
-                    'messages' => $messages
+                    'message' => 'JSON not contain amount of items and parameter. On of them are necessary!'
                 ]
             ];
 

@@ -171,12 +171,48 @@ class ChatController
     {
         //TODO: everything with jwt oauth2.0
 
-        //TODO: GET -> json: shows all room settings and parameter, type and separate api link for room image
+        if ($request->isMethod('GET')) {
+            $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
 
-        //TODO: PUT -> request body: json -> "add": {userId} (if type = private only two user in room at all), "settings": {}, "parameter": {}, "name": "foo"
-        //TODO: PUT -> request attached image -> image path; Response -> json: room with changes
+            if (is_null($room)) {
+                $data = [
+                    'error' => [
+                        'status' => 404,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' => sprintf('Room with id %s do\'nt exists', $id)
+                    ]
+                ];
 
-        //TODO: DELETE -> delete everything: room and other dependencies with chat
+                return new JsonResponse(
+                    $data,
+                    404
+                );
+            }
+
+            $convertedData = $this->dataService->convertObjectToArray($room);
+            $processedData = $this->dataService->decodeJson($convertedData, 'settings');
+            $processedData = $this->dataService->decodeJson($processedData, 'parameter');
+            $data['room'] = $this->dataService->rebuildArrayToOneValue($processedData, 'type', 'type');
+
+            $roomMembers = $this->roomMemberRepository->findBy(['chatRoomId' => $room->getId()]);
+
+            $convertedData = $this->dataService->convertObjectToArray($roomMembers);
+
+            $data['members'] = $this->dataService->removeProperties($convertedData, [
+                'id',
+                'chatRoom'
+            ]);
+            $data['members'] = $this->dataService->rebuildPropertyArray($data['members'], 'user', [
+                'id',
+                'nickname'
+            ]);
+
+            return new JsonResponse(
+                $data
+            );
+        }
 
         if ($request->isMethod('DELETE')) {
             $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
@@ -215,7 +251,16 @@ class ChatController
             );
         }
 
-        return new JsonResponse();
+        //TODO: PUT -> request body: json -> "add": {userId} (if type = private only two user in room at all), "settings": {}, "parameter": {}, "name": "foo"
+        //TODO: PUT -> request attached image -> image path; Response -> json: room with changes
+
+        $parameter = json_decode($request->getContent(), true);
+
+
+
+        return new JsonResponse(
+
+        );
     }
 
     /**

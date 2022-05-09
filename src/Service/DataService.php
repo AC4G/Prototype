@@ -115,4 +115,22 @@ class DataService
         return $data;
     }
 
+    public function decodeJson(
+        array $data,
+        string $key
+    ): array
+    {
+        foreach ($data as &$object) {
+            foreach ($object as $propertyKey => $property) {
+                if ($propertyKey === $key) {
+                    $object[$key] = json_decode($property);
+
+                    continue 2;
+                }
+            }
+        }
+
+        return $data;
+    }
+
 }

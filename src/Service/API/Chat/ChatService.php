@@ -81,10 +81,9 @@ class ChatService
 
     public function addUserToRoom(
         User $user,
-        int $id
+        ChatRoom $room
     ): bool
     {
-        $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
         $roomMembers = $this->chatRoomMemberRepository->findBy(['chatRoomId' => $room->getId()]);
         $roomType = $room->getType()->getType();
 
@@ -106,7 +105,7 @@ class ChatService
 
     public function addOrUpdateSettings(
         array $settings,
-        int $id
+        ChatRoom $room
     )
     {
 
@@ -114,7 +113,7 @@ class ChatService
 
     public function addOrUpdateParameter(
         array $parameters,
-        int $id
+        ChatRoom $room
     )
     {
 
@@ -122,10 +121,14 @@ class ChatService
 
     public function addOrUpdateName(
         string $name,
-        int $id
+        ChatRoom $room
     )
     {
+        $room
+            ->setName($name)
+        ;
 
+        $this->chatRoomRepository->flushEntity();
     }
 
 }

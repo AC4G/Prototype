@@ -170,27 +170,26 @@ class ChatController
     ): Response
     {
         //TODO: everything with jwt oauth2.0
+        $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
+
+        if (is_null($room)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('Chat room with id %s don\'t exists', $id)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
 
         if ($request->isMethod('GET')) {
-            $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
-
-            if (is_null($room)) {
-                $data = [
-                    'error' => [
-                        'status' => 404,
-                        'source' => [
-                            'pointer' => $request->getUri()
-                        ],
-                        'message' => sprintf('Room with id %s do\'nt exists', $id)
-                    ]
-                ];
-
-                return new JsonResponse(
-                    $data,
-                    404
-                );
-            }
-
             $convertedData = $this->dataService->convertObjectToArray($room);
             $processedData = $this->dataService->decodeJson($convertedData, 'settings');
             $processedData = $this->dataService->decodeJson($processedData, 'parameter');
@@ -215,25 +214,6 @@ class ChatController
         }
 
         if ($request->isMethod('DELETE')) {
-            $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
-
-            if (is_null($room)) {
-                $data = [
-                    'error' => [
-                        'status' => 404,
-                        'source' => [
-                            'pointer' => $request->getUri()
-                        ],
-                        'message' =>  sprintf('Room with id %s don\'t exists', $id)
-                    ]
-                ];
-
-                return new JsonResponse(
-                    $data,
-                    404
-                );
-            }
-
             $this->chatService->deleteRoomAndDependencies($room);
 
             $data = [
@@ -253,7 +233,6 @@ class ChatController
 
         //TODO: PATCH -> request body: json -> "add": {userId} (if type = private only two user in room at all), "settings": {}, "parameter": {}, "name": "foo"
         //TODO: PATCH -> request attached image -> image path; Response -> json: room with changes
-
         $parameters = json_decode($request->getContent(), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -298,7 +277,7 @@ class ChatController
                         'source' => [
                             'pointer' => $request->getUri()
                         ],
-                        'message' =>  'add must be a list!'
+                        'message' => 'add must be a list!'
                     ]
                 ];
 
@@ -328,7 +307,7 @@ class ChatController
                     );
                 }
 
-                if($this->chatService->addUserToRoom($user, $id) === false) {
+                if($this->chatService->addUserToRoom($user, $room) === false) {
                     $data = [
                         'error' => [
                             'status' => 400,
@@ -365,7 +344,7 @@ class ChatController
                 );
             }
 
-            $this->chatService->addOrUpdateSettings($parameters['settings'], $id);
+            $this->chatService->addOrUpdateSettings($parameters['settings'], $room);
         }
 
         if (array_key_exists('parameters', $parameters)) {
@@ -386,11 +365,11 @@ class ChatController
                 );
             }
 
-            $this->chatService->addOrUpdateParameter($parameters['parameters'], $id);
+            $this->chatService->addOrUpdateParameter($parameters['parameters'], $room);
         }
 
         if (array_key_exists('name', $parameters)) {
-            $this->chatService->addOrUpdateName($parameters['name'], $id);
+            $this->chatService->addOrUpdateName($parameters['name'], $room);
         }
 
         $data = [

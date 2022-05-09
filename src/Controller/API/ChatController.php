@@ -417,4 +417,45 @@ class ChatController
 
         return new JsonResponse();
     }
+
+    /**
+     * @Route("/api/chat/{id}/members", name="api_chat_by_id_members", methods={"GET", "DELETE"}, requirements={"id" = "\d+"})
+     */
+    public function chatByIdMembers(
+        Request $request,
+        int $id
+    ): Response
+    {
+        return new JsonResponse(
+
+        );
+    }
+
+    /**
+     * @Route("/api/chat/{id}/parameters", name="api_chat_by_id_parameters", methods={"GET", "DELETE"}, requirements={"id" = "\d+"})
+     */
+    public function chatByIdParameters(
+        Request $request,
+        int $id
+    ): Response
+    {
+        return new JsonResponse(
+
+        );
+    }
+
+    /**
+     * @Route("/api/chat/{id}/settings", name="api_chat_by_id_settings", methods={"GET", "DELETE"}, requirements={"id" = "\d+"})
+     */
+    public function chatByIdSettings(
+        Request $request,
+        int $id
+    ): Response
+    {
+        return new JsonResponse(
+
+        );
+    }
+
+
 }

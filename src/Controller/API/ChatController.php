@@ -251,15 +251,160 @@ class ChatController
             );
         }
 
-        //TODO: PUT -> request body: json -> "add": {userId} (if type = private only two user in room at all), "settings": {}, "parameter": {}, "name": "foo"
-        //TODO: PUT -> request attached image -> image path; Response -> json: room with changes
+        //TODO: PATCH -> request body: json -> "add": {userId} (if type = private only two user in room at all), "settings": {}, "parameter": {}, "name": "foo"
+        //TODO: PATCH -> request attached image -> image path; Response -> json: room with changes
 
-        $parameter = json_decode($request->getContent(), true);
+        $parameters = json_decode($request->getContent(), true);
 
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  'Invalid json!'
+                ]
+            ];
 
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
+        if (!count($parameters) > 0) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  'Content is empty. Nothing saved or updated!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
+        if (array_key_exists('add', $parameters)) {
+            if (!is_countable($parameters['add'])) {
+                $data = [
+                    'error' => [
+                        'status' => 406,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  'add must be a list!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    406
+                );
+            }
+
+            foreach ($parameters['add'] as $member) {
+                $user = $this->userRepository->findOneBy(['id' => $member]);
+
+                if (is_null($user)) {
+                    $data = [
+                        'error' => [
+                            'status' => 404,
+                            'source' => [
+                                'pointer' => $request->getUri()
+                            ],
+                            'message' =>  sprintf('User with id %s don\'t exists', $member)
+                        ]
+                    ];
+
+                    return new JsonResponse(
+                        $data,
+                        404
+                    );
+                }
+
+                if($this->chatService->addUserToRoom($user, $id) === false) {
+                    $data = [
+                        'error' => [
+                            'status' => 400,
+                            'source' => [
+                                'pointer' => $request->getUri()
+                            ],
+                            'message' =>  sprintf('Chat room with id %s is private and has already 2 members', $id)
+                        ]
+                    ];
+
+                    return new JsonResponse(
+                        $data,
+                        400
+                    );
+                }
+            }
+        }
+
+        if (array_key_exists('settings', $parameters)) {
+            if (!is_countable($parameters['settings'])) {
+                $data = [
+                    'error' => [
+                        'status' => 406,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  'settings must be a list!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    406
+                );
+            }
+
+            $this->chatService->addOrUpdateSettings($parameters['settings'], $id);
+        }
+
+        if (array_key_exists('parameters', $parameters)) {
+            if (!is_countable($parameters['parameters'])) {
+                $data = [
+                    'error' => [
+                        'status' => 406,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  'parameters must be a list!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    406
+                );
+            }
+
+            $this->chatService->addOrUpdateParameter($parameters['parameters'], $id);
+        }
+
+        if (array_key_exists('name', $parameters)) {
+            $this->chatService->addOrUpdateName($parameters['name'], $id);
+        }
+
+        $data = [
+            'notification' => [
+                'status' => 200,
+                'source' => [
+                    'pointer' => $request->getUri()
+                ],
+                'message' => sprintf('Chat room with id %s successfully updated', $id)
+            ]
+        ];
 
         return new JsonResponse(
-
+            $data
         );
     }
 

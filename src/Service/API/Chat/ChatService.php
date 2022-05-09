@@ -79,5 +79,53 @@ class ChatService
         $this->chatRoomRepository->deleteEntry($room);
     }
 
+    public function addUserToRoom(
+        User $user,
+        int $id
+    ): bool
+    {
+        $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
+        $roomMembers = $this->chatRoomMemberRepository->findBy(['chatRoomId' => $room->getId()]);
+        $roomType = $room->getType()->getType();
+
+        if (count($roomMembers) === 2 && $roomType === 'private') {
+            return false;
+        }
+
+        $roomMember = new ChatRoomMember();
+
+        $roomMember
+            ->setUser($user)
+            ->setChatRoom($room->getId())
+        ;
+
+        $this->chatRoomMemberRepository->persistAndFlushEntity($roomMember);
+
+        return true;
+    }
+
+    public function addOrUpdateSettings(
+        array $settings,
+        int $id
+    )
+    {
+
+    }
+
+    public function addOrUpdateParameter(
+        array $parameters,
+        int $id
+    )
+    {
+
+    }
+
+    public function addOrUpdateName(
+        string $name,
+        int $id
+    )
+    {
+
+    }
 
 }

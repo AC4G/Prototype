@@ -108,7 +108,35 @@ class ChatService
         ChatRoom $room
     )
     {
+        $roomSettings = json_decode($room->getSettings(), true);
 
+        if (!count($roomSettings) > 0) {
+            $room
+                ->setSettings(json_encode($settings))
+            ;
+
+            $this->chatRoomRepository->flushEntity();
+
+            return;
+        }
+
+        foreach ($settings as $settingKey => $setting) {
+            foreach ($roomSettings as $roomSettingKey => $roomSetting) {
+                if ($roomSettingKey === $settingKey) {
+                    $roomSettings[$roomSettingKey] = is_numeric($roomSetting) && is_numeric($setting) ? $roomSetting + $setting : $setting;
+
+                    continue 2;
+                }
+
+                $roomSettings[$settingKey] = $setting;
+            }
+        }
+
+        $room
+            ->setSettings(json_encode($roomSettings))
+        ;
+
+        $this->chatRoomRepository->flushEntity();
     }
 
     public function addOrUpdateParameter(
@@ -116,7 +144,35 @@ class ChatService
         ChatRoom $room
     )
     {
+        $roomParameters = json_decode($room->getParameter(), true);
 
+        if (!count($roomParameters) > 0) {
+            $room
+                ->setParameter(json_encode($parameters))
+            ;
+
+            $this->chatRoomRepository->flushEntity();
+
+            return;
+        }
+
+        foreach ($parameters as $parameterKey => $parameter) {
+            foreach ($roomParameters as $roomParameterKey => $roomParameter) {
+                if ($roomParameterKey === $parameterKey) {
+                    $roomParameters[$roomParameterKey] = is_numeric($roomParameter) && is_numeric($parameter) ? $roomParameter + $parameter : $parameter;
+
+                    continue 2;
+                }
+
+                $roomParameters[$parameterKey] = $parameter;
+            }
+        }
+
+        $room
+            ->setParameter(json_encode($roomParameters))
+        ;
+
+        $this->chatRoomRepository->flushEntity();
     }
 
     public function addOrUpdateName(

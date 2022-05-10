@@ -231,7 +231,6 @@ class ChatController
             );
         }
 
-        //TODO: PATCH -> request body: json -> "add": {userId} (if type = private only two user in room at all), "settings": {}, "parameter": {}, "name": "foo"
         //TODO: PATCH -> request attached image -> image path; Response -> json: room with changes
         $parameters = json_decode($request->getContent(), true);
 
@@ -452,6 +451,42 @@ class ChatController
         int $id
     ): Response
     {
+        return new JsonResponse(
+
+        );
+    }
+
+    /**
+     * @Route("/api/chat/{id}/image", name="api_chat_by_id_image", methods={"GET", "DELETE", "POST"}, requirements={"id" = "\d+"})
+     */
+    public function chatByIdImage(
+        Request $request,
+        int $id
+    ): Response
+    {
+        $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
+
+        if (is_null($room)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('Chat room with id %s don\'t exists', $id)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        $image = $request->files->all();
+
+        dd($image);
+
         return new JsonResponse(
 
         );

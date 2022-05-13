@@ -7,14 +7,17 @@ use App\Repository\UserRepository;
 use App\Service\API\Chat\ChatService;
 use App\Repository\ChatRoomRepository;
 use App\Repository\ChatRoomMemberRepository;
+use App\Repository\ChatRoomMessageRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ChatController
+class ChatController extends AbstractController
 {
     public function __construct(
+        private ChatRoomMessageRepository $chatRoomMessageRepository,
         private ChatRoomMemberRepository $roomMemberRepository,
         private ChatRoomRepository $chatRoomRepository,
         private UserRepository $userRepository,
@@ -390,18 +393,172 @@ class ChatController
      * @Route("/api/chat/{id}/messages", name="api_chat_by_id_messages", methods={"GET", "POST", "DELETE"}, requirements={"id" = "\d+"})
      */
     public function chatByIdMessages(
+        Request $request,
         int $id
     ): Response
     {
         //TODO: everything with jwt oauth2.0
 
-        //TODO: GET -> show all messages, latest first
+        $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
 
-        //TODO: POST -> add new message ; json -> "userId": {id}, "message": {message}, "time": {time}, file
+        if (is_null($room)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('Chat room with id %s don\'t exists', $id)
+                ]
+            ];
 
-        //TODO: DELETE -> delete all messages
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
 
-        return new JsonResponse();
+        $messages = $this->chatRoomMessageRepository->findBy(['room' => $room]);
+
+        if (!count($messages) > 0) {
+            $data = [
+                'error' => [
+                    'status' => 400,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('Chat room with id %s do not contain messages yet!', $id)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                400
+            );
+        }
+
+        if ($request->isMethod('GET')) {
+            $convertedData = $this->dataService->convertObjectToArray($messages);
+            $data = $this->dataService->rebuildPropertyArray($convertedData, 'user', [
+                'id',
+                'nickname'
+            ]);
+            $data = $this->dataService->removeProperties($data, [
+                'room'
+            ]);
+
+            return new JsonResponse(
+              array_reverse($data)
+            );
+        }
+
+        if ($request->isMethod('POST')) {
+            $parameter = json_decode($request->getContent(), true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $data = [
+                    'error' => [
+                        'status' => 406,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  'Invalid json!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    406
+                );
+            }
+
+            if (!array_key_exists('userId', $parameter)) {
+                $data = [
+                    'error' => [
+                        'status' => 406,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  'Json must contain userId!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    406
+                );
+            }
+
+            if (!array_key_exists('message', $parameter)) {
+                $data = [
+                    'error' => [
+                        'status' => 406,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  'Json must contain message!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    406
+                );
+            }
+
+            $user = $this->userRepository->findOneBy(['id' => $parameter['userId']]);
+
+            if (is_null($user)) {
+                $data = [
+                    'error' => [
+                        'status' => 404,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  sprintf('User with id %s don\'t exists', $user)
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    404
+                );
+            }
+
+            $this->chatService->createMessage($user, $room, $parameter['message']);
+
+            $data = [
+                'notification' => [
+                    'status' => 200,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => sprintf('Message saved in chat room with id %s', $id)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data
+            );
+        }
+
+        foreach ($messages as $message) {
+            $this->chatRoomMessageRepository->deleteEntry($message);
+        }
+
+        $data = [
+            'notification' => [
+                'status' => 200,
+                'source' => [
+                    'pointer' => $request->getUri()
+                ],
+                'message' => 'All messages deleted!'
+            ]
+        ];
+
+        return new JsonResponse(
+            $data
+        );
     }
 
     /**
@@ -413,6 +570,8 @@ class ChatController
     ): Response
     {
         //TODO: everything with jwt oauth2.0
+
+
 
         return new JsonResponse();
     }
@@ -482,10 +641,6 @@ class ChatController
                 404
             );
         }
-
-        $image = $request->files->all();
-
-        dd($image);
 
         return new JsonResponse(
 

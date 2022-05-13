@@ -2,8 +2,10 @@
 
 namespace App\Service\API\Chat;
 
+use DateTime;
 use App\Entity\User;
 use App\Entity\ChatRoom;
+use App\Entity\ChatMessage;
 use App\Entity\ChatRoomType;
 use App\Entity\ChatRoomMember;
 use App\Repository\ChatRoomRepository;
@@ -15,6 +17,7 @@ use App\Repository\ChatRoomMessageRepository;
 class ChatService
 {
     public function __construct(
+        private ChatRoomMessageRepository $chatRoomMessageRepository,
         private ChatRoomMemberRepository $chatRoomMemberRepository,
         private ChatRoomTypeRepository $chatRoomTypeRepository,
         private ChatRoomMessageRepository $messageRepository,
@@ -185,6 +188,24 @@ class ChatService
         ;
 
         $this->chatRoomRepository->flushEntity();
+    }
+
+    public function createMessage(
+        User $user,
+        ChatRoom $chatRoom,
+        string $message
+    )
+    {
+        $chatMessage = new ChatMessage();
+
+        $chatMessage
+            ->setUser($user)
+            ->setMessage($message)
+            ->setRoom($chatRoom)
+            ->setSendDate(new DateTime())
+        ;
+
+        $this->chatRoomMessageRepository->persistAndFlushEntity($chatMessage);
     }
 
 }

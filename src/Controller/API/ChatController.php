@@ -13,8 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Validator\Constraints\Json;
 
-class ChatController extends AbstractController
+final class ChatController extends AbstractController
 {
     public function __construct(
         private ChatRoomMessageRepository $chatRoomMessageRepository,
@@ -472,6 +473,23 @@ class ChatController extends AbstractController
                 );
             }
 
+            if (!is_array($parameter)) {
+                $data = [
+                    'error' => [
+                        'status' => 406,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  'Json don\'t contain any content!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    406
+                );
+            }
+
             if (!array_key_exists('userId', $parameter)) {
                 $data = [
                     'error' => [
@@ -515,7 +533,7 @@ class ChatController extends AbstractController
                         'source' => [
                             'pointer' => $request->getUri()
                         ],
-                        'message' =>  sprintf('User with id %s don\'t exists', $user)
+                        'message' =>  sprintf('User with id %s don\'t exists', $parameter['userId'])
                     ]
                 ];
 
@@ -562,18 +580,133 @@ class ChatController extends AbstractController
     }
 
     /**
-     * @Route("/api/chat/{id}/messages/{messageId}", name="api_chat_by_id_message_by_id", methods={"GET", "PATCH", "DELETE"}, requirements={"id" = "\d+", "messageId" = "\d+"})
+     * @Route("/api/chat/messages/{id}", name="api_chat_by_id_message_by_id", methods={"GET", "PATCH", "DELETE"}, requirements={"id" = "\d+"})
      */
     public function chatByIdMessageById(
-        int $id,
-        int $messageId
+        Request $request,
+        int $id
     ): Response
     {
         //TODO: everything with jwt oauth2.0
 
+        $message = $this->chatRoomMessageRepository->findOneBy(['id' => $id]);
 
+        if (is_null($message)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('Message with id %s don\'t exists!', $id)
+                ]
+            ];
 
-        return new JsonResponse();
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        if ($request->isMethod('GET')) {
+            $convertedData = $this->dataService->convertObjectToArray($message);
+            $data = $this->dataService->rebuildPropertyArray($convertedData, 'user', [
+                'id',
+                'nickname'
+            ]);
+            $data = $this->dataService->rebuildArrayToOneValue($data, 'room', 'id');
+
+            return new JsonResponse(
+              $data
+            );
+        }
+
+        if ($request->isMethod('PATCH')) {
+            $parameter = json_decode($request->getContent(), true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $data = [
+                    'error' => [
+                        'status' => 406,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  'Invalid json!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    406
+                );
+            }
+
+            if (!is_array($parameter)) {
+                $data = [
+                    'error' => [
+                        'status' => 406,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  'Json don\'t contain any content!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    406
+                );
+            }
+
+            if (!array_key_exists('message', $parameter)) {
+                $data = [
+                    'error' => [
+                        'status' => 406,
+                        'source' => [
+                            'pointer' => $request->getUri()
+                        ],
+                        'message' =>  'Json must contain message!'
+                    ]
+                ];
+
+                return new JsonResponse(
+                    $data,
+                    406
+                );
+            }
+
+            $this->chatService->updateMessage($message, $parameter['message']);
+
+            $data = [
+                'notification' => [
+                    'status' => 200,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' => 'Message updated!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data
+            );
+        }
+
+        $this->chatRoomMessageRepository->deleteEntry($message);
+
+        $data = [
+            'notification' => [
+                'status' => 200,
+                'source' => [
+                    'pointer' => $request->getUri()
+                ],
+                'message' => sprintf('Message with id %s successfully deleted!', $id)
+            ]
+        ];
+
+        return new JsonResponse(
+            $data
+        );
     }
 
     /**
@@ -584,8 +717,158 @@ class ChatController extends AbstractController
         int $id
     ): Response
     {
-        return new JsonResponse(
+        $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
 
+        if (is_null($room)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('Chat room with id %s don\'t exists', $id)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        $members = $this->roomMemberRepository->findBy(['chatRoomId' => $room->getId()]);
+
+        if (!count($members) > 0) {
+            $data = [
+                'error' => [
+                    'status' => 400,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('Chat room with id %s don\'t has anny members', $id)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                400
+            );
+        }
+
+        if ($request->isMethod('GET')) {
+            $convertedData = $this->dataService->convertObjectToArray($members);
+            $data = $this->dataService->removeProperties($convertedData, [
+                'id',
+                'chatRoom'
+            ]);
+            $data = $this->dataService->rebuildPropertyArray($data, 'user', [
+                'id',
+                'nickname'
+            ]);
+
+            return new JsonResponse(
+                $data
+            );
+        }
+
+        foreach ($members as $member) {
+            $this->roomMemberRepository->deleteEntry($member);
+        }
+
+        $data = [
+            'notification' => [
+                'status' => 200,
+                'source' => [
+                    'pointer' => $request->getUri()
+                ],
+                'message' => sprintf('All members from chat room %s have been removed!', $id)
+            ]
+        ];
+
+        return new JsonResponse(
+            $data
+        );
+    }
+
+    /**
+     * @Route("/api/chat/{id}/members/{userId}", name="api_chat_by_id_member_by_id", methods={"DELETE"}, requirements={"id" = "\d+", "userId" = "\d+"})
+     */
+    public function chatByIdMemberById(
+        Request $request,
+        int $id,
+        int $userId
+    ): Response
+    {
+        $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
+
+        if (is_null($room)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('Chat room with id %s don\'t exists', $id)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        $user = $this->userRepository->findOneBy(['id' => $userId]);
+
+        if (is_null($user)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('User with id %s don\'t exists', $userId)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        $member = $this->roomMemberRepository->findOneBy(['chatRoomId' => $room->getId(), 'user' => $user]);
+
+        if (is_null($member)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('User with id %s isn\'t a member of chat room with id %d', $userId, $id)
+                ]
+            ];
+
+            return new JsonResponse(
+              $data
+            );
+        }
+
+        $this->roomMemberRepository->deleteEntry($member);
+
+        $data = [
+            'notification' => [
+                'status' => 200,
+                'source' => [
+                    'pointer' => $request->getUri()
+                ],
+                'message' => sprintf('User with id %s was been removed from chat room with id %d!', $userId, $id)
+            ]
+        ];
+
+        return new JsonResponse(
+            $data
         );
     }
 
@@ -597,8 +880,66 @@ class ChatController extends AbstractController
         int $id
     ): Response
     {
-        return new JsonResponse(
+        $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
 
+        if (is_null($room)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('Chat room with id %s don\'t exists', $id)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
+        if ($request->isMethod('GET')) {
+            $convertedData = $this->dataService->convertObjectToArray($room);
+
+            return new JsonResponse(
+                json_decode($convertedData[0]['parameter'], true)
+            );
+        }
+
+        $parameter = json_decode($request->getContent(), true);
+
+        if (!is_array($parameter)) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  'Json don\'t contain any content!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
+        $this->chatService->deleteParameter($room, $parameter);
+
+        $data = [
+            'notification' => [
+                'status' => 200,
+                'source' => [
+                    'pointer' => $request->getUri()
+                ],
+                'message' => sprintf('Parameter successfully removed from chat room with id %s', $id)
+            ]
+        ];
+
+        return new JsonResponse(
+            $data
         );
     }
 
@@ -610,13 +951,32 @@ class ChatController extends AbstractController
         int $id
     ): Response
     {
+        $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
+
+        if (is_null($room)) {
+            $data = [
+                'error' => [
+                    'status' => 404,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  sprintf('Chat room with id %s don\'t exists', $id)
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                404
+            );
+        }
+
         return new JsonResponse(
 
         );
     }
 
     /**
-     * @Route("/api/chat/{id}/image", name="api_chat_by_id_image", methods={"GET", "DELETE", "POST"}, requirements={"id" = "\d+"})
+     * @Route("/api/chat/{id}/messages/{messageId}/image", name="api_chat_by_id_image", methods={"GET", "DELETE", "POST"}, requirements={"id" = "\d+"})
      */
     public function chatByIdImage(
         Request $request,
@@ -641,6 +1001,8 @@ class ChatController extends AbstractController
                 404
             );
         }
+
+        //TODO: add file to message
 
         return new JsonResponse(
 

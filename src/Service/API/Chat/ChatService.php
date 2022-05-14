@@ -208,4 +208,40 @@ class ChatService
         $this->chatRoomMessageRepository->persistAndFlushEntity($chatMessage);
     }
 
+    public function updateMessage(
+        ChatMessage $chatMessage,
+        string $message
+    )
+    {
+        $chatMessage
+            ->setMessage($message)
+        ;
+
+        $this->chatRoomMessageRepository->flushEntity();
+    }
+
+    public function deleteParameter(
+        ChatRoom $chatRoom,
+        array $parameters
+    )
+    {
+        $oldParameters = json_decode($chatRoom->getParameter(), true);
+
+        foreach ($oldParameters as $parameterKey => &$oldParameter) {
+            foreach ($parameters as $key => $parameter) {
+                if ($key === $parameterKey) {
+                    unset($oldParameters[$key]);
+
+                    continue 2;
+                }
+            }
+        }
+
+        $chatRoom
+            ->setParameter(json_encode($oldParameters))
+        ;
+
+        $this->chatRoomRepository->flushEntity();
+    }
+
 }

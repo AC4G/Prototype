@@ -970,37 +970,24 @@ final class ChatController extends AbstractController
             );
         }
 
+        if ($request->isMethod('GET')) {
+
+        }
+
         return new JsonResponse(
 
         );
     }
 
     /**
-     * @Route("/api/chat/{id}/messages/{messageId}/image", name="api_chat_by_id_image", methods={"GET", "DELETE", "POST"}, requirements={"id" = "\d+"})
+     * @Route("/api/chat/messages/{messageId}/image", name="api_chat_by_id_image", methods={"GET", "DELETE", "POST"}, requirements={"id" = "\d+"})
      */
     public function chatByIdImage(
         Request $request,
         int $id
     ): Response
     {
-        $room = $this->chatRoomRepository->findOneBy(['id' => $id]);
 
-        if (is_null($room)) {
-            $data = [
-                'error' => [
-                    'status' => 404,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'message' =>  sprintf('Chat room with id %s don\'t exists', $id)
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                404
-            );
-        }
 
         //TODO: add file to message
 

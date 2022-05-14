@@ -909,6 +909,23 @@ final class ChatController extends AbstractController
 
         $parameter = json_decode($request->getContent(), true);
 
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  'Invalid json!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
         if (!is_array($parameter)) {
             $data = [
                 'error' => [
@@ -971,11 +988,63 @@ final class ChatController extends AbstractController
         }
 
         if ($request->isMethod('GET')) {
+            $convertedData = $this->dataService->convertObjectToArray($room);
 
+            return new JsonResponse(
+                json_decode($convertedData[0]['settings'], true)
+            );
         }
 
-        return new JsonResponse(
+        $settings = json_decode($request->getContent(), true);
 
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  'Invalid json!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
+        if (!is_array($settings)) {
+            $data = [
+                'error' => [
+                    'status' => 406,
+                    'source' => [
+                        'pointer' => $request->getUri()
+                    ],
+                    'message' =>  'Json don\'t contain any content!'
+                ]
+            ];
+
+            return new JsonResponse(
+                $data,
+                406
+            );
+        }
+
+        $this->chatService->deleteSettings($room, $settings);
+
+        $data = [
+            'notification' => [
+                'status' => 200,
+                'source' => [
+                    'pointer' => $request->getUri()
+                ],
+                'message' => sprintf('Settings successfully removed from chat room with id %s', $id)
+            ]
+        ];
+
+        return new JsonResponse(
+            $data
         );
     }
 

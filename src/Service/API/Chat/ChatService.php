@@ -227,6 +227,10 @@ class ChatService
     {
         $oldParameters = json_decode($chatRoom->getParameter(), true);
 
+        if (!is_array($oldParameters)) {
+            return;
+        }
+
         foreach ($oldParameters as $parameterKey => &$oldParameter) {
             foreach ($parameters as $key => $parameter) {
                 if ($key === $parameterKey) {
@@ -239,6 +243,34 @@ class ChatService
 
         $chatRoom
             ->setParameter(json_encode($oldParameters))
+        ;
+
+        $this->chatRoomRepository->flushEntity();
+    }
+
+    public function deleteSettings(
+        ChatRoom $chatRoom,
+        array $settings
+    )
+    {
+        $oldSettings = json_decode($chatRoom->getSettings(), true);
+
+        if (!is_array($oldSettings)) {
+            return;
+        }
+
+        foreach ($oldSettings as $settingKey => &$oldSetting) {
+            foreach ($settings as $key => $setting) {
+                if ($key === $settingKey) {
+                    unset($oldSettings[$key]);
+
+                    continue 2;
+                }
+            }
+        }
+
+        $chatRoom
+            ->setSettings(json_encode($oldSettings))
         ;
 
         $this->chatRoomRepository->flushEntity();

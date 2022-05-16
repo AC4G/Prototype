@@ -42,7 +42,7 @@ class Inventory
      *
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
      * })
      */
     private User $user;
@@ -52,7 +52,7 @@ class Inventory
      *
      * @ORM\ManyToOne(targetEntity="Item")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="item_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="item_id", referencedColumnName="id", onDelete="CASCADE")
      * })
      */
     private Item $item;

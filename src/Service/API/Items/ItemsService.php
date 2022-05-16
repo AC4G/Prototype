@@ -4,7 +4,7 @@ namespace App\Service\API\Items;
 
 use DateTime;
 use App\Entity\Item;
-use App\Service\DataService;
+use App\Serializer\ItemNormalizer;
 use App\Repository\ItemRepository;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -13,7 +13,7 @@ class ItemsService
     public function __construct(
         private NormalizerInterface $normalizer,
         private ItemRepository $itemRepository,
-        private DataService $dataService
+        private ItemNormalizer $itemNormalizer
     )
     {
     }
@@ -98,20 +98,20 @@ class ItemsService
     }
 
     public function prepareData(
-        array|object $item
+        array|Item $items
     ): array
     {
-        $data = $this->dataService->convertObjectToArray($item);
-        $data = $this->dataService->rebuildPropertyArray($data, 'user', [
-            'id',
-            'nickname',
-        ]);
-        $data = $this->dataService->removeProperties($data, [
-            'path',
-        ]);
-        return $this->dataService->convertPropertiesToJson($data, [
-            'parameter',
-        ]);
+        if (is_object($items)) {
+            return $this->itemNormalizer->normalize($items);
+        }
+
+        $itemsList = [];
+
+        foreach ($items as $item) {
+            $itemsList[] = $this->itemNormalizer->normalize($item);
+        }
+
+        return $itemsList;
     }
 
 

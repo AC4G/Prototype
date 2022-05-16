@@ -85,6 +85,7 @@
         }
     },
     "require-dev": {
+        "phpmetrics/phpmetrics": "^2.8",
         "symfony/maker-bundle": "^1.38",
         "symfony/stopwatch": "6.0.*",
         "symfony/web-profiler-bundle": "6.0.*"

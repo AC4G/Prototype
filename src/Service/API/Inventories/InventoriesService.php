@@ -5,14 +5,14 @@ namespace App\Service\API\Inventories;
 use App\Entity\User;
 use App\Entity\Item;
 use App\Entity\Inventory;
-use App\Service\DataService;
+use App\Serializer\InventoryNormalizer;
 use App\Repository\InventoryRepository;
 
 class InventoriesService
 {
     public function __construct(
         private InventoryRepository $inventoryRepository,
-        private DataService $dataService
+       private InventoryNormalizer $inventoryNormalizer
     )
     {
     }
@@ -99,25 +99,20 @@ class InventoriesService
     }
 
     public function prepareInventories(
-        array|object $inventory
+        array|Inventory $inventories
     ): array
     {
-        $data = $this->dataService->convertObjectToArray($inventory);
-        $data = $this->dataService->rebuildPropertyArray($data, 'user', [
-            'id',
-            'nickname'
-        ]);
-        $data = $this->dataService->rebuildPropertyArray($data, 'item', [
-            'id',
-            'name',
-            'gameName'
-        ]);
-        $data = $this->dataService->convertPropertiesToJson($data, [
-            'parameter'
-        ]);
-        return $this->dataService->removeProperties($data, [
-            'id'
-        ]);
+        if (is_object($inventories)) {
+            return $this->inventoryNormalizer->normalize($inventories);
+        }
+
+        $inventoryList = [];
+
+        foreach ($inventories as $inventory) {
+            $inventoryList[] = $this->inventoryNormalizer->normalize($inventory);
+        }
+
+        return $inventoryList;
     }
 
 

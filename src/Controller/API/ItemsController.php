@@ -61,6 +61,12 @@ final class ItemsController extends AbstractController
         string $property
     ): ?Response
     {
+        $item = '';
+
+        if (is_numeric($property)) {
+            $item = $this->itemRepository->findOneBy(['id' => (int)$property]);
+        }
+
         //TODO: PUT -> only with oauth
 
         if ($request->isMethod('GET')) {
@@ -170,9 +176,7 @@ final class ItemsController extends AbstractController
             );
         }
 
-        $item = $this->itemsService->updateItem($property, $newParameter);
-
-        if (!$item instanceof Item) {
+        if (is_null($item)) {
             $data = [
                 'error' => [
                     'status' => 404,
@@ -189,8 +193,20 @@ final class ItemsController extends AbstractController
             );
         }
 
+        $this->itemsService->updateItem($item, $newParameter);
+
+        $data = [
+            'notification' => [
+                'status' => 202,
+                'source' => [
+                    'pointer' => $request->getUri()
+                ],
+                'message' => 'Parameter successfully added or updated!'
+            ]
+        ];
+
         return new JsonResponse(
-            $this->itemsService->prepareData($item)[0],
+            $data,
             202
         );
     }

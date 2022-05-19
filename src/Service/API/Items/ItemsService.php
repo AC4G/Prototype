@@ -24,56 +24,40 @@ class ItemsService
     }
 
     public function updateItem(
-        string $property,
+        Item $item,
         array $newParameter
-    ): ?Item
+    )
     {
-        $item = $this->itemRepository->findOneBy(['id' => (int)$property]);
-
-        if (is_null($item)) {
-            return null;
-        }
-
         $normalizedItem = $this->normalizer->normalize($item);
 
-        foreach ($newParameter as $key => $parameter) {
-            if ($key === 'id' || $key === 'user' || $key === 'creationDate' || $key === 'path') {
-                continue;
-            }
-
-            if ($key === 'parameter') {
-                $data = json_decode($normalizedItem[$key], true);
-
-                foreach ($parameter as $subParameterKey => $secondParameter) {
-                    $data[$subParameterKey] = $secondParameter;
-                }
-
-                $normalizedItem[$key] = json_encode($data);
-
-                continue;
-            }
-
-            if (array_key_exists($key, $normalizedItem)) {
-                $normalizedItem[$key] = $parameter;
-            }
+        if (array_key_exists('name', $newParameter)) {
+            $item
+                ->setName($newParameter['name'])
+            ;
         }
 
-        foreach ($normalizedItem as $key => $parameter) {
-            if ($key === 'id' || $key === 'user') {
-                continue;
-            }
+        if (array_key_exists('gameName', $newParameter)) {
+            $item
+                ->setGameName($newParameter['gameName'])
+            ;
+        }
 
-            if (str_contains($key, 'Date')) {
-                $parameter = new DateTime($parameter);
-            }
+        if (array_key_exists('parameter', $newParameter)) {
+            if (is_array($newParameter['parameter'])) {
+                $parameters = $newParameter['parameter'];
+                $data = json_decode($normalizedItem['parameter'], true);
 
-            $method = 'set' . ucfirst($key);
-            $item->$method($parameter);
+                foreach ($parameters as $key => $parameter) {
+                    $data[$key] = $parameter;
+                }
+
+                $item
+                    ->setParameter(json_encode($data))
+                ;
+            }
         }
 
         $this->itemRepository->flushEntity();
-
-        return $item;
     }
 
     public function deleteParameter(

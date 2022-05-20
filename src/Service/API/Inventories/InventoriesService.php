@@ -12,7 +12,7 @@ class InventoriesService
 {
     public function __construct(
         private InventoryRepository $inventoryRepository,
-       private InventoryNormalizer $inventoryNormalizer
+        private InventoryNormalizer $inventoryNormalizer
     )
     {
     }
@@ -49,7 +49,7 @@ class InventoriesService
             }
         }
 
-        if (!count($parameters) > 0) {
+        if (count($parameters) === 0) {
             $parameters = $newParameters;
         }
 

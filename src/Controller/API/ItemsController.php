@@ -32,13 +32,13 @@ final class ItemsController extends AbstractController
     {
         $items = $this->itemsService->getItems();
 
-        if (count($items) > 0) {
-            return new JsonResponse(
-                $this->itemsService->prepareData($items)
-            );
+        if (count($items) === 0) {
+            return $this->customResponse->errorResponse($request, 'Not one item stored. Maybe next time..', 404);
         }
 
-        return $this->customResponse->errorResponse($request, 'Not one item stored. Maybe next time..', 404);
+        return new JsonResponse(
+            $this->itemsService->prepareData($items)
+        );
     }
 
     /**
@@ -58,8 +58,6 @@ final class ItemsController extends AbstractController
         //TODO: PUT -> only with oauth
 
         if ($request->isMethod('GET')) {
-            $item = '';
-
             if (!is_numeric($property)) {
                 $user = $this->userRepository->findOneBy(['nickname' => $property]);
 
@@ -79,7 +77,7 @@ final class ItemsController extends AbstractController
             }
 
             if (is_array($item)) {
-                if (!count($item) > 0) {
+                if (count($item) === 0) {
                     return $this->customResponse->errorResponse($request, 'User hasn\'t an item yet!', 400);
                 }
             }
@@ -96,7 +94,7 @@ final class ItemsController extends AbstractController
         }
 
         if (!is_numeric($property)) {
-            return $this->customResponse->errorResponse($request, 'For the PUT method the property must be numeric!');
+            return $this->customResponse->errorResponse($request, 'For the PATCH method the property must be numeric!');
         }
 
         if (is_null($item)) {
@@ -109,7 +107,7 @@ final class ItemsController extends AbstractController
     }
 
     /**
-     * @Route("/api/items/{id}/parameters", name="api_item_by_id_remove_parameters", methods={"DELETE"}, requirements={"id" = "\d+"})
+     * @Route("/api/items/{id}/parameters", name="api_item_by_id_remove_parameters", methods={"DELETE", "GET"}, requirements={"id" = "\d+"})
      */
     public function deleteParameter(
         Request $request,
@@ -117,11 +115,22 @@ final class ItemsController extends AbstractController
     ): Response
     {
         //TODO: only with oauth
-
         $item = $this->itemRepository->findOneBy(['id' => $id]);
 
         if (is_null($item)) {
             return $this->customResponse->errorResponse($request, 'Item not found', 404);
+        }
+
+        if ($request->isMethod('GET')) {
+            $parameter = json_decode($item->getParameter(), true);
+
+            if (count($parameter) === 0) {
+                return $this->customResponse->notificationResponse($request, sprintf('Item with id %s don\'t has parameter yet!', $id));
+            }
+
+            return new JsonResponse(
+                $parameter
+            );
         }
 
         $parameters = json_decode($request->getContent(), true);
@@ -130,7 +139,7 @@ final class ItemsController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
         }
 
-        if (!count($parameters) > 0) {
+        if (count($parameters) === 0) {
             return  $this->customResponse->errorResponse($request, 'Not even passed a parameter for delete. Nothing changed!', 406);
         }
 

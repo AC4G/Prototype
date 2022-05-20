@@ -2,7 +2,6 @@
 
 namespace App\Service\API\Items;
 
-use DateTime;
 use App\Entity\Item;
 use App\Serializer\ItemNormalizer;
 use App\Repository\ItemRepository;

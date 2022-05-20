@@ -2,11 +2,10 @@
 
 namespace App\Controller\API;
 
-
-use App\Entity\Item;
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
 use App\Service\API\Items\ItemsService;
+use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,7 +17,8 @@ final class ItemsController extends AbstractController
     public function __construct(
         private UserRepository $userRepository,
         private ItemRepository $itemRepository,
-        private ItemsService $itemsService,
+        private CustomResponse $customResponse,
+        private ItemsService $itemsService
     )
     {
     }
@@ -38,19 +38,7 @@ final class ItemsController extends AbstractController
             );
         }
 
-        $data = [
-            'response' => [
-                'status' => 200,
-                'source' => [
-                    'pointer' => $request->getUri()
-                ],
-                'message' => 'Not one item stored. Maybe next time..'
-            ]
-        ];
-
-        return new JsonResponse(
-            $data
-        );
+        return $this->customResponse->errorResponse($request, 'Not one item stored. Maybe next time..', 404);
     }
 
     /**
@@ -76,20 +64,7 @@ final class ItemsController extends AbstractController
                 $user = $this->userRepository->findOneBy(['nickname' => $property]);
 
                 if (is_null($user)) {
-                    $data = [
-                        'error' => [
-                            'status' => 404,
-                            'source' => [
-                                'pointer' => $request->getUri()
-                            ],
-                            'message' => 'User not exist!'
-                        ]
-                    ];
-
-                    return new JsonResponse(
-                        $data,
-                        404
-                    );
+                    return $this->customResponse->errorResponse($request, 'User don\'t exists!', 404);
                 }
 
                 $item = $this->itemRepository->findBy(['user' => $user]);
@@ -100,38 +75,12 @@ final class ItemsController extends AbstractController
             }
 
             if (is_null($item)) {
-                $data = [
-                    'error' => [
-                        'status' => 404,
-                        'source' => [
-                          'pointer' => $request->getUri()
-                        ],
-                        'message' => 'Item not found'
-                    ]
-                ];
-
-                return new JsonResponse(
-                    $data,
-                    404
-                );
+                return $this->customResponse->errorResponse($request, 'Item not found', 404);
             }
 
             if (is_array($item)) {
                 if (!count($item) > 0) {
-                    $data = [
-                        'error' => [
-                            'status' => 400,
-                            'source' => [
-                                'pointer' => $request->getUri()
-                            ],
-                            'message' => 'User hasn\'t an item yet!'
-                        ]
-                    ];
-
-                    return new JsonResponse(
-                        $data,
-                        400
-                    );
+                    return $this->customResponse->errorResponse($request, 'User hasn\'t an item yet!', 400);
                 }
             }
 
@@ -143,72 +92,20 @@ final class ItemsController extends AbstractController
         $newParameter = json_decode($request->getContent(), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            $data = [
-                'error' => [
-                    'status' => 400,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'message' => 'No valid JSON. Please do it right!'
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                400
-            );
+            return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
         }
 
         if (!is_numeric($property)) {
-            $data = [
-                'error' => [
-                    'status' => 400,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'message' => 'For the PUT method the property must be numeric!'
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                400
-            );
+            return $this->customResponse->errorResponse($request, 'For the PUT method the property must be numeric!');
         }
 
         if (is_null($item)) {
-            $data = [
-                'error' => [
-                    'status' => 404,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'message' => 'Item not found'
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                404
-            );
+            return $this->customResponse->errorResponse($request, 'Item not found', 404);
         }
 
         $this->itemsService->updateItem($item, $newParameter);
 
-        $data = [
-            'notification' => [
-                'status' => 202,
-                'source' => [
-                    'pointer' => $request->getUri()
-                ],
-                'message' => 'Parameter successfully added or updated!'
-            ]
-        ];
-
-        return new JsonResponse(
-            $data,
-            202
-        );
+        return $this->customResponse->notificationResponse($request, 'Parameter successfully added or updated!', 202);
     }
 
     /**
@@ -224,74 +121,22 @@ final class ItemsController extends AbstractController
         $item = $this->itemRepository->findOneBy(['id' => $id]);
 
         if (is_null($item)) {
-            $data = [
-                'error' => [
-                    'status' => 404,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'message' => 'Item not found'
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                404
-            );
+            return $this->customResponse->errorResponse($request, 'Item not found', 404);
         }
 
         $parameters = json_decode($request->getContent(), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            $data = [
-                'error' => [
-                    'status' => 406,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'message' => 'Invalid json!'
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                406
-            );
+            return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
         }
 
         if (!count($parameters) > 0) {
-            $data = [
-                'error' => [
-                    'status' => 400,
-                    'source' => [
-                        'pointer' => $request->getUri()
-                    ],
-                    'message' => 'Not even passed a parameter for delete. Nothing changed!'
-                ]
-            ];
-
-            return new JsonResponse(
-                $data,
-                400
-            );
+            return  $this->customResponse->errorResponse($request, 'Not even passed a parameter for delete. Nothing changed!', 406);
         }
 
         $this->itemsService->deleteParameter($parameters, $item);
 
-        $data = [
-            'notification' => [
-                'status' => 200,
-                'source' => [
-                    'pointer' => $request->getUri()
-                ],
-                'message' => sprintf('Parameter successfully removed from item %s', $id)
-            ]
-        ];
-
-        return new JsonResponse(
-            $data,
-            200
-        );
+        return $this->customResponse->notificationResponse($request, sprintf('Parameter successfully removed from item %s', $id));
     }
 
 

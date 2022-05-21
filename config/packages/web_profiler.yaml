@@ -3,8 +3,8 @@ when@dev:
         toolbar: true
         intercept_redirects: false
 
-    framework:
-        profiler: { only_exceptions: false }
+    #framework:
+    #    profiler: { only_exceptions: false }
 
 when@test:
     web_profiler:

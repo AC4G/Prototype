@@ -46,9 +46,9 @@ final class InventoryController extends AbstractController
     }
 
     /**
-     * @Route("/api/inventories/{property}", name="api_inventories_by_property", methods={"GET", "POST", "PATCH", "DELETE"})
+     * @Route("/api/inventories/{property}", name="api_inventories_by_property", methods={"GET"})
      */
-    public function processInventory(
+    public function getInventoryByProperty(
         Request $request,
         string $property
     ): Response
@@ -61,49 +61,44 @@ final class InventoryController extends AbstractController
             return $this->customResponse->errorResponse($request, is_numeric($property) ? sprintf('User with id %s don\'t exists!', $property) : sprintf('User %s don\'t exists!', $property), 404);
         }
 
-        if ($request->isMethod('GET')) {
-            $inventory = $this->inventoryRepository->findBy(['user' => $user]);
+        $inventory = $this->inventoryRepository->findBy(['user' => $user]);
 
-            if (!count($inventory) > 0) {
-                return $this->customResponse->errorResponse($request, 'User has not an item in inventory yet!', 400);
-            }
-
-            return new JsonResponse(
-                $this->inventoriesService->prepareInventories($inventory)
-            );
+        if (count($inventory) === 0) {
+            return $this->customResponse->errorResponse($request, 'User has not an item in inventory yet!', 400);
         }
 
-        $json = $request->getContent();
-        $parameter = json_decode($json, true);
+        return new JsonResponse(
+            $this->inventoriesService->prepareInventories($inventory)
+        );
+    }
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
+    /**
+     * @Route("/api/inventories/{property}/{itemId}", name="api_inventories_by_property_and_item_id", methods={"GET", "POST", "PATCH", "DELETE"}, requirements={"itemId" = "\d+"})
+     */
+    public function processInventoryByItem(
+        Request $request,
+        string $property,
+        int $itemId
+    ): Response
+    {
+        $user = $this->userRepository->findOneBy((is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]));
+
+        if (is_null($user)) {
+            return $this->customResponse->errorResponse($request, is_numeric($property) ? sprintf('User with id %s don\'t exists!', $property) : sprintf('User %s don\'t exists!', $property), 404);
         }
 
-        if (!array_key_exists('itemId', $parameter)) {
-            return $this->customResponse->errorResponse($request, 'Json not contain itemId', 406);
-        }
-
-        $item = $this->itemRepository->findOneBy(['id' => (int)$parameter['itemId']]);
+        $item = $this->itemRepository->findOneBy(['id' => $itemId]);
 
         if (is_null($item)) {
-            return $this->customResponse->errorResponse($request, is_numeric($parameter['itemId']) ? sprintf('Item with id %s don\'t exists', $parameter['itemId']) : sprintf('Item id must be numeric and not like that %s', $parameter['itemId']), 404);
+            return $this->customResponse->errorResponse($request, 'Item not found', 404);
         }
 
         $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
 
-        if ($request->isMethod('DELETE')) {
-            if (is_null($inventory)) {
-                return $this->customResponse->errorResponse($request, sprintf('User has no item with id %s in inventory', $parameter['itemId']), 404);
-            }
+        $parameter = json_decode($request->getContent(), true);
 
-            $this->inventoryRepository->deleteEntry($inventory);
-
-            return $this->customResponse->notificationResponse($request, 'Item successfully removed from inventory');
-        }
-
-        if (!array_key_exists('amount', $parameter) && !array_key_exists('parameter', $parameter)) {
-            return $this->customResponse->errorResponse($request, 'Json not contain amount of items and parameter. On of them are necessary!', 406);
+        if (json_last_error() !== JSON_ERROR_NONE && $request->isMethod('POST') || $request->isMethod('PATCH')) {
+            return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
         }
 
         if ($request->isMethod('PATCH')) {
@@ -116,23 +111,39 @@ final class InventoryController extends AbstractController
             return $this->customResponse->notificationResponse($request, 'Inventory updated');
         }
 
-        if (!is_null($inventory)) {
-            return $this->customResponse->errorResponse($request, sprintf('User already has that item with id %s. For update use PUT method', $parameter['itemId']), 406);
+        if ($request->isMethod('POST')) {
+            if (!is_null($inventory)) {
+                return $this->customResponse->errorResponse($request, sprintf('User already has that item with id %s. For update use PATCH method', $itemId), 406);
+            }
+
+            if (!array_key_exists('amount', $parameter)) {
+                return $this->customResponse->errorResponse($request, 'Amount is required with POST method!', 406);
+            }
+
+            $this->inventoriesService->createEntryInInventory($parameter, $user, $item);
+
+            return $this->customResponse->notificationResponse($request, 'Item successfully added to inventory', 201);
         }
 
-        if (!array_key_exists('amount', $parameter)) {
-            return $this->customResponse->errorResponse($request, 'Amount is required with POST method!', 406);
+        if (is_null($inventory)) {
+            return $this->customResponse->errorResponse($request, 'User does not has this item in inventory!', 406);
         }
 
-        $this->inventoriesService->createEntryInInventory($parameter, $user, $item);
+        if ($request->isMethod('GET')) {
+            return new JsonResponse(
+              $this->inventoriesService->prepareInventories($inventory)
+            );
+        }
 
-        return $this->customResponse->notificationResponse($request, 'Item successfully added to inventory', 201);
+        $this->inventoryRepository->deleteEntry($inventory);
+
+        return $this->customResponse->notificationResponse($request, 'Item successfully removed from inventory');
     }
 
     /**
      * @Route("/api/inventories/{property}/{itemId}/parameters", name="api_inventories_item_by_id_remove_parameters", methods={"DELETE"}, requirements={"itemId" = "\d+"})
      */
-    public function deleteParameter(
+    public function deleteParameterFromItemInInventory(
         Request $request,
         string $property,
         int $itemId
@@ -170,5 +181,6 @@ final class InventoryController extends AbstractController
 
         return $this->customResponse->notificationResponse($request, sprintf('Inventory parameter from user %s and item %d successfully removed', $property, $itemId));
     }
+
 
 }

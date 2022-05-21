@@ -18,7 +18,7 @@ framework:
         log: true
 
     profiler:
-        collect: false
+        collect: true
 
 when@test:
     framework:

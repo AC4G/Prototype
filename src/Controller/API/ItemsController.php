@@ -121,15 +121,15 @@ final class ItemsController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Item not found', 404);
         }
 
+        $itemParameter = json_decode($item->getParameter(), true);
+
+        if (count($itemParameter) === 0) {
+            return $this->customResponse->notificationResponse($request, sprintf('Item with id %s don\'t has parameter yet!', $id));
+        }
+
         if ($request->isMethod('GET')) {
-            $parameter = json_decode($item->getParameter(), true);
-
-            if (count($parameter) === 0) {
-                return $this->customResponse->notificationResponse($request, sprintf('Item with id %s don\'t has parameter yet!', $id));
-            }
-
             return new JsonResponse(
-                $parameter
+                $itemParameter
             );
         }
 

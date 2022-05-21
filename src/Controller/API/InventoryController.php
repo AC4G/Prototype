@@ -97,7 +97,7 @@ final class InventoryController extends AbstractController
 
         $parameter = json_decode($request->getContent(), true);
 
-        if (json_last_error() !== JSON_ERROR_NONE && $request->isMethod('POST') || $request->isMethod('PATCH')) {
+        if (($request->isMethod('POST') || $request->isMethod('PATCH')) && json_last_error() !== JSON_ERROR_NONE) {
             return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
         }
 

@@ -27,253 +27,33 @@ class ChatService
     }
 
     public function createRoom(
-        array $parameter,
-        User $user
-    ): ?ChatRoom
+        array $parameters
+    ): ChatRoom
     {
-        $roomType = $this->chatRoomTypeRepository->findOneBy(['type' => $parameter['type']]);
+        $type = $this->chatRoomTypeRepository->findOneBy(['type' => $parameters['type']]);
 
-        if (is_null($roomType)) {
-            $roomType = new ChatRoomType();
+        if (is_null($type)) {
+            $type = new ChatRoomType();
 
-            $roomType->setType($parameter['type']);
+            $type
+                ->setType($parameters['type'])
+            ;
 
-            $this->chatRoomTypeRepository->persistAndFlushEntity($roomType);
+            $this->chatRoomTypeRepository->persistAndFlushEntity($type);
         }
 
         $room = new ChatRoom();
 
-        $room->setType($roomType);
+        $room
+            ->setParameter(array_key_exists('parameter', $parameters) ? json_encode($parameters['parameter']) : '{}')
+            ->setName(array_key_exists('name', $parameters) ? $parameters['name'] : '')
+            ->setSettings(array_key_exists('settings', $parameters) ? json_encode($parameters['settings']) : '{}')
+            ->setType($type)
+        ;
 
         $this->chatRoomRepository->persistAndFlushEntity($room);
 
-        $roomMember = new ChatRoomMember();
-
-        $roomMember
-            ->setChatRoom($room->getId())
-            ->setUser($user)
-        ;
-
-        $this->chatRoomMemberRepository->persistAndFlushEntity($roomMember);
-
         return $room;
-    }
-
-    public function deleteRoomAndDependencies(
-        ChatRoom $room
-    )
-    {
-        $messages = $this->messageRepository->findBy(['room' => $room]);
-
-        if (count($messages) > 0) {
-            foreach ($messages as $message) {
-                $this->messageRepository->deleteEntry($message);
-            }
-        }
-
-        $members = $this->chatRoomMemberRepository->findBy(['chatRoomId' => $room->getId()]);
-
-        if (count($members) > 0) {
-            foreach ($members as $member) {
-                $this->chatRoomMemberRepository->deleteEntry($member);
-            }
-        }
-
-        $this->chatRoomRepository->deleteEntry($room);
-    }
-
-    public function addUserToRoom(
-        User $user,
-        ChatRoom $room
-    ): bool
-    {
-        $roomMembers = $this->chatRoomMemberRepository->findBy(['chatRoomId' => $room->getId()]);
-        $roomType = $room->getType()->getType();
-
-        if (count($roomMembers) === 2 && $roomType === 'private') {
-            return false;
-        }
-
-        $roomMember = new ChatRoomMember();
-
-        $roomMember
-            ->setUser($user)
-            ->setChatRoom($room->getId())
-        ;
-
-        $this->chatRoomMemberRepository->persistAndFlushEntity($roomMember);
-
-        return true;
-    }
-
-    public function addOrUpdateSettings(
-        array $settings,
-        ChatRoom $room
-    )
-    {
-        $roomSettings = json_decode($room->getSettings(), true);
-
-        if (!count($roomSettings) > 0) {
-            $room
-                ->setSettings(json_encode($settings))
-            ;
-
-            $this->chatRoomRepository->flushEntity();
-
-            return;
-        }
-
-        foreach ($settings as $settingKey => $setting) {
-            foreach ($roomSettings as $roomSettingKey => $roomSetting) {
-                if ($roomSettingKey === $settingKey) {
-                    $roomSettings[$roomSettingKey] = is_numeric($roomSetting) && is_numeric($setting) ? $roomSetting + $setting : $setting;
-
-                    continue 2;
-                }
-
-                $roomSettings[$settingKey] = $setting;
-            }
-        }
-
-        $room
-            ->setSettings(json_encode($roomSettings))
-        ;
-
-        $this->chatRoomRepository->flushEntity();
-    }
-
-    public function addOrUpdateParameter(
-        array $parameters,
-        ChatRoom $room
-    )
-    {
-        $roomParameters = json_decode($room->getParameter(), true);
-
-        if (!count($roomParameters) > 0) {
-            $room
-                ->setParameter(json_encode($parameters))
-            ;
-
-            $this->chatRoomRepository->flushEntity();
-
-            return;
-        }
-
-        foreach ($parameters as $parameterKey => $parameter) {
-            foreach ($roomParameters as $roomParameterKey => $roomParameter) {
-                if ($roomParameterKey === $parameterKey) {
-                    $roomParameters[$roomParameterKey] = is_numeric($roomParameter) && is_numeric($parameter) ? $roomParameter + $parameter : $parameter;
-
-                    continue 2;
-                }
-
-                $roomParameters[$parameterKey] = $parameter;
-            }
-        }
-
-        $room
-            ->setParameter(json_encode($roomParameters))
-        ;
-
-        $this->chatRoomRepository->flushEntity();
-    }
-
-    public function addOrUpdateName(
-        string $name,
-        ChatRoom $room
-    )
-    {
-        $room
-            ->setName($name)
-        ;
-
-        $this->chatRoomRepository->flushEntity();
-    }
-
-    public function createMessage(
-        User $user,
-        ChatRoom $chatRoom,
-        string $message
-    )
-    {
-        $chatMessage = new ChatMessage();
-
-        $chatMessage
-            ->setUser($user)
-            ->setMessage($message)
-            ->setRoom($chatRoom)
-            ->setSendDate(new DateTime())
-        ;
-
-        $this->chatRoomMessageRepository->persistAndFlushEntity($chatMessage);
-    }
-
-    public function updateMessage(
-        ChatMessage $chatMessage,
-        string $message
-    )
-    {
-        $chatMessage
-            ->setMessage($message)
-        ;
-
-        $this->chatRoomMessageRepository->flushEntity();
-    }
-
-    public function deleteParameter(
-        ChatRoom $chatRoom,
-        array $parameters
-    )
-    {
-        $oldParameters = json_decode($chatRoom->getParameter(), true);
-
-        if (!is_array($oldParameters)) {
-            return;
-        }
-
-        foreach ($oldParameters as $parameterKey => &$oldParameter) {
-            foreach ($parameters as $key => $parameter) {
-                if ($key === $parameterKey) {
-                    unset($oldParameters[$key]);
-
-                    continue 2;
-                }
-            }
-        }
-
-        $chatRoom
-            ->setParameter(json_encode($oldParameters))
-        ;
-
-        $this->chatRoomRepository->flushEntity();
-    }
-
-    public function deleteSettings(
-        ChatRoom $chatRoom,
-        array $settings
-    )
-    {
-        $oldSettings = json_decode($chatRoom->getSettings(), true);
-
-        if (!is_array($oldSettings)) {
-            return;
-        }
-
-        foreach ($oldSettings as $settingKey => &$oldSetting) {
-            foreach ($settings as $key => $setting) {
-                if ($key === $settingKey) {
-                    unset($oldSettings[$key]);
-
-                    continue 2;
-                }
-            }
-        }
-
-        $chatRoom
-            ->setSettings(json_encode($oldSettings))
-        ;
-
-        $this->chatRoomRepository->flushEntity();
     }
 
 }

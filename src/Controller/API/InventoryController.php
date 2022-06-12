@@ -36,7 +36,7 @@ final class InventoryController extends AbstractController
 
         $inventory = $this->inventoryRepository->findAll();
 
-        if (count($inventory) === 0) {
+        if (count($inventory) !== 0) {
             return new JsonResponse(
                 $this->inventoriesService->prepareInventories($inventory)
             );

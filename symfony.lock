@@ -2,6 +2,9 @@
     "almasaeed2010/adminlte": {
         "version": "v3.2.0"
     },
+    "defuse/php-encryption": {
+        "version": "v2.3.1"
+    },
     "doctrine/annotations": {
         "version": "1.13",
         "recipe": {
@@ -86,8 +89,29 @@
     "laminas/laminas-code": {
         "version": "4.5.1"
     },
+    "lcobucci/clock": {
+        "version": "2.2.0"
+    },
+    "lcobucci/jwt": {
+        "version": "4.1.5"
+    },
+    "league/event": {
+        "version": "2.2.0"
+    },
+    "league/oauth2-server": {
+        "version": "8.3.5"
+    },
+    "league/uri": {
+        "version": "6.6.0"
+    },
+    "league/uri-interfaces": {
+        "version": "2.3.0"
+    },
     "nikic/php-parser": {
         "version": "v4.13.2"
+    },
+    "paragonie/random_compat": {
+        "version": "v9.99.100"
     },
     "phpmetrics/phpmetrics": {
         "version": "v2.8.1"
@@ -101,8 +125,14 @@
     "psr/event-dispatcher": {
         "version": "1.0.0"
     },
+    "psr/http-message": {
+        "version": "1.0.1"
+    },
     "psr/log": {
         "version": "3.0.0"
+    },
+    "stella-maris/clock": {
+        "version": "0.1.4"
     },
     "symfony/cache": {
         "version": "v6.0.6"

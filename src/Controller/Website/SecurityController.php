@@ -48,4 +48,16 @@ class SecurityController extends AbstractController
     {
         //logout automatically
     }
+
+    /**
+     * @Route("/login/oauth/authorize", name="oauth_user_login")
+     */
+    public function oauthLoginAction(
+        Request $request
+    )
+    {
+
+    }
+
+
 }

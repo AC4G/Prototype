@@ -10,9 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
  * OauthClient
  *
  * @ORM\Table(name="oauth_client", uniqueConstraints={@ORM\UniqueConstraint(name="client_secret_UNIQUE", columns={"client_secret"}), @ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="client_id_UNIQUE", columns={"client_id"})}, indexes={@ORM\Index(name="fk_OAuth_Client_Project1_idx", columns={"project_id"})})
- * @ORM\Entity(repositoryClass="App\Repository\OauthClientRepository")
+ * @ORM\Entity(repositoryClass="ClientRepository")
  */
-class OauthClient
+class Client
 {
     /**
      * @var int

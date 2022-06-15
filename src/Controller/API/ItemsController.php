@@ -55,7 +55,7 @@ final class ItemsController extends AbstractController
             $item = $this->itemRepository->findOneBy(['id' => (int)$property]);
         }
 
-        //TODO: PUT -> only with oauth
+        //TODO: PATCH -> only with authentication
 
         if ($request->isMethod('GET')) {
             if (!is_numeric($property)) {
@@ -73,12 +73,12 @@ final class ItemsController extends AbstractController
             }
 
             if (is_null($item)) {
-                return $this->customResponse->errorResponse($request, 'Item not found', 404);
+                return $this->customResponse->errorResponse($request,'Item not found', 404);
             }
 
             if (is_array($item)) {
                 if (count($item) === 0) {
-                    return $this->customResponse->errorResponse($request, 'User hasn\'t an item yet!', 400);
+                    return $this->customResponse->errorResponse($request, 'User hasn\'t created an item yet!', 400);
                 }
             }
 
@@ -107,14 +107,14 @@ final class ItemsController extends AbstractController
     }
 
     /**
-     * @Route("/api/items/{id}/parameters", name="api_item_by_id_remove_parameters", methods={"DELETE", "GET"}, requirements={"id" = "\d+"})
+     * @Route("/api/items/{id}/parameters", name="api_item_by_id_process_parameters", methods={"DELETE", "GET"}, requirements={"id" = "\d+"})
      */
-    public function deleteParameter(
+    public function processParameter(
         Request $request,
         int $id
     ): Response
     {
-        //TODO: only with oauth
+        //TODO: DELETE only with authentication
         $item = $this->itemRepository->findOneBy(['id' => $id]);
 
         if (is_null($item)) {

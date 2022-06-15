@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\OauthClient;
+use App\Entity\Client;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -37,14 +37,14 @@ class WebApp
     private ?string $redirectUrl;
 
     /**
-     * @var OauthClient
+     * @var Client
      *
-     * @ORM\ManyToOne(targetEntity="OauthClient")
+     * @ORM\ManyToOne(targetEntity="Client")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="oauth_client_id", referencedColumnName="id")
      * })
      */
-    private OauthClient $oauthClient;
+    private Client $oauthClient;
 
     public function getId(): ?int
     {
@@ -75,12 +75,12 @@ class WebApp
         return $this;
     }
 
-    public function getOauthClient(): ?OauthClient
+    public function getOauthClient(): ?Client
     {
         return $this->oauthClient;
     }
 
-    public function setOauthClient(?OauthClient $oauthClient): self
+    public function setOauthClient(?Client $oauthClient): self
     {
         $this->oauthClient = $oauthClient;
 

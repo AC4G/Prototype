@@ -83,6 +83,9 @@
     "egulias/email-validator": {
         "version": "3.1.2"
     },
+    "firebase/php-jwt": {
+        "version": "v6.2.0"
+    },
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.7"
     },
@@ -101,6 +104,9 @@
     "league/oauth2-server": {
         "version": "8.3.5"
     },
+    "league/oauth2-server-bundle": {
+        "version": "v0.3.0"
+    },
     "league/uri": {
         "version": "6.6.0"
     },
@@ -110,8 +116,23 @@
     "nikic/php-parser": {
         "version": "v4.13.2"
     },
+    "nyholm/psr7": {
+        "version": "1.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "0cd4d2d0e7f646fda75f9944f747a56e6ed13d4c"
+        },
+        "files": [
+            "config/packages/nyholm_psr7.yaml"
+        ]
+    },
     "paragonie/random_compat": {
         "version": "v9.99.100"
+    },
+    "php-http/message-factory": {
+        "version": "v1.0.2"
     },
     "phpmetrics/phpmetrics": {
         "version": "v2.8.1"
@@ -124,6 +145,9 @@
     },
     "psr/event-dispatcher": {
         "version": "1.0.0"
+    },
+    "psr/http-factory": {
+        "version": "1.0.1"
     },
     "psr/http-message": {
         "version": "1.0.1"
@@ -293,6 +317,9 @@
     },
     "symfony/proxy-manager-bridge": {
         "version": "v6.0.6"
+    },
+    "symfony/psr-http-message-bridge": {
+        "version": "v2.1.2"
     },
     "symfony/rate-limiter": {
         "version": "v6.0.7"

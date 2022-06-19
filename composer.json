@@ -12,7 +12,7 @@
         "doctrine/doctrine-bundle": "^2.6",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.11",
-        "league/oauth2-server-bundle": "^0.3.0",
+        "firebase/php-jwt": "^6.2",
         "symfony/console": "6.0.*",
         "symfony/dotenv": "6.0.*",
         "symfony/expression-language": "6.0.*",

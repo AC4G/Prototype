@@ -21,4 +21,6 @@ class WebAppRepository extends AbstractRepository
             $registry, WebApp::class
         );
     }
+
+
 }

@@ -10,7 +10,8 @@ final class CustomResponse
     public function errorResponse(
         Request $request,
         string $message,
-        int $status = 200
+        int $status = 200,
+        array $headers = []
     ): JsonResponse
     {
         $data = [
@@ -32,7 +33,8 @@ final class CustomResponse
     public function notificationResponse(
         Request $request,
         string $message,
-        int $status = 200
+        int $status = 200,
+        array $headers = []
     ): JsonResponse
     {
         $data = [
@@ -47,7 +49,8 @@ final class CustomResponse
 
         return new JsonResponse(
             $data,
-            $status
+            $status,
+            $headers
         );
     }
 

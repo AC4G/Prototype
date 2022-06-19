@@ -44,7 +44,7 @@ class WebApp
      *   @ORM\JoinColumn(name="oauth_client_id", referencedColumnName="id")
      * })
      */
-    private Client $oauthClient;
+    private Client $client;
 
     public function getId(): ?int
     {
@@ -63,7 +63,7 @@ class WebApp
         return $this;
     }
 
-    public function getRedirectUrl(): ?string
+    public function getRedirectUri(): ?string
     {
         return $this->redirectUrl;
     }
@@ -75,14 +75,14 @@ class WebApp
         return $this;
     }
 
-    public function getOauthClient(): ?Client
+    public function getClient(): ?Client
     {
-        return $this->oauthClient;
+        return $this->client;
     }
 
-    public function setOauthClient(?Client $oauthClient): self
+    public function setClient(?Client $client): self
     {
-        $this->oauthClient = $oauthClient;
+        $this->client = $client;
 
         return $this;
     }

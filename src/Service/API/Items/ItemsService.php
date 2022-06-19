@@ -35,6 +35,9 @@ class ItemsService
             ;
         }
 
+        /**
+         * Will be removed in the future
+         */
         if (array_key_exists('gameName', $newParameter)) {
             $item
                 ->setGameName($newParameter['gameName'])

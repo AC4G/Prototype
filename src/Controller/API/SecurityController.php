@@ -40,7 +40,7 @@ class SecurityController extends AbstractController
         }
 
         if (!array_key_exists('client_id', $content) && !array_key_exists('client_secret', $content)) {
-            return $this->customResponse->errorResponse($request, 'client_id required!', 406);
+            return $this->customResponse->errorResponse($request, 'Client credentials required!', 406);
         }
 
         $client = $this->clientRepository->findOneBy(['clientId' => $content['client_id'], 'clientSecret' => $content['client_secret']]);

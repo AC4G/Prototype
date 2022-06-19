@@ -25,4 +25,5 @@ yarn-error.log
 
 ###> ssl ###
 *.key
+private.pem
 ###< ssl ###

@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Repository\ClientRepository;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\API\Security\SecurityService;
@@ -13,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class SecurityController extends AbstractController
 {
     public function __construct(
+        private ClientRepository $clientRepository,
         private SecurityService $securityService,
         private CustomResponse $customResponse
     )
@@ -41,12 +43,18 @@ class SecurityController extends AbstractController
             return $this->customResponse->errorResponse($request, 'client_id required!', 406);
         }
 
+        $client = $this->clientRepository->findOneBy(['clientId' => $content['client_id'], 'clientSecret' => $content['client_secret']]);
+
+        if (is_null($client)) {
+            return $this->customResponse->errorResponse($request, 'Rejected!', 400);
+        }
+
         if ($content['grant_type'] === 'authorization_code') {
             if (!array_key_exists('code', $content)) {
                 return $this->customResponse->errorResponse($request, 'code required!', 406);
             }
 
-            //If client id and secret matches to the auth. token, return access and refresh token
+            //If client id and secret matches to the code, return access and refresh token
         }
 
         /*Start of 'Client Credentials Grant'
@@ -57,27 +65,17 @@ class SecurityController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Invalid grant_type!', 406);
         }
 
-        $client = $this->securityService->findClient($content['client_id'], $content['client_secret']);
+        $payload = $this->securityService->generateAccessTokenForCCG($client);
 
-        if (is_null($client)) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 400);
-        }
-
-        $payload = $this->securityService->generateResponsePayloadWithJWT($client);
-
-        $response = new JsonResponse(
+        return new JsonResponse(
             $payload,
             200,
             [
-                'Content-Type' => 'application/json',
+                'Content-Type' => 'application/json;charset=UTF-8',
                 'Cache-Control' => 'no-store',
                 'Pragma' => 'no-cache'
             ]
         );
-
-        $response->setCharset('UTF-8');
-
-        return $response;
     }
 
 

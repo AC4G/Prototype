@@ -32,6 +32,13 @@ class AccessToken
     private string $accessToken;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(name="scopes", type="array", nullable=false)
+     */
+    private array $scopes = [];
+
+    /**
      * @var DateTime
      *
      * @ORM\Column(name="expire_date", type="datetime", nullable=false)
@@ -73,6 +80,19 @@ class AccessToken
         $this->accessToken = $accessToken;
 
         return $this;
+    }
+
+    public function getScopes(): array
+    {
+        return array_values($this->scopes);
+    }
+
+    /**
+     * @param array $scopes
+     */
+    public function setScopes(array $scopes): void
+    {
+        $this->scopes = $scopes;
     }
 
     public function getExpireDate(): ?DateTime

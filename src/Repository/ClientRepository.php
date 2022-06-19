@@ -21,4 +21,6 @@ class ClientRepository extends AbstractRepository
             $registry, Client::class
         );
     }
+
+
 }

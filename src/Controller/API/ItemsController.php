@@ -55,8 +55,6 @@ final class ItemsController extends AbstractController
             $item = $this->itemRepository->findOneBy(['id' => (int)$property]);
         }
 
-        //TODO: PATCH -> only with authentication
-
         if ($request->isMethod('GET')) {
             if (!is_numeric($property)) {
                 $user = $this->userRepository->findOneBy(['nickname' => $property]);
@@ -86,6 +84,8 @@ final class ItemsController extends AbstractController
                 $this->itemsService->prepareData($item)
             );
         }
+
+        //TODO: PATCH -> only with authentication
 
         $newParameter = json_decode($request->getContent(), true);
 

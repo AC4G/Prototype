@@ -3,6 +3,7 @@
 namespace App\Service\API\Security;
 
 use DateTime;
+use App\Entity\Item;
 use Firebase\JWT\JWT;
 use App\Entity\Client;
 use App\Entity\AccessToken;
@@ -17,8 +18,7 @@ final class SecurityService
     }
 
     public function generateAccessTokenForCCG(
-        Client $client,
-        string $grantType
+        Client $client
     ): array
     {
         $token = bin2hex(random_bytes(64));
@@ -32,7 +32,7 @@ final class SecurityService
             ->setAccessToken($token)
             ->setProject($client->getProject())
             ->setExpireDate($expire)
-            ->setScopes(['read', 'write', 'modify', 'delete'])
+            ->setScopes(['read', 'write', 'modify'])
         ;
 
         $this->accessTokenRepository->persistAndFlushEntity($accessToken);
@@ -69,6 +69,16 @@ final class SecurityService
         return JWT::encode([
             'token' => $token
         ], $privateKey, 'RS256');
+    }
+
+    public function isClientAllowedForAdjustment(
+        string $token,
+        Item $item
+    ): bool
+    {
+        $accessTokenData = $this->accessTokenRepository->findOneBy(['accessToken' => $token]);
+
+        return !is_null($accessTokenData) && $item->getUser()->getId() === $accessTokenData->getUser()->getId() && $item->getUser()->getId() === $accessTokenData->getUser()->getId();
     }
 
 

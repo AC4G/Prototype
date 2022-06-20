@@ -7,6 +7,7 @@ use App\Repository\UserRepository;
 use App\Service\API\Items\ItemsService;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
+use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class ItemsController extends AbstractController
 {
     public function __construct(
+        private SecurityService $securityService,
         private UserRepository $userRepository,
         private ItemRepository $itemRepository,
         private CustomResponse $customResponse,
@@ -33,7 +35,7 @@ final class ItemsController extends AbstractController
         $items = $this->itemsService->getItems();
 
         if (count($items) === 0) {
-            return $this->customResponse->errorResponse($request, 'Not one item stored. Maybe next time..', 404);
+            return $this->customResponse->errorResponse($request, 'No one item stored. Maybe next time..', 404);
         }
 
         return new JsonResponse(
@@ -99,6 +101,16 @@ final class ItemsController extends AbstractController
 
         if (is_null($item)) {
             return $this->customResponse->errorResponse($request, 'Item not found', 404);
+        }
+
+        $token = $request->headers->get('Authorization');
+
+        if (is_null($token)) {
+            return $this->customResponse->errorResponse($request, 'Access Token required!', 406);
+        }
+
+        if (!$this->securityService->isClientAllowedForAdjustment($token, $item)) {
+            return $this->customResponse->errorResponse($request, 'Rejected!', 400);
         }
 
         $this->itemsService->updateItem($item, $newParameter);

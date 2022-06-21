@@ -151,6 +151,16 @@ final class ItemsController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
         }
 
+        $token = $request->headers->get('Authorization');
+
+        if (is_null($token)) {
+            return $this->customResponse->errorResponse($request, 'Access Token required!', 406);
+        }
+
+        if (!$this->securityService->isClientAllowedForAdjustment($token, $item)) {
+            return $this->customResponse->errorResponse($request, 'Rejected!', 400);
+        }
+
         if (count($parameters) === 0) {
             return  $this->customResponse->errorResponse($request, 'Not even passed a parameter for delete. Nothing changed!', 406);
         }

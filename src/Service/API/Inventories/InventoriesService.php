@@ -8,7 +8,7 @@ use App\Entity\Inventory;
 use App\Serializer\InventoryNormalizer;
 use App\Repository\InventoryRepository;
 
-class InventoriesService
+final class InventoriesService
 {
     public function __construct(
         private InventoryRepository $inventoryRepository,

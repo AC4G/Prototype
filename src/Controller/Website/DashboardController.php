@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Dashboard\DashboardService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class DashboardController extends AbstractController
+final class DashboardController extends AbstractController
 {
     public function __construct(
         private DashboardService $dashboardService

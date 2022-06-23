@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class SecurityController extends AbstractController
+final class SecurityController extends AbstractController
 {
     public function __construct(
         private ClientRepository $clientRepository,

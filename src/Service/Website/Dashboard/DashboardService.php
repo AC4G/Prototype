@@ -4,7 +4,7 @@ namespace App\Service\Website\Dashboard;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class DashboardService
+final class DashboardService
 {
     private array $parameter;
 

@@ -7,7 +7,7 @@ use App\Serializer\ItemNormalizer;
 use App\Repository\ItemRepository;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class ItemsService
+final class ItemsService
 {
     public function __construct(
         private NormalizerInterface $normalizer,

@@ -109,7 +109,7 @@ final class ItemsController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Access Token required!', 406);
         }
 
-        if (!$this->securityService->isClientAllowedForAdjustment($token, $item)) {
+        if (!$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 400);
         }
 
@@ -157,7 +157,7 @@ final class ItemsController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Access Token required!', 406);
         }
 
-        if (!$this->securityService->isClientAllowedForAdjustment($token, $item)) {
+        if (!$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 400);
         }
 

@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <a href="{{ path('home') }}">
+        <p><- back to homepage</p>
+    </a>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                {% if not (errors is empty) %}
+                    {% for error in errors%}
+                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                            <div>
+                                Error: {{ error }}
+                            </div>
+                        </div>
+                    {%  endfor %}
+                {% endif %}
+                <div>
+                    <img src="{{ asset( client_logo ) }}" style="border-radius: 100px; height: 100px">
+                    {{ client_name }}
+                </div>
+               {{ form(login_form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

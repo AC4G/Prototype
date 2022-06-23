@@ -17,7 +17,10 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class RegistrationFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(
+        FormBuilderInterface $builder,
+        array $options
+    )
     {
         $builder
             ->add('nickname', TextType::class, [
@@ -49,7 +52,9 @@ class RegistrationFormType extends AbstractType
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(
+        OptionsResolver $resolver
+    )
     {
         $resolver->setDefaults([
             'data_class' => User::class,
@@ -58,4 +63,6 @@ class RegistrationFormType extends AbstractType
             'csrf_token_id' => 'user_item',
         ]);
     }
+
+
 }

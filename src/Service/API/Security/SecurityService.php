@@ -2,6 +2,7 @@
 
 namespace App\Service\API\Security;
 
+use App\Entity\Inventory;
 use DateTime;
 use App\Entity\Item;
 use Firebase\JWT\JWT;
@@ -47,13 +48,6 @@ final class SecurityService
         ];
     }
 
-    public function authorizeClientForGrantRestrictedAccess(): bool
-    {
-
-
-        return true;
-    }
-
     protected function generateJWT(
         string $token
     ): string
@@ -71,7 +65,7 @@ final class SecurityService
         ], $privateKey, 'RS256');
     }
 
-    public function isClientAllowedForAdjustment(
+    public function isClientAllowedForAdjustmentOnItem(
         string $token,
         Item $item
     ): bool
@@ -79,6 +73,16 @@ final class SecurityService
         $accessTokenData = $this->accessTokenRepository->findOneBy(['accessToken' => $token]);
 
         return !is_null($accessTokenData) && $item->getUser()->getId() === $accessTokenData->getUser()->getId() && $item->getUser()->getId() === $accessTokenData->getUser()->getId();
+    }
+
+    public function isClientAllowedForAdjustmentOnInventory(
+        string $token,
+        Inventory $inventory
+    ): bool
+    {
+        //TODO: authenticate
+
+        return false;
     }
 
 

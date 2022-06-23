@@ -81,6 +81,8 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
+        //TODO: POST, PATCH, DELETE only with authentication code grant and GET if user is private
+
         $user = $this->userRepository->findOneBy((is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]));
 
         if (is_null($user)) {
@@ -149,6 +151,8 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
+        //TODO: authentication code grant
+
         $item = $this->itemRepository->findOneBy(['id' => $itemId]);
 
         if (is_null($item)) {

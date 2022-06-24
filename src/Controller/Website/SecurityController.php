@@ -5,6 +5,7 @@ namespace App\Controller\Website;
 use App\Entity\User;
 use App\Form\OAuth\LoginFormType;
 use App\Repository\ClientRepository;
+use App\Repository\WebAppRepository;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,7 @@ final class SecurityController extends AbstractController
     public function __construct(
         private AuthenticationUtils $authenticationUtils,
         private ClientRepository $clientRepository,
+        private WebAppRepository $webAppRepository,
         private SecurityService $securityService,
         private Security $security
     )
@@ -28,7 +30,7 @@ final class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/login", name="login")
+     * @Route("/login", name="login", methods={"GET", "POST"})
      */
     public function loginAction(): Response
     {
@@ -61,7 +63,7 @@ final class SecurityController extends AbstractController
         Request $request
     ): Response
     {
-        $errors = [];
+        $error = '';
         $client = null;
 
         $query = $request->query->all() ?? [];
@@ -70,13 +72,13 @@ final class SecurityController extends AbstractController
             $client = $this->clientRepository->findOneBy(['clientId' => $query['client_id']]);
 
             if (is_null($client)) {
-                $errors[] = 'Client not found!';
+                $error = 'Client not found!';
                 goto end;
             }
         }
 
         if (!array_key_exists('client_id', $query)) {
-            $errors[] = 'client_id is missing in the query. Contact the client, from where you came from!';
+            $error = 'invalid_request';
             goto end;
         }
 
@@ -87,7 +89,7 @@ final class SecurityController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid() && $form->get('approval')->getData()) {
             if (!array_key_exists('response_type', $query)) {
-                $errors[] = 'response_type required!';
+                $error = 'response_type required!';
                 goto end;
             }
 
@@ -98,18 +100,38 @@ final class SecurityController extends AbstractController
             }
 
             if ($query['response_type'] !== 'code') {
-                $errors[] = 'Wrong response_type';
+                $error = 'unsupported_response_type';
                 goto end;
             }
 
             $user = $this->securityService->getUserByCredentials($request);
 
             if (is_null($user)) {
-                $errors[] = 'Email or password are false!';
+                $error = 'Email or password are false!';
                 goto end;
             }
 
-            //TODO: create authentication token and redirect user
+            if ($this->securityService->hasClientAuthTokenFromUser($user, $client)) {
+                $error = 'Already authenticated!';
+                goto end;
+            }
+
+            $webApp = $this->webAppRepository->findOneBy(['client' => $client]);
+
+            if (is_null($webApp) || is_null($webApp->getRedirectUrl()) || count($webApp->getScopes()) === 0) {
+                $error = 'unauthorized_client';
+                goto end;
+            }
+
+            $authToken = $this->securityService->createAuthenticationToken($user, $client, $webApp);
+
+            $redirectUri = $webApp->getRedirectUrl() . '?code=' . $authToken->getAuthToken();
+
+            if (!is_null($state)) {
+                $redirectUri = $redirectUri . '&state=' . $state;
+            }
+
+            return $this->redirect($redirectUri);
         }
 
         end:
@@ -118,7 +140,7 @@ final class SecurityController extends AbstractController
             'login_form' => $form,
             'client_name' => is_null($client) ? '' : $client->getProject()->getProjectName(),
             'client_logo' => is_null($client) ?  : '/files/' . $client->getProject()->getOrganisationLogo(),
-            'errors' => $errors
+            'error' => $error
         ]);
     }
 

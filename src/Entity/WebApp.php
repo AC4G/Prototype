@@ -46,6 +46,13 @@ class WebApp
      */
     private Client $client;
 
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="scopes", type="array", nullable=false)
+     */
+    private array $scopes = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -63,7 +70,7 @@ class WebApp
         return $this;
     }
 
-    public function getRedirectUri(): ?string
+    public function getRedirectUrl(): ?string
     {
         return $this->redirectUrl;
     }
@@ -83,6 +90,18 @@ class WebApp
     public function setClient(?Client $client): self
     {
         $this->client = $client;
+
+        return $this;
+    }
+
+    public function getScopes(): array
+    {
+        return $this->scopes;
+    }
+
+    public function setScopes(array $scopes): self
+    {
+        $this->scopes = $scopes;
 
         return $this;
     }

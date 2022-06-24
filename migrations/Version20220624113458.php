@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20220501135736 extends AbstractMigration
+final class Version20220624113458 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,6 +20,7 @@ final class Version20220501135736 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('ALTER TABLE auth_token CHANGE expire_date expire_date DATETIME DEFAULT NULL');
         $this->addSql('DROP INDEX fk_User_Id_Token_Type ON token');
         $this->addSql('CREATE INDEX fk_User_Id_Token_Type ON token (user_id, token, token_type)');
     }
@@ -27,6 +28,7 @@ final class Version20220501135736 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('ALTER TABLE auth_token CHANGE expire_date expire_date DATETIME NOT NULL');
         $this->addSql('DROP INDEX fk_User_Id_Token_Type ON token');
         $this->addSql('CREATE INDEX fk_User_Id_Token_Type ON token (user_id, token, token_type(255))');
     }

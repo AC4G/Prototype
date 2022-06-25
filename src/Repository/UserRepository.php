@@ -37,4 +37,11 @@ class UserRepository extends AbstractRepository
     {
         return !is_null($this->findOneBy(['id' => $id]));
     }
+
+    public function getUserByProperty(string $property): ?User
+    {
+        return $this->findOneBy((is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]));
+    }
+
+
 }

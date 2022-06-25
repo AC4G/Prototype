@@ -5,8 +5,8 @@ namespace App\Controller\API;
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
 use App\Repository\InventoryRepository;
-use App\Service\API\Security\SecurityService;
 use App\Service\Response\API\CustomResponse;
+use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -55,22 +55,22 @@ final class InventoryController extends AbstractController
         string $property
     ): Response
     {
-        $user = $this->userRepository->findOneBy((is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]));
+        $user = $this->userRepository->getUserByProperty($property);
 
         if (is_null($user)) {
             return $this->customResponse->errorResponse($request, is_numeric($property) ? sprintf('User with id %s don\'t exists!', $property) : sprintf('User %s don\'t exists!', $property), 404);
-        }
-
-        $inventory = $this->inventoryRepository->findBy(['user' => $user]);
-
-        if (count($inventory) === 0 && !$user->isPrivate()) {
-            return $this->customResponse->errorResponse($request, 'User has not an item in inventory yet!', 400);
         }
 
         $token = $request->headers->get('Authorization');
 
         if ($user->isPrivate() && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user))) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+        }
+
+        $inventory = $this->inventoryRepository->findBy(['user' => $user]);
+
+        if (count($inventory) === 0 && !$user->isPrivate()) {
+            return $this->customResponse->errorResponse($request, 'User has not an item in inventory yet!', 400);
         }
 
         return new JsonResponse(
@@ -87,7 +87,7 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
-        $user = $this->userRepository->findOneBy((is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]));
+        $user = $this->userRepository->getUserByProperty($property);
 
         if (is_null($user)) {
             return $this->customResponse->errorResponse($request, is_numeric($property) ? sprintf('User with id %s don\'t exists!', $property) : sprintf('User %s don\'t exists!', $property), 404);
@@ -95,11 +95,7 @@ final class InventoryController extends AbstractController
 
         $token = $request->headers->get('Authorization');
 
-        if (($user->isPrivate() && is_null($token) || ($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user)))) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
-        }
-
-        if (!$user->isPrivate() && ($request->isMethod('POST') || $request->isMethod('PATCH') || $request->isMethod('DELETE')) && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user))) {
+        if (($user->isPrivate() && is_null($token) || ($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user))) || (!$user->isPrivate() && !$request->isMethod('GET') && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user)))) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
@@ -173,7 +169,7 @@ final class InventoryController extends AbstractController
     }
 
     /**
-     * @Route("/api/inventories/{property}/{itemId}/parameters", name="api_inventories_item_by_id_remove_parameters", methods={"DELETE"}, requirements={"itemId" = "\d+"})
+     * @Route("/api/inventories/{property}/{itemId}/parameters", name="api_inventories_item_by_id_remove_parameters", methods={"DELETE", "GET"}, requirements={"itemId" = "\d+"})
      */
     public function deleteParameterFromItemInInventory(
         Request $request,
@@ -181,7 +177,17 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
-        //TODO: authentication code grant
+        $user = $this->userRepository->getUserByProperty($property);
+
+        if (is_null($user)) {
+            return $this->customResponse->errorResponse($request, is_numeric($property) ? sprintf('User with id %s don\'t exists', $property) : sprintf('User %s don\'t exists', $property), 404);
+        }
+
+        $token = $request->headers->get('Authorization');
+
+        if (($user->isPrivate() && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user)) && $request->isMethod('GET')) || (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user))) {
+            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+        }
 
         $item = $this->itemRepository->findOneBy(['id' => $itemId]);
 
@@ -189,10 +195,14 @@ final class InventoryController extends AbstractController
             return $this->customResponse->errorResponse($request, sprintf('Item with id %s don\'t exists!', $itemId), 404);
         }
 
-        $user = $this->userRepository->findOneBy(is_numeric($property)? ['id' => (int)$property] : ['nickname' => $property]);
+        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
 
-        if (is_null($user)) {
-            return $this->customResponse->errorResponse($request, is_numeric($property) ? sprintf('User with id %s don\'t exists', $property) : sprintf('User %s don\'t exists', $property), 404);
+        if (is_null($inventory)) {
+            return $this->customResponse->errorResponse($request, sprintf('User don\'t has item with id %s in inventory', $itemId), 404);
+        }
+
+        if ($request->isMethod('GET')) {
+            return new JsonResponse(json_decode($inventory->getParameter(), true));
         }
 
         $parameters = json_decode($request->getContent(), true);
@@ -203,12 +213,6 @@ final class InventoryController extends AbstractController
 
         if (count($parameters) === 0) {
             return $this->customResponse->errorResponse($request, 'Not even passed a parameter for delete. Nothing changed!', 406);
-        }
-
-        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
-
-        if (is_null($inventory)) {
-            return $this->customResponse->errorResponse($request, sprintf('User don\'t has item with id %s in inventory', $itemId), 404);
         }
 
         $this->inventoriesService->deleteParameter($inventory, $parameters);

@@ -2,18 +2,24 @@
 
 namespace App\Service\API\Security;
 
-use App\Entity\Inventory;
 use DateTime;
+use App\Entity\User;
 use App\Entity\Item;
 use Firebase\JWT\JWT;
 use App\Entity\Client;
+use App\Entity\AuthToken;
 use App\Entity\AccessToken;
+use App\Entity\RefreshToken;
+use App\Repository\AuthTokenRepository;
 use App\Repository\AccessTokenRepository;
+use App\Repository\RefreshTokenRepository;
 
 final class SecurityService
 {
     public function __construct(
-        private AccessTokenRepository $accessTokenRepository
+        private RefreshTokenRepository $refreshTokenRepository,
+        private AccessTokenRepository $accessTokenRepository,
+        private AuthTokenRepository $authTokenRepository
     )
     {
     }
@@ -75,14 +81,57 @@ final class SecurityService
         return !is_null($accessTokenData) && $item->getUser()->getId() === $accessTokenData->getUser()->getId() && $item->getUser()->getId() === $accessTokenData->getUser()->getId();
     }
 
-    public function isClientAllowedForAdjustmentOnInventory(
+    public function createPayloadWithAccessAndRefreshToken(
+        AuthToken $authToken
+    ): array
+    {
+        $accessToken = new AccessToken();
+
+        $expire = new DateTime('+10 day');
+
+        $accessToken
+            ->setUser($authToken->getUser())
+            ->setProject($authToken->getProject())
+            ->setAccessToken(bin2hex(random_bytes(64)))
+            ->setExpireDate($expire)
+            ->setScopes($authToken->getScopes())
+        ;
+
+        $this->accessTokenRepository->persistAndFlushEntity($accessToken);
+
+        $refreshToken = new RefreshToken();
+
+        $refreshToken
+            ->setUser($authToken->getUser())
+            ->setProject($authToken->getProject())
+            ->setRefreshToken(bin2hex(random_bytes(64)))
+            ->setExpireDate(new DateTime('+15 day'))
+            ->setScopes($authToken->getScopes())
+        ;
+
+        $this->refreshTokenRepository->persistAndFlushEntity($refreshToken);
+
+        $this->authTokenRepository->deleteEntry($authToken);
+
+        $diff = $expire->diff(new DateTime());
+        $expireInSeconds = $diff->s + ($diff->m * 60) + ($diff->h * 3600) + ($diff->d * 3600 * 24);
+
+        return [
+            'access_token' => $this->generateJWT($accessToken->getAccessToken()),
+            'token_type' => 'bearer',
+            'expires_in' => $expireInSeconds,
+            'refresh_token' => $this->generateJWT($refreshToken->getRefreshToken())
+        ];
+    }
+
+    public function isClientAllowedForAdjustmentOnUserContent(
         string $token,
-        Inventory $inventory
+        User $user
     ): bool
     {
-        //TODO: authenticate
+        $accessToken = $this->accessTokenRepository->findOneBy(['user' => $user, 'accessToken' => $token]);
 
-        return false;
+        return !is_null($accessToken) && new DateTime() < $accessToken->getExpireDate();
     }
 
 

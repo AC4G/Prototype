@@ -58,6 +58,13 @@ class RefreshToken
      */
     private Project $project;
 
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="scopes", type="array", nullable=false)
+     */
+    private array $scopes = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -107,6 +114,18 @@ class RefreshToken
     public function setProject(?Project $project): self
     {
         $this->project = $project;
+
+        return $this;
+    }
+
+    public function getScopes(): array
+    {
+        return $this->scopes;
+    }
+
+    public function setScopes(array $scopes): self
+    {
+        $this->scopes = $scopes;
 
         return $this;
     }

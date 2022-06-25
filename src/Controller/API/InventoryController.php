@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
 use App\Repository\InventoryRepository;
+use App\Service\API\Security\SecurityService;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +19,7 @@ final class InventoryController extends AbstractController
     public function __construct(
         private InventoryRepository $inventoryRepository,
         private InventoriesService $inventoriesService,
+        private SecurityService $securityService,
         private UserRepository $userRepository,
         private ItemRepository $itemRepository,
         private CustomResponse $customResponse
@@ -53,8 +55,6 @@ final class InventoryController extends AbstractController
         string $property
     ): Response
     {
-        //TODO: if user is private, than access only with jwt oauth2.0 and post put only with oauth2.0
-
         $user = $this->userRepository->findOneBy((is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]));
 
         if (is_null($user)) {
@@ -63,8 +63,14 @@ final class InventoryController extends AbstractController
 
         $inventory = $this->inventoryRepository->findBy(['user' => $user]);
 
-        if (count($inventory) === 0) {
+        if (count($inventory) === 0 && !$user->isPrivate()) {
             return $this->customResponse->errorResponse($request, 'User has not an item in inventory yet!', 400);
+        }
+
+        $token = $request->headers->get('Authorization');
+
+        if ($user->isPrivate() && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user))) {
+            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
         return new JsonResponse(
@@ -81,12 +87,20 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
-        //TODO: POST, PATCH, DELETE only with authentication code grant and GET if user is private
-
         $user = $this->userRepository->findOneBy((is_numeric($property) ? ['id' => (int)$property] : ['nickname' => $property]));
 
         if (is_null($user)) {
             return $this->customResponse->errorResponse($request, is_numeric($property) ? sprintf('User with id %s don\'t exists!', $property) : sprintf('User %s don\'t exists!', $property), 404);
+        }
+
+        $token = $request->headers->get('Authorization');
+
+        if (($user->isPrivate() && is_null($token) || ($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user)))) {
+            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+        }
+
+        if (!$user->isPrivate() && ($request->isMethod('POST') || $request->isMethod('PATCH') || $request->isMethod('DELETE')) && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user))) {
+            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
         $item = $this->itemRepository->findOneBy(['id' => $itemId]);
@@ -103,21 +117,33 @@ final class InventoryController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
         }
 
-        if ($request->isMethod('PATCH')) {
-            if (is_null($inventory)) {
-                return $this->customResponse->errorResponse($request, 'User does not has this item in inventory. Please use POST method to add item!', 406);
-            }
+        if (is_null($inventory) && $request->isMethod('PATCH')) {
+            return $this->customResponse->errorResponse($request, 'User does not has this item in inventory. Please use POST method to add item!', 406);
+        }
 
+        if (is_null($inventory) && $request->isMethod('POST')) {
+            return $this->customResponse->errorResponse($request, sprintf('User already has that item with id %s. For update use PATCH method', $itemId), 406);
+        }
+
+        if (is_null($inventory) && ($request->isMethod('GET') || $request->isMethod('DELETE'))) {
+            return $this->customResponse->errorResponse($request, 'User does not has this item in inventory!', 406);
+        }
+
+        /*
+         * Update Inventory
+         *  - PATCH
+         */
+        if ($request->isMethod('PATCH')) {
             $this->inventoriesService->updateInventory($parameter, $inventory);
 
             return $this->customResponse->notificationResponse($request, 'Inventory updated');
         }
 
+        /*
+         * Put Item in users inventory (create entry)
+         *  - POST
+         */
         if ($request->isMethod('POST')) {
-            if (!is_null($inventory)) {
-                return $this->customResponse->errorResponse($request, sprintf('User already has that item with id %s. For update use PATCH method', $itemId), 406);
-            }
-
             if (!array_key_exists('amount', $parameter)) {
                 return $this->customResponse->errorResponse($request, 'Amount is required with POST method!', 406);
             }
@@ -127,16 +153,20 @@ final class InventoryController extends AbstractController
             return $this->customResponse->notificationResponse($request, 'Item successfully added to inventory', 201);
         }
 
-        if (is_null($inventory)) {
-            return $this->customResponse->errorResponse($request, 'User does not has this item in inventory!', 406);
-        }
-
+        /*
+         * Get all entries from inventory
+         *  - GET
+         */
         if ($request->isMethod('GET')) {
             return new JsonResponse(
               $this->inventoriesService->prepareInventories($inventory)
             );
         }
 
+        /*
+         * Delete one entry from inventory
+         *  - DELETE
+         */
         $this->inventoryRepository->deleteEntry($inventory);
 
         return $this->customResponse->notificationResponse($request, 'Item successfully removed from inventory');

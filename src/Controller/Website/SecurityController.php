@@ -89,7 +89,7 @@ final class SecurityController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid() && $form->get('approval')->getData()) {
             if (!array_key_exists('response_type', $query)) {
-                $error = 'response_type required!';
+                $error = 'invalid_request';
                 goto end;
             }
 

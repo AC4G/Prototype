@@ -3,6 +3,9 @@
 namespace App\Controller\API;
 
 use App\Repository\ClientRepository;
+use App\Repository\AuthTokenRepository;
+use App\Repository\AccessTokenRepository;
+use App\Repository\RefreshTokenRepository;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\API\Security\SecurityService;
@@ -14,6 +17,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class SecurityController extends AbstractController
 {
     public function __construct(
+        private RefreshTokenRepository $refreshTokenRepository,
+        private AccessTokenRepository $accessTokenRepository,
+        private AuthTokenRepository $authTokenRepository,
         private ClientRepository $clientRepository,
         private SecurityService $securityService,
         private CustomResponse $customResponse
@@ -26,7 +32,7 @@ final class SecurityController extends AbstractController
      */
     public function authorizeClient(
         Request $request
-    )
+    ): Response
     {
         $content = $request->request->all();
 
@@ -39,25 +45,45 @@ final class SecurityController extends AbstractController
             return $this->customResponse->errorResponse($request, 'grant_type required!', 406);
         }
 
-        if (!array_key_exists('client_id', $content) && !array_key_exists('client_secret', $content)) {
+        if (!array_key_exists('client_id', $content) xor !array_key_exists('client_secret', $content)) {
             return $this->customResponse->errorResponse($request, 'Client credentials required!', 406);
         }
 
         $client = $this->clientRepository->findOneBy(['clientId' => $content['client_id'], 'clientSecret' => $content['client_secret']]);
 
         if (is_null($client)) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 400);
+            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
         if ($content['grant_type'] === 'authorization_code') {
+            /*  Start of 'Authorization Code Grant'
+            *  - access token for client resources
+            */
+
             if (!array_key_exists('code', $content)) {
                 return $this->customResponse->errorResponse($request, 'code required!', 406);
             }
 
-            //If client id and secret matches to the code, return access and refresh token
+            $authToken = $this->authTokenRepository->findOneBy(['authToken' => $content['code'], 'project' => $client->getProject()]);
+
+            if (is_null($authToken)) {
+                return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+            }
+
+            $payload = $this->securityService->createPayloadWithAccessAndRefreshToken($authToken);
+
+            return new JsonResponse(
+                $payload,
+                200,
+                [
+                    'Content-Type' => 'application/json;charset=UTF-8',
+                    'Cache-Control' => 'no-store',
+                    'Pragma' => 'no-cache'
+                ]
+            );
         }
 
-        /*Start of 'Client Credentials Grant'
+        /*  Start of 'Client Credentials Grant'
          *  - access token only for client resources
          */
 

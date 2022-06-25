@@ -110,7 +110,7 @@ final class ItemsController extends AbstractController
         }
 
         if (!$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 400);
+            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
         $this->itemsService->updateItem($item, $newParameter);
@@ -158,7 +158,7 @@ final class ItemsController extends AbstractController
         }
 
         if (!$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 400);
+            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
         if (count($parameters) === 0) {

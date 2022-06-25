@@ -105,11 +105,7 @@ final class ItemsController extends AbstractController
 
         $token = $request->headers->get('Authorization');
 
-        if (is_null($token)) {
-            return $this->customResponse->errorResponse($request, 'Access Token required!', 406);
-        }
-
-        if (!$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
+        if (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
@@ -126,7 +122,6 @@ final class ItemsController extends AbstractController
         int $id
     ): Response
     {
-        //TODO: DELETE only with authentication
         $item = $this->itemRepository->findOneBy(['id' => $id]);
 
         if (is_null($item)) {
@@ -145,20 +140,16 @@ final class ItemsController extends AbstractController
             );
         }
 
+        $token = $request->headers->get('Authorization');
+
+        if (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
+            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+        }
+
         $parameters = json_decode($request->getContent(), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
-        }
-
-        $token = $request->headers->get('Authorization');
-
-        if (is_null($token)) {
-            return $this->customResponse->errorResponse($request, 'Access Token required!', 406);
-        }
-
-        if (!$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
         if (count($parameters) === 0) {

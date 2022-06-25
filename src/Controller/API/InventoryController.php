@@ -185,7 +185,7 @@ final class InventoryController extends AbstractController
 
         $token = $request->headers->get('Authorization');
 
-        if (($user->isPrivate() && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user)) && $request->isMethod('GET')) || (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user))) {
+        if (($user->isPrivate() && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user)) && $request->isMethod('GET')) || ((is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user)) && !$request->isMethod('GET'))) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 

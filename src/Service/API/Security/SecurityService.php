@@ -81,7 +81,7 @@ final class SecurityService
         return !is_null($accessTokenData) && $item->getUser()->getId() === $accessTokenData->getUser()->getId() && $item->getUser()->getId() === $accessTokenData->getUser()->getId();
     }
 
-    public function createPayloadWithAccessAndRefreshToken(
+    public function createPayloadWithAccessAndRefreshTokenFromAuthToken(
         AuthToken $authToken
     ): array
     {
@@ -112,6 +112,51 @@ final class SecurityService
         $this->refreshTokenRepository->persistAndFlushEntity($refreshToken);
 
         $this->authTokenRepository->deleteEntry($authToken);
+
+        $diff = $expire->diff(new DateTime());
+        $expireInSeconds = $diff->s + ($diff->m * 60) + ($diff->h * 3600) + ($diff->d * 3600 * 24);
+
+        return [
+            'access_token' => $this->generateJWT($accessToken->getAccessToken()),
+            'token_type' => 'bearer',
+            'expires_in' => $expireInSeconds,
+            'refresh_token' => $this->generateJWT($refreshToken->getRefreshToken())
+        ];
+    }
+
+    public function createPayloadWithAccessAndRefreshTokenFromRefreshToken(
+        RefreshToken $oldRefreshToken,
+        AccessToken $oldAccessToken
+    ): array
+    {
+        $accessToken = new AccessToken();
+
+        $expire = new DateTime('+10 day');
+
+        $accessToken
+            ->setUser($oldRefreshToken->getUser())
+            ->setProject($oldRefreshToken->getProject())
+            ->setAccessToken(bin2hex(random_bytes(64)))
+            ->setExpireDate($expire)
+            ->setScopes($oldRefreshToken->getScopes())
+        ;
+
+        $this->accessTokenRepository->persistAndFlushEntity($accessToken);
+
+        $refreshToken = new RefreshToken();
+
+        $refreshToken
+            ->setUser($oldRefreshToken->getUser())
+            ->setProject($oldRefreshToken->getProject())
+            ->setRefreshToken(bin2hex(random_bytes(64)))
+            ->setExpireDate(new DateTime('+15 day'))
+            ->setScopes($oldRefreshToken->getScopes())
+        ;
+
+        $this->refreshTokenRepository->persistAndFlushEntity($refreshToken);
+
+        $this->accessTokenRepository->deleteEntry($oldAccessToken);
+        $this->refreshTokenRepository->deleteEntry($oldRefreshToken);
 
         $diff = $expire->diff(new DateTime());
         $expireInSeconds = $diff->s + ($diff->m * 60) + ($diff->h * 3600) + ($diff->d * 3600 * 24);

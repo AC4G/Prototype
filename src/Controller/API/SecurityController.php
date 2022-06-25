@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use DateTime;
 use App\Repository\ClientRepository;
 use App\Repository\AuthTokenRepository;
 use App\Repository\AccessTokenRepository;
@@ -40,6 +41,7 @@ final class SecurityController extends AbstractController
          * grant_type
          *  - Client Credentials Grant -> client_credentials
          *  - Authorization Code Grant -> authorization_code
+         *  -
          */
         if (!array_key_exists('grant_type', $content)) {
             return $this->customResponse->errorResponse($request, 'grant_type required!', 406);
@@ -70,7 +72,40 @@ final class SecurityController extends AbstractController
                 return $this->customResponse->errorResponse($request, 'Rejected!', 403);
             }
 
-            $payload = $this->securityService->createPayloadWithAccessAndRefreshToken($authToken);
+            $payload = $this->securityService->createPayloadWithAccessAndRefreshTokenFromAuthToken($authToken);
+
+            return new JsonResponse(
+                $payload,
+                200,
+                [
+                    'Content-Type' => 'application/json;charset=UTF-8',
+                    'Cache-Control' => 'no-store',
+                    'Pragma' => 'no-cache'
+                ]
+            );
+        }
+
+        if ($content['grant_type'] === 'refresh_token') {
+            /*  Start Refresh Token Grant
+             *  - access token for client resources
+             */
+            if (!array_key_exists('refresh_token', $content)) {
+                return $this->customResponse->errorResponse($request, 'refresh_token required!', 406);
+            }
+
+            $refreshToken = $this->refreshTokenRepository->findOneBy(['refreshToken' => $content['refresh_token'], 'project' => $client->getProject()]);
+
+            if (is_null($refreshToken)) {
+                return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+            }
+
+            $accessToken = $this->accessTokenRepository->findOneBy(['project' => $client->getProject(), 'user' => $refreshToken->getUser()]);
+
+            if (is_null($accessToken) || new DateTime() < $accessToken->getExpireDate()) {
+                return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+            }
+
+            $payload = $this->securityService->createPayloadWithAccessAndRefreshTokenFromRefreshToken($refreshToken, $accessToken);
 
             return new JsonResponse(
                 $payload,

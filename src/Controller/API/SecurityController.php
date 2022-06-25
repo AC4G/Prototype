@@ -41,7 +41,7 @@ final class SecurityController extends AbstractController
          * grant_type
          *  - Client Credentials Grant -> client_credentials
          *  - Authorization Code Grant -> authorization_code
-         *  -
+         *  - Refresh Token Grant -> refresh_token
          */
         if (!array_key_exists('grant_type', $content)) {
             return $this->customResponse->errorResponse($request, 'grant_type required!', 406);
@@ -101,7 +101,7 @@ final class SecurityController extends AbstractController
 
             $accessToken = $this->accessTokenRepository->findOneBy(['project' => $client->getProject(), 'user' => $refreshToken->getUser()]);
 
-            if (is_null($accessToken) || new DateTime() < $accessToken->getExpireDate()) {
+            if (is_null($accessToken) || new DateTime() > $accessToken->getExpireDate()) {
                 return $this->customResponse->errorResponse($request, 'Rejected!', 403);
             }
 

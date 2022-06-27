@@ -3,9 +3,11 @@
 namespace App\Service\API\Security;
 
 use DateTime;
+use Exception;
 use App\Entity\User;
 use App\Entity\Item;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use App\Entity\Client;
 use App\Entity\AuthToken;
 use App\Entity\AccessToken;
@@ -69,6 +71,32 @@ final class SecurityService
         return JWT::encode([
             'token' => $token
         ], $privateKey, 'RS256');
+    }
+
+    public function decodeJWTAndReturnToken(
+        ?string $jwt
+    ): ?string
+    {
+        $passphrase = '6913abde502dffb25b96af7c5a2e322304d48c89381d852edab6a4e98f343d618e1e8196858ea9193b869a4b50e43d2c65178260dd7a50d89d71cd9394bdcdef';
+        $privateKeyFile = '../private.pem';
+
+        $privateKey = openssl_get_privatekey(
+            file_get_contents($privateKeyFile),
+            $passphrase
+        );
+
+        $publicKey = openssl_pkey_get_details($privateKey)['key'];
+
+        try {
+            $payload = JWT::decode(
+                $jwt,
+                new Key($publicKey, 'RS256')
+            );
+        } catch (Exception $e) {
+            return null;
+        }
+
+        return get_object_vars($payload)['token'];
     }
 
     public function isClientAllowedForAdjustmentOnItem(

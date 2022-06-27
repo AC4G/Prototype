@@ -87,26 +87,30 @@ final class ItemsController extends AbstractController
             );
         }
 
-        //TODO: PATCH -> only with authentication
-
-        $newParameter = json_decode($request->getContent(), true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
+        if (is_null($item)) {
+            return $this->customResponse->errorResponse($request, 'Item not found', 404);
         }
 
         if (!is_numeric($property)) {
             return $this->customResponse->errorResponse($request, 'For the PATCH method the property must be numeric!');
         }
 
-        if (is_null($item)) {
-            return $this->customResponse->errorResponse($request, 'Item not found', 404);
+        $jwt = $request->headers->get('Authorization');
+
+        if (is_null($jwt)) {
+            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
-        $token = $request->headers->get('Authorization');
+        $token = $this->securityService->decodeJWTAndReturnToken($jwt);
 
         if (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+        }
+
+        $newParameter = json_decode($request->getContent(), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
         }
 
         $this->itemsService->updateItem($item, $newParameter);
@@ -140,7 +144,13 @@ final class ItemsController extends AbstractController
             );
         }
 
-        $token = $request->headers->get('Authorization');
+        $jwt = $request->headers->get('Authorization');
+
+        if (is_null($jwt)) {
+            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+        }
+
+        $token = $this->securityService->decodeJWTAndReturnToken($jwt);
 
         if (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);

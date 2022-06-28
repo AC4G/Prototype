@@ -45,19 +45,8 @@ final class RegistrationService
             ->setCreationDate(new DateTime())
         ;
 
-        try {
-            $this->userRepository->persistAndFlushEntity($user);
-        } catch (Exception $e) {
-            $this->errors[] = $this->createError('saving', 'user_entity');
-        }
+        $this->userRepository->persistAndFlushEntity($user);
 
-        $this->user = $user;
-    }
-
-    public function giveUserARole(
-        User $user
-    ): void
-    {
         $roleIdent = $this->roleIdentRepository->findOneBy(['roleName' => 'ROLE_USER']);
 
         if (is_null($roleIdent)) {
@@ -66,26 +55,18 @@ final class RegistrationService
                 ->setRoleName('ROLE_USER');
         }
 
-        try {
-            $this->roleIdentRepository->persistEntity($roleIdent);
-        } catch (Exception $e) {
-            $this->errors[] = $this->createError('saving', 'roleIdent_entity');
-        }
+        $this->roleIdentRepository->persistAndFlushEntity($roleIdent);
 
-        if (count($this->errors) < 1) {
-            $userRoles = new UserRoles();
+        $userRoles = new UserRoles();
 
-            $userRoles
-                ->setUser($user)
-                ->setRoleIdent($roleIdent)
-            ;
+        $userRoles
+            ->setUser($user)
+            ->setRoleIdent($roleIdent)
+        ;
 
-            try {
-                $this->userRolesRepository->persistEntity($userRoles);
-            } catch (Exception $e) {
-                $this->errors[] = $this->createError('saving', 'userRoles_entity');
-            }
-        }
+        $this->userRolesRepository->persistAndFlushEntity($userRoles);
+
+        $this->user = $user;
     }
 
     private function createError(

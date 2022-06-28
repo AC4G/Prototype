@@ -34,9 +34,12 @@ final class InventoryController extends AbstractController
         Request $request
     ): Response
     {
-        return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+        $jwt = $request->headers->get('Authorization');
 
-        //TODO: secure route! Access only for admins
+        if (!$this->securityService->isClientAdmin($jwt)) {
+            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+        }
+
         $inventory = $this->inventoryRepository->findAll();
 
         if (count($inventory) !== 0) {
@@ -64,13 +67,7 @@ final class InventoryController extends AbstractController
 
         $jwt = $request->headers->get('Authorization');
 
-        if ($user->isPrivate() && (is_null($jwt))) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
-        }
-
-        $token = is_null($jwt) ? null : $this->securityService->decodeJWTAndReturnToken($jwt);
-
-        if ($user->isPrivate() && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user))) {
+        if ($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user)) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
@@ -102,13 +99,7 @@ final class InventoryController extends AbstractController
 
         $jwt = $request->headers->get('Authorization');
 
-        if ($user->isPrivate() && is_null($jwt) || !$user->isPrivate() && is_null($jwt) && !$request->isMethod('GET')) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
-        }
-
-        $token = is_null($jwt) ? null : $this->securityService->decodeJWTAndReturnToken($jwt);
-
-        if ($user->isPrivate() && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user)) || !$user->isPrivate() && !$request->isMethod('GET') && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user))) {
+        if ($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user) || !$user->isPrivate() && !$request->isMethod('GET') && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user)) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
@@ -198,13 +189,7 @@ final class InventoryController extends AbstractController
 
         $jwt = $request->headers->get('Authorization');
 
-        if (($user->isPrivate() && is_null($jwt) || !$user->isPrivate() && !$request->isMethod('GET') && is_null($jwt))) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
-        }
-
-        $token = is_null($jwt) ? null : $this->securityService->decodeJWTAndReturnToken($jwt);
-
-        if ($user->isPrivate() && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user)) || !$user->isPrivate() && (!$request->isMethod('GET') && (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnUserContent($token, $user)))) {
+        if (($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user) || !$user->isPrivate() && !$request->isMethod('GET') && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user))) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 

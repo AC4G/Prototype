@@ -13,6 +13,7 @@ use App\Entity\AuthToken;
 use App\Entity\AccessToken;
 use App\Entity\RefreshToken;
 use App\Repository\AuthTokenRepository;
+use App\Repository\UserRolesRepository;
 use App\Repository\AccessTokenRepository;
 use App\Repository\RefreshTokenRepository;
 
@@ -21,7 +22,8 @@ final class SecurityService
     public function __construct(
         private RefreshTokenRepository $refreshTokenRepository,
         private AccessTokenRepository $accessTokenRepository,
-        private AuthTokenRepository $authTokenRepository
+        private AuthTokenRepository $authTokenRepository,
+        private UserRolesRepository $userRolesRepository
     )
     {
     }
@@ -73,7 +75,7 @@ final class SecurityService
         ], $privateKey, 'RS256');
     }
 
-    public function decodeJWTAndReturnToken(
+    protected function decodeJWTAndReturnToken(
         ?string $jwt
     ): ?string
     {
@@ -97,16 +99,6 @@ final class SecurityService
         }
 
         return get_object_vars($payload)['token'];
-    }
-
-    public function isClientAllowedForAdjustmentOnItem(
-        string $token,
-        Item $item
-    ): bool
-    {
-        $accessTokenData = $this->accessTokenRepository->findOneBy(['accessToken' => $token]);
-
-        return !is_null($accessTokenData) && $item->getUser()->getId() === $accessTokenData->getUser()->getId() && $item->getUser()->getId() === $accessTokenData->getUser()->getId();
     }
 
     public function createPayloadWithAccessAndRefreshTokenFromAuthToken(
@@ -198,13 +190,74 @@ final class SecurityService
     }
 
     public function isClientAllowedForAdjustmentOnUserContent(
-        string $token,
+        ?string $jwt,
         User $user
     ): bool
     {
+        if (is_null($jwt)) {
+            return false;
+        }
+
+        $token = $this->decodeJWTAndReturnToken($jwt);
+
+        if (is_null($token)) {
+            return false;
+        }
+
         $accessToken = $this->accessTokenRepository->findOneBy(['user' => $user, 'accessToken' => $token]);
 
         return !is_null($accessToken) && new DateTime() < $accessToken->getExpireDate();
+    }
+
+    public function isClientAllowedForAdjustmentOnItem(
+        ?string $jwt,
+        Item $item
+    ): bool
+    {
+        if (is_null($jwt)) {
+            return false;
+        }
+
+        $token = $this->decodeJWTAndReturnToken($jwt);
+
+        if (is_null($token)) {
+            return false;
+        }
+
+        $accessTokenData = $this->accessTokenRepository->findOneBy(['accessToken' => $token]);
+
+        return !is_null($accessTokenData) && $item->getUser()->getId() === $accessTokenData->getUser()->getId() && $item->getUser()->getId() === $accessTokenData->getUser()->getId();
+    }
+
+    public function isClientAdmin(
+        $jwt
+    ): bool
+    {
+        if (is_null($jwt)) {
+            return false;
+        }
+
+        $token = $this->decodeJWTAndReturnToken($jwt);
+
+        if (is_null($token)) {
+            return false;
+        }
+
+        $accessToken = $this->accessTokenRepository->findOneBy(['accessToken' => $token]);
+
+        if (is_null($accessToken)) {
+            return false;
+        }
+
+        $userRoles = $this->userRolesRepository->findBy(['user' => $accessToken->getProject()->getDeveloper()->getUser()]);
+
+        foreach ($userRoles as $role) {
+            if ($role->getRoleIdent()->getRoleName() === 'ROLE_ADMIN') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

@@ -97,13 +97,7 @@ final class ItemsController extends AbstractController
 
         $jwt = $request->headers->get('Authorization');
 
-        if (is_null($jwt)) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
-        }
-
-        $token = $this->securityService->decodeJWTAndReturnToken($jwt);
-
-        if (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
+        if (!$this->securityService->isClientAllowedForAdjustmentOnItem($jwt, $item)) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
@@ -146,13 +140,7 @@ final class ItemsController extends AbstractController
 
         $jwt = $request->headers->get('Authorization');
 
-        if (is_null($jwt)) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
-        }
-
-        $token = $this->securityService->decodeJWTAndReturnToken($jwt);
-
-        if (is_null($token) || !$this->securityService->isClientAllowedForAdjustmentOnItem($token, $item)) {
+        if (!$this->securityService->isClientAllowedForAdjustmentOnItem($jwt, $item)) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 

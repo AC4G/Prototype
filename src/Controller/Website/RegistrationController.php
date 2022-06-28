@@ -67,12 +67,11 @@ final class RegistrationController extends AbstractController
                 $errors[] = 'An account with this email already exists.';
             }
 
-            if (count($errors) < 1) {
+            if (count($errors) === 0) {
                 $this->registrationService->registerUser($user);
-                $errors = $this->registrationService->getErrors();
             }
 
-            if(count($errors) < 1) {
+            if(count($errors) === 0) {
                 $response = $this->redirectToRoute('login');
 
                 $userId = $this->registrationService->getUser()->getId();
@@ -90,26 +89,9 @@ final class RegistrationController extends AbstractController
 
                 $this->emailService->sendEmail();
 
-                $errors = $this->emailService->getError();
+                $this->addFlash('success', 'Please follow the link in your Email to verify it.');
 
-                if (array_key_exists('email', $errors)) {
-                    $this->userRepository->deleteEntry($user);
-                }
-
-                if (!array_key_exists('email', $errors)) {
-                    $this->registrationService->giveUserARole($this->registrationService->getUser());
-
-                    /*
-                     *   only for debugging purpose <4/2/2022 6:35PM AC4G>
-                     *   $errors = $this->registrationService->getErrors();
-                    */
-                }
-
-                if (count($errors) < 1) {
-                    $this->addFlash('success', 'Please follow the link in your Email to verify it.');
-
-                    return $response;
-                }
+                return $response;
             }
         }
 

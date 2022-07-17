@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Home</h1>
+    <h1 class="neon-blue-text">Home</h1>
     {% if not is_granted('IS_AUTHENTICATED_FULLY') %}
         <a href="{{ path('login') }}">Log In</a>
     {% endif %}

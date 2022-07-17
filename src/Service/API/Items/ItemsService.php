@@ -35,15 +35,6 @@ final class ItemsService
             ;
         }
 
-        /**
-         * Will be removed in the future
-         */
-        if (array_key_exists('gameName', $newParameter)) {
-            $item
-                ->setGameName($newParameter['gameName'])
-            ;
-        }
-
         if (array_key_exists('parameter', $newParameter)) {
             if (is_array($newParameter['parameter'])) {
                 $parameters = $newParameter['parameter'];

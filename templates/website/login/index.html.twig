@@ -15,7 +15,7 @@
                 {% endif %}
                 <form action="{{ path('login') }}" method="post">
                     <div class="form-group">
-                        <label for="nickname">Nickname</label>
+                        <label>Nickname</label>
                         <input type="text" class="form-control" id="username" name="_username" placeholder="Enter your nickname.." value="{{ last_username }}" required>
                     </div>
                     <div class="form-group">
@@ -23,7 +23,7 @@
                         <input type="password" class="form-control" id="password" name="_password" placeholder="Enter your password.." required>
                     </div>
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary submit-button" style="margin-top: 20px; margin-bottom: 20px">Submit</button>
                 </form>
                 <p>
                     You don't have an account? Go to

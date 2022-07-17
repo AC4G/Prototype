@@ -4,12 +4,13 @@ namespace App\Entity;
 
 use DateTime;
 use App\Entity\User;
+use App\Entity\Project;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Item
  *
- * @ORM\Table(name="item", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"})}, indexes={@ORM\Index(name="fk_Item_User_idx", columns={"user_id"})})
+ * @ORM\Table(name="item", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"})}, indexes={@ORM\Index(name="fk_Item_User_idx", columns={"user_id"})}, indexes={@ORM\Index(name="fk_Item_Project1_idx", columns={"project_id"})})
  * @ORM\Entity(repositoryClass="App\Repository\ItemRepository")
  */
 class Item
@@ -31,11 +32,14 @@ class Item
     private string $name;
 
     /**
-     * @var string|null
+     * @var Project
      *
-     * @ORM\Column(name="game_name", type="string", length=255, nullable=true)
+     * @ORM\ManyToOne(targetEntity="Project")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="project_id", referencedColumnName="id", onDelete="CASCADE")
+     * })
      */
-    private ?string $gameName;
+    private Project $project;
 
     /**
      * @var string
@@ -85,14 +89,14 @@ class Item
         return $this;
     }
 
-    public function getGameName(): ?string
+    public function getProject(): ?Project
     {
-        return $this->gameName;
+        return $this->project;
     }
 
-    public function setGameName(?string $gameName): self
+    public function setProject(?Project $project): self
     {
-        $this->gameName = $gameName;
+        $this->project = $project;
 
         return $this;
     }

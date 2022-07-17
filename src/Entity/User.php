@@ -53,6 +53,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password;
 
     /**
+     * @var null|string
+     *
+     * @ORM\Column(name="profile_pic", type="text", length=0, nullable=true)
+     */
+    private ?string $profilePic = null;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(name="is_private", type="boolean", nullable=false)
@@ -120,6 +127,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getProfilePic(): ?string
+    {
+        return $this->profilePic;
+    }
+
+    public function setProfilePic(?string $profilePic): self
+    {
+        $this->profilePic = $profilePic;
+
+        return $this;
+    }
+
     public function isPrivate(): bool
     {
         return $this->isPrivate;
@@ -169,7 +188,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials()
     {
-        // TODO: Implement eraseCredentials() method.
+
     }
 
     public function getUserIdentifier(): string

@@ -1,10 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    <h1 class="neon-blue-text">Home</h1>
-    {% if not is_granted('IS_AUTHENTICATED_FULLY') %}
-        <a href="{{ path('login') }}">Log In</a>
-    {% endif %}
+{% block title %}Home{% endblock %}
 
-    <a href="{{ path('dashboard') }}">Dashboard</a>
+{% block body %}
+    <header>
+       <nav>
+           <div class="top-nav">
+                Top NAV
+           </div>
+           <div class="bottom-nav">
+                Bottom NAV
+           </div>
+       </nav>
+    </header>
 {% endblock %}

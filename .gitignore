@@ -32,3 +32,6 @@ private.pem
 /public/files/
 ###< files ###
 
+##> npm ##
+/node_modules
+##< npm ##

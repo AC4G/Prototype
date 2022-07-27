@@ -13,6 +13,8 @@ final class HomeController extends AbstractController
      */
     public function showHomeTemplate(): Response
     {
-        return $this->render('website/home/index.html.twig');
+        return $this->render('website/home/index.html.twig', [
+
+        ]);
     }
 }

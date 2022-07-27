@@ -592,6 +592,99 @@ video {
   }
 }
 
+.invisible {
+  visibility: hidden;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.relative {
+  position: relative;
+}
+
+.left-\[5\.2\%\] {
+  left: 5.2%;
+}
+
+.top-\[31px\] {
+  top: 31px;
+}
+
+.left-\[-61\.6835px\] {
+  left: -61.6835px;
+}
+
+.top-\[22px\] {
+  top: 22px;
+}
+
+.left-\[29px\] {
+  left: 29px;
+}
+
+.top-\[45px\] {
+  top: 45px;
+}
+
+.left-\[-62\.8335px\] {
+  left: -62.8335px;
+}
+
+.right-\[5\.2\%\] {
+  right: 5.2%;
+}
+
+.top-\[16\.5px\] {
+  top: 16.5px;
+}
+
+.top-\[2px\] {
+  top: 2px;
+}
+
+.left-\[2px\] {
+  left: 2px;
+}
+
+.right-\[12px\] {
+  right: 12px;
+}
+
+.top-\[14\.5px\] {
+  top: 14.5px;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+.m-auto {
+  margin: auto;
+}
+
+.mx-\[127px\] {
+  margin-left: 127px;
+  margin-right: 127px;
+}
+
+.mt-\[21px\] {
+  margin-top: 21px;
+}
+
+.mt-\[11px\] {
+  margin-top: 11px;
+}
+
+.mt-\[14px\] {
+  margin-top: 14px;
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
 .block {
   display: block;
 }
@@ -604,11 +697,179 @@ video {
   display: none;
 }
 
+.h-\[73px\] {
+  height: 73px;
+}
+
+.h-\[244px\] {
+  height: 244px;
+}
+
+.h-\[419px\] {
+  height: 419px;
+}
+
+.h-\[200px\] {
+  height: 200px;
+}
+
+.h-\[42px\] {
+  height: 42px;
+}
+
+.h-\[38px\] {
+  height: 38px;
+}
+
+.h-\[242px\] {
+  height: 242px;
+}
+
+.h-\[2px\] {
+  height: 2px;
+}
+
+.h-\[4px\] {
+  height: 4px;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.w-fit {
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.w-\[222px\] {
+  width: 222px;
+}
+
+.w-\[42px\] {
+  width: 42px;
+}
+
+.w-\[38px\] {
+  width: 38px;
+}
+
+.w-\[175px\] {
+  width: 175px;
+}
+
+.w-\[140px\] {
+  width: 140px;
+}
+
+.w-\[93\.74\%\] {
+  width: 93.74%;
+}
+
+.w-\[105px\] {
+  width: 105px;
+}
+
+.flex-auto {
+  flex: 1 1 auto;
+}
+
 .flex-shrink-0 {
   flex-shrink: 0;
 }
 
-.bg-blue-200 {
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.bg-white {
   --tw-bg-opacity: 1;
-  background-color: rgb(191 219 254 / var(--tw-bg-opacity));
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
+.bg-black {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+}
+
+.text-\[18px\] {
+  font-size: 18px;
+}
+
+.opacity-0 {
+  opacity: 0;
+}
+
+.shadow-md {
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition {
+  transition-property: color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.delay-100 {
+  transition-delay: 100ms;
+}
+
+.p {
+  height: 22px;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  font-family: Inter, sans-serif;
+  font-size: 18px;
+  transition-property: color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.p:hover {
+  --tw-text-opacity: 1;
+  color: rgb(136 136 136 / var(--tw-text-opacity));
+}
+
+.hover\:text-black:hover {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+
+.group:hover .group-hover\:visible {
+  visibility: visible;
+}
+
+.group:hover .group-hover\:bg-grey {
+  --tw-bg-opacity: 1;
+  background-color: rgb(136 136 136 / var(--tw-bg-opacity));
+}
+
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
 }

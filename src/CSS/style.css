@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.p {
+    @apply font-inter w-fit h-[22px] hover:text-grey transition text-[18px];
+}

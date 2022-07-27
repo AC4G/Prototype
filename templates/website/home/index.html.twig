@@ -4,13 +4,151 @@
 
 {% block body %}
     <header>
-       <nav>
-           <div class="top-nav">
-                Top NAV
+       <nav class="w-full">
+           <div class="h-[73px] relative">
+               <div class="w-fit absolute left-[5.2%] top-[31px]">
+                   <p class="p hover:text-black">Metaverse</p>
+               </div>
+               <div class="w-full absolute flex justify-center">
+                   <div class="w-fit absolute top-[31px] flex">
+                       <div class="group flex-auto">
+                           <p class="p text-[18px] cursor-pointer group-hover:text-p-grey">Explanation</p>
+                           <div class="absolute z-10 invisible opacity-0 delay-100 rounded shadow-md group-hover:visible group-hover:opacity-100 transition-opacity w-[222px] h-[244px] left-[-61.6835px] top-[22px] bg-white">
+                               <ul class="relative w-fit left-[29px] top-[45px]">
+                                   <li>
+                                       <a href="">
+                                           <p class="p">About our Services</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                           <p class="p">Practical</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                           <p class="p">Goals</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                           <p class="p">Security</p>
+                                       </a>
+                                   </li>
+                               </ul>
+                           </div>
+                       </div>
+                       <div class="group mx-[127px] flex justify-center">
+                           <p class="p cursor-pointer group-hover:text-p-grey">Documentation</p>
+                           <div class="absolute z-10 invisible opacity-0 delay-100 rounded shadow-md group-hover:visible group-hover:opacity-100 transition-opacity w-[222px] h-[419px] top-[22px] bg-white">
+                               <ul class="relative w-fit left-[29px] top-[45px]">
+                                   <li>
+                                       <a href="">
+                                           <p class="p">Items</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                           <p class="p">Inventory</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                               <p class="p">Storage</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                           <p class="p">Chat</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                           <p class="p">Post</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                           <p class="p">Forum</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                           <p class="p">Projects</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                           <p class="p">Security</p>
+                                       </a>
+                                   </li>
+                               </ul>
+                           </div>
+                       </div>
+                       <div class="relative group flex-auto">
+                           <p class="p cursor-pointer group-hover:text-p-grey">Community</p>
+                           <div class="absolute z-10 invisible opacity-0 delay-100 rounded shadow-md group-hover:visible group-hover:opacity-100 transition-opacity w-[222px] h-[200px] left-[-62.8335px] top-[22px] bg-white">
+                               <ul class="relative w-fit left-[29px] top-[45px]">
+                                   <li>
+                                       <a href="">
+                                           <p class="p">Posts</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                           <p class="p">Forum</p>
+                                       </a>
+                                   </li>
+                                   <li class="mt-[21px]">
+                                       <a href="">
+                                           <p class="p">Projects</p>
+                                       </a>
+                                   </li>
+                               </ul>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+               <div class="group w-fit absolute right-[5.2%] top-[16.5px]">
+                   {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                       <div class="w-[42px] h-[42px] rounded-full bg-black cursor-pointer group-hover:bg-grey transition">
+                            <img src="./files/metaverse.jpg" class="relative top-[2px] left-[2px] w-[38px] h-[38px] rounded-full">
+                       </div>
+                       <div class="absolute z-10 invisible opacity-0 delay-100 rounded shadow-md group-hover:visible group-hover:opacity-100 transition-opacity w-[175px] h-[242px] right-[5.2%] bg-white">
+                           <ul class="relative w-fit left-[29px] top-[45px]">
+                               <li>
+                                   <a href="">
+                                       <p class="p">Dashboard</p>
+                                   </a>
+                               </li>
+                               <li class="mt-[21px]">
+                                   <a href="">
+                                       <p class="p">Account</p>
+                                   </a>
+                               </li>
+                               <li class="mt-[21px]">
+                                   <a href="">
+                                       <p class="p">Settings</p>
+                                   </a>
+                               </li>
+                               <div class="relative mt-[11px] right-[12px] w-[140px] bg-black h-[2px] rounded"></div>
+                               <li class="mt-[14px]">
+                                   <a href="{{ path('logout') }}">
+                                       <p class="p">Logout</p>
+                                   </a>
+                               </li>
+                           </ul>
+                       </div>
+                   {% else %}
+                       <div class="relative top-[14.5px]">
+                            <a href="{{ path('login') }}">
+                                <p class="p text-[18px]">Log In</p>
+                            </a>
+                       </div>
+                   {% endif %}
+               </div>
            </div>
-           <div class="bottom-nav">
-                Bottom NAV
-           </div>
+           <div class="h-[4px] bg-black w-[93.74%] rounded m-auto"></div>
        </nav>
     </header>
 {% endblock %}

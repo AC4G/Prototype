@@ -1,34 +1,41 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <a href="{{ path('home') }}">
-        <p><- back to homepage</p>
-    </a>
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12">
-                <h1>Log In</h1>
-                {% if error %}
-                    <div class="alert alert-danger" role="alert">
-                        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                    </div>
-                {% endif %}
-                <form action="{{ path('login') }}" method="post">
-                    <div class="form-group">
-                        <label>Nickname</label>
-                        <input type="text" class="form-control" id="username" name="_username" placeholder="Enter your nickname.." value="{{ last_username }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" name="_password" placeholder="Enter your password.." required>
-                    </div>
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                    <button type="submit" class="btn btn-primary submit-button" style="margin-top: 20px; margin-bottom: 20px">Submit</button>
-                </form>
-                <p>
-                    You don't have an account? Go to
-                    <a href="{{ path('registration') }}">Registration</a>
-                </p>
+    <div class="relative top-[180px] w-fit mx-auto">
+        <div class="w-fit h-fit mx-auto">
+            <p class="text-black break-normal text-[28px] font-inter">Log In</p>
+        </div>
+        {% if error %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-4 rounded w-[384px] mx-auto mt-[18px]" role="alert">
+                <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            </div>
+        {% endif %}
+        <form action="{{ path('login') }}" method="post" class="relative top-[40px]">
+            <div class="w-[384px] h-fit relative mx-auto">
+                <p class="text-black text-[16px] font-inter">Nickname</p>
+                <input class="w-[384px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none" type="text" id="username" name="_username" placeholder="Enter your nickname.." value="{{ last_username }}" required>
+                <div class="border w-[384px] border-[#2e4053] rounded"></div>
+            </div>
+            <div class="w-[384px] h-fit relative mx-auto top-[36px]">
+                <p class="text-black text-[16px] font-inter">Password</p>
+                <input class="w-[384px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none" type="password" id="password" name="_password" placeholder="Enter your password.." required>
+                <div class="border w-[384px] border-[#2e4053] rounded"></div>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            </div>
+            <div class="w-fit h-fit relative mx-auto top-[80px]">
+                <button class="text-[18px] font-inter w-[80px] h-[42px] bg-black text-white rounded" type="submit">Log In</button>
+            </div>
+        </form>
+        <div class="w-[384px] h-fit relative flex justify-between top-[160px] mx-auto">
+            <div class="">
+                <a href="{{ path('registration') }}" class="text-grey font-inter text-[14px]">
+                    No account yet?
+                </a>
+            </div>
+            <div class="">
+                <a href="" class="text-grey font-inter text-[14px]">
+                    Password forgotten?
+                </a>
             </div>
         </div>
     </div>

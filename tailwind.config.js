@@ -18,7 +18,9 @@ module.exports = {
         'opacity': 'opacity',
       },
       zIndex: {
-        '[-1]': '-1',
+        '12': '12',
+        '100': '100',
+        '110': '100',
       }
     },
     fontFamily: {

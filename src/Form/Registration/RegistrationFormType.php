@@ -25,15 +25,26 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('nickname', TextType::class, [
                 'required' => true,
+                'attr' => [
+                    'class' => 'r-nickname',
+                    'placeholder' => 'Enter nickname..'
+                ],
+                'label' => false
             ])
             ->add('email', EmailType::class, [
                 'constraints' => [
                     new NotBlank(),
                 ],
                 'required' => true,
+                'attr' => [
+                    'class' => 'r-email',
+                    'placeholder' => 'Enter your Email..'
+                ],
+                'label' => false
             ])
             ->add('password',  RepeatedType::class, [
                 'type' => PasswordType::class,
+
                 'required' => true,
                 'constraints' => [
                     new NotBlank(),
@@ -41,14 +52,34 @@ class RegistrationFormType extends AbstractType
                         'min' => 10,
                     ]),
                 ],
-                'first_options'  => ['label' => 'Password'],
-                'second_options' => ['label' => 'Repeat Password'],
+                'first_options'  => [
+                    'label' => false,
+                    'attr' => [
+                        'class' => 'r-f-password',
+                        'placeholder' => 'Enter password..'
+                    ]
+                ],
+                'second_options' => [
+                    'label' => false,
+                    'attr' => [
+                        'class' => 'r-s-password',
+                        'placeholder' => 'Repeat password..'
+                    ]
+                ],
             ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
                 'required' => true,
+                'attr' => [
+                    'class' => 'r-agree-terms'
+                ],
+                'label' => false
             ])
-            ->add('Submit', SubmitType::class)
+            ->add('register', SubmitType::class, [
+                'attr' => [
+                    'class' => 'r-submit'
+                ]
+            ])
         ;
     }
 

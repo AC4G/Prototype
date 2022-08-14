@@ -38,7 +38,7 @@ final class DashboardController extends AbstractController
         $user = $this->getUser();
 
         if ($request->isMethod('POST')) {
-            if ($request->request->get('form-type') == 'picture') {
+            if ($request->request->get('form-type') === 'picture') {
                 $file = $request->files->get('profile-picture');
 
                 if (is_null($file)) {
@@ -52,20 +52,19 @@ final class DashboardController extends AbstractController
                 }
 
                 $nickname = strtolower($user->getNickname());
-                $dirPath = 'files/profile/' . $nickname . '/';
+                $dir = 'files/profile/' . $nickname . '/';
 
-                if (file_exists($dirPath) && count(scandir($dirPath)) > 0) {
-                    foreach (glob($dirPath . '*', GLOB_MARK) as $fileOld) {
-                        if (is_dir($fileOld)) {
+                if (file_exists($dir) && count(scandir($dir)) > 0) {
+                    $files = glob($dir . '*', GLOB_MARK);
+                    foreach ($files as $fileOld) {
+                        if (is_file($fileOld)) {
                             unlink($fileOld);
                         }
                     }
                 }
-                if (!file_exists('files/profile/' . $nickname . '/')) {
+                if (!file_exists($dir)) {
                     mkdir('files/profile/' . $nickname);
                 }
-
-                $dir = 'files/profile/' . $nickname . '/';
 
                 $file->move($dir, $nickname . '.' . $extension);
 

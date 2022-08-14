@@ -5,3 +5,54 @@
 .p {
     @apply font-inter w-fit h-[22px] hover:text-grey transition text-[18px];
 }
+
+#registration_form > div {
+    @apply mt-[20px] w-[384px] h-fit relative mx-auto;
+}
+
+#registration_form:first-child {
+    @apply relative mt-[40px];
+}
+
+#registration_form > div > label {
+    @apply text-black text-[16px] font-inter;
+}
+
+#registration_form > div > input {
+    @apply w-[384px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none;
+}
+
+.r-nickname, .r-email, .r-f-password, .r-s-password {
+    @apply w-[384px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none;
+}
+
+.r-agree-terms {
+    @apply  relative left-[10px];
+}
+
+.r-agree-terms:checked {
+    @apply accent-black;
+}
+
+.r-submit {
+    @apply text-[18px] font-inter w-[100px] h-[42px] bg-black text-white rounded;
+}
+
+.active-menu-dashboard {
+    background: rgba(255, 255, 255, 0.19);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4.2px);
+    -webkit-backdrop-filter: blur(4.2px);
+    border: 1px solid rgba(255, 255, 255, 0.17);
+}
+
+/*#dashboard-nav {
+    background: rgb(231,249,244);
+    background: linear-gradient(90deg, rgba(231,249,244,1) 80%, rgba(255,255,255,1) 100%);
+}*/
+
+#dashboard-nav {
+
+}
+

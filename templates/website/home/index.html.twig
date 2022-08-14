@@ -7,7 +7,7 @@
        <nav class="w-full">
            <div class="h-[73px] relative">
                <div class="w-fit absolute left-[5.2%] top-[31px]">
-                   <p class="p hover:text-black">Metaverse</p>
+                   <p class="p hover:text-black pointer-events-none">Metaverse</p>
                </div>
                <div class="w-full absolute flex justify-center">
                    <div class="w-fit absolute top-[31px] flex">
@@ -116,18 +116,18 @@
                </div>
                <div class="group w-fit absolute right-[5.2%] top-[16.5px]">
                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                       <div class="w-[42px] h-[42px] rounded-full bg-[#2e4053] cursor-pointer group-hover:bg-grey transition">
-                            <img src="./files/metaverse.jpg" class="relative top-[2px] left-[2px] w-[38px] h-[38px] rounded-full">
+                       <div class="w-[42px] h-[42px] rounded-full bg-[#2e4053] cursor-pointer group-hover:bg-[#c5ffef] transition">
+                            <img src="{% if user.profilePic is not null %} {{ asset(user.profilePic) }} {% else %} {{ asset('files/profile/default.jpg') }} {% endif %}" class="relative top-[2px] left-[2px] w-[38px] h-[38px] rounded-full">
                        </div>
                        <div class="absolute z-10 invisible opacity-0 delay-100 rounded shadow-md group-hover:visible group-hover:opacity-100 transition-opacity w-[175px] h-[242px] right-[5.2%] bg-white">
                            <ul class="relative w-fit left-[29px] top-[45px]">
                                <li>
-                                   <a href="">
+                                   <a href="{{ path('dashboard') }}">
                                        <p class="p">Dashboard</p>
                                    </a>
                                </li>
                                <li class="mt-[21px]">
-                                   <a href="">
+                                   <a href="{{ path('dashboard_account') }}">
                                        <p class="p">Account</p>
                                    </a>
                                </li>
@@ -136,7 +136,7 @@
                                        <p class="p">Settings</p>
                                    </a>
                                </li>
-                               <div class="relative mt-[11px] right-[12px] w-[140px] bg-black h-[2px] mt-[16px] rounded"></div>
+                               <div class="relative mt-[11px] right-[12px] w-[140px] bg-[#ebebeb] h-[2px] mt-[16px] rounded"></div>
                                <li class="mt-[14px]">
                                    <a href="{{ path('logout') }}">
                                        <p class="p">Logout</p>
@@ -153,7 +153,7 @@
                    {% endif %}
                </div>
            </div>
-           <div class="h-[2px] bg-[#2e4053] w-[93.74%] rounded m-auto"></div>
+           <div class="h-[2px] bg-[#ebebeb] w-[93.74%] rounded m-auto"></div>
        </nav>
     </header>
 {% endblock %}

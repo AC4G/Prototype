@@ -64,7 +64,7 @@ final class RegistrationController extends AbstractController
             }
 
             if ($this->userRepository->isEmailAlreadyUsed($user->getEmail())) {
-                $errors[] = 'An account with this email already exists.';
+                $errors[] = 'The specified email is invalid.';
             }
 
             if (count($errors) === 0) {

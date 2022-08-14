@@ -1,29 +1,63 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <a href="{{ path('home') }}">
-        <p><- back to homepage</p>
-    </a>
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12">
-                <h1>Registration</h1>
-                {% if not (errors is empty) %}
+    <div class="relative top-[120px] w-fit mx-auto">
+        <div class="w-fit h-fit mx-auto">
+            <p class="text-black break-normal text-[28px] font-inter">Registration</p>
+        </div>
+
+        {% if not (errors is empty) %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-4 rounded w-[384px] mx-auto mt-[18px]" role="alert">
+                <ul class="px-4 list-decimal">
                     {% for error in errors%}
-                        <div class="alert alert-danger d-flex align-items-center" role="alert">
-                            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-                            <div>
-                                Error: {{ error }}
-                            </div>
-                        </div>
+                        <li>
+                            {{ error }}
+                        </li>
                     {%  endfor %}
-                {% endif %}
-                {{ form(registration_form) }}
-                <p>
-                    Do you already have an account? Then go to the
-                    <a href="{{ path('login') }}">Log In</a>
-                </p>
+                </ul>
             </div>
+        {% endif %}
+        <div class="relative top-[40px] w-fit h-fit">
+            <form class="registration_form w-fit h-fit" method="post">
+                <div class="w-[384px] h-fit relative mx-auto">
+                    <p class="text-black text-[16px] font-inter">Nickname</p>
+                    {{ form_row(registration_form.nickname) }}
+                    <div class="border w-[384px] border-[#2e4053] rounded"></div>
+                </div>
+                <div class="w-[384px] h-fit relative mx-auto top-[36px]">
+                    <p class="text-black text-[16px] font-inter">Email</p>
+                    {{ form_row(registration_form.email) }}
+                    <div class="border w-[384px] border-[#2e4053] rounded"></div>
+                </div>
+                {% if not (form_errors(registration_form.password.first) is empty) %}
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-4 rounded w-[384px] mx-auto mt-[48px]" role="alert">
+                        {{ form_errors(registration_form.password.first) }}
+                    </div>
+                {% endif %}
+                <div class="relative {% if (form_errors(registration_form.password.first) is empty) %} top-[72px] {% else %} top-[12px] {% endif %}">
+                    <div class="w-fit h-fit mx-auto">
+                        <p class="text-black text-[16px] font-inter">Password</p>
+                        {{ form_widget(registration_form.password.first) }}
+                        <div class="border w-[384px] border-[#2e4053] rounded"></div>
+                    </div>
+                    <div class="w-[384px] h-fit relative top-[36px] mx-auto">
+                        <p class="text-black text-[16px] font-inter">Repeat Password</p>
+                        {{ form_row(registration_form.password.second) }}
+                        <div class="border w-[384px] border-[#2e4053] rounded"></div>
+                    </div>
+                    <div class="w-[384px] h-fit relative top-[72px] mx-auto flex">
+                        <p class="text-black text-[16px] font-inter">Agree to</p>
+                        <a href="" class="text-grey font-inter text-[16px]">
+                            &nbsp;terms and conditions
+                        </a>
+                        {{ form_row(registration_form.agreeTerms) }}
+                    </div>
+                    <div class="w-fit h-fit relative top-[108px] mx-auto flex">
+                        {{ form_row(registration_form.register) }}
+                    </div>
+                    {{ form_row(registration_form.token) }}
+                </div>
+            </form>
         </div>
     </div>
 {% endblock %}

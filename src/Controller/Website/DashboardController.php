@@ -3,17 +3,17 @@
 namespace App\Controller\Website;
 
 use App\Serializer\UserNormalizer;
-use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\Website\Account\AccountService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class DashboardController extends AbstractController
 {
     public function __construct(
         private UserNormalizer $userNormalizer,
-        private UserRepository $userRepository
+        private AccountService $accountService
     )
     {
     }
@@ -29,56 +29,31 @@ final class DashboardController extends AbstractController
     }
 
     /**
-     * @Route("/dashboard/account", name="dashboard_account")
+     * @Route("/dashboard/profile", name="dashboard_profile")
      */
-    public function showAccount(
+    public function showProfile(
         Request $request
     ): Response
     {
         $user = $this->getUser();
 
         if ($request->isMethod('POST')) {
-            if ($request->request->get('form-type') == 'picture') {
+            if ($request->request->get('form-type') === 'picture') {
                 $file = $request->files->get('profile-picture');
 
                 if (is_null($file)) {
-                    return $this->redirectToRoute('dashboard_account');
+                    goto a;
                 }
 
-                $extension = substr($file->getClientOriginalName(), strpos($file->getClientOriginalName(), '.') + 1);
-
-                if (is_null($user)) {
-                    return $this->redirectToRoute('home');
-                }
-
-                $nickname = strtolower($user->getNickname());
-                $dirPath = 'files/profile/' . $nickname . '/';
-
-                if (file_exists($dirPath) && count(scandir($dirPath)) > 0) {
-                    foreach (glob($dirPath . '*', GLOB_MARK) as $fileOld) {
-                        if (is_dir($fileOld)) {
-                            unlink($fileOld);
-                        }
-                    }
-                }
-                if (!file_exists('files/profile/' . $nickname . '/')) {
-                    mkdir('files/profile/' . $nickname);
-                }
-
-                $dir = 'files/profile/' . $nickname . '/';
-
-                $file->move($dir, $nickname . '.' . $extension);
-
-                $user->setProfilePic($dir . $nickname . '.' . $extension);
-                $this->userRepository->flushEntity();
-
-                sleep(1);
+                $this->accountService->saveProfilePicture($file, $user);
             }
         }
 
+        a:
+
         $user = $this->userNormalizer->normalize($this->getUser());
 
-        return $this->render('website/dashboard/account.html.twig', [
+        return $this->render('website/dashboard/profile.html.twig', [
             'user' => $user
         ]);
     }

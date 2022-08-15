@@ -1,0 +1,84 @@
+{% extends 'baseDashboard.html.twig' %}
+
+{% block body %}
+    <div class="overflow-x-hidden overflow-y-scroll w-full h-[100vh]">
+        <div class="h-[80px] w-full">
+            <div class="h-[78px] w-[80%] mx-auto pt-[19.5px]">
+                <p class="font-inter text-[26px] select-none">Profile</p>
+            </div>
+            <div class="relative mx-auto h-[2px] bg-[#ebebeb] w-[80%] rounded"></div>
+        </div>
+        <div class="flex w-full h-fit h-[200px] pt-[20px]">
+            <div class="relative w-full">
+                <form action="{{ path('dashboard_profile') }}" method="post" enctype="multipart/form-data" name="profile-pic-form" class="w-full h-fit">
+                    <div class="w-fit relative left-[20%]">
+                        <div class="w-fit h-[30px]">
+                            <p class="font-inter text-[14px] select-none">Profile picture</p>
+                        </div>
+                        <div class="relative w-[124px] h-[124px] rounded-full bg-[#2e4053]">
+                            <img src="{% if user.profilePic is not null %} {{ asset(user.profilePic) }} {% else %} {{ asset('files/profile/default.jpg') }} {% endif %}" class="relative top-[2px] left-[2px] w-[120px] h-[120px] rounded-full">
+                            <div class="z-10 border-2 border-[#2e4053] bg-white hover:bg-[#2e4053] group absolute rounded w-[40px] h-[30px] left-[90px] top-[80px] transition" id="edit-prf-pic">
+                                <input id="prf-pic-input" name="profile-picture" type="file" class="opacity-0 cursor-pointer w-[36px] h-[26px] absolute">
+                                <input name="form-type" type="hidden" value="picture">
+                                <div class="w-full h-full pt-[6px] pl-[10px]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-pencil fill-black group-hover:fill-white transition" viewBox="0 0 16 16">
+                                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute w-full h-fit">
+                        <div class="relative flex-none w-[260px] h-[300px] mx-auto bg-black opacity-0 z-0 rounded-lg transition-all" id="imgprwbox">
+                            <div class="absolute top-[20px] left-[30px]">
+                                <img id="imgprw" class="w-[200px] h-[200px]" src="#">
+                            </div>
+                            <div class="absolute bottom-[0px] w-full h-[80px] flex justify-around">
+                                <div class="relative top-[10px] h-fit">
+                                    <button type="button" class="text-red-700 h-[40px] w-[80px] rounded border-2 border-[#2e4053]" id="discardprfimg">Discard</button>
+                                </div>
+                                <div class="relative top-[10px] h-fit">
+                                    <button type="submit" class="text-white h-[40px] w-[80px] rounded bg-[#06b6d4]" id="saveprfimg">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        let prfpicinput = document.getElementById('prf-pic-input');
+        let imgprwbox = document.getElementById('imgprwbox');
+        let imgprw = document.getElementById('imgprw');
+        let discardprfimg = document.getElementById('discardprfimg');
+        let saveprfimg = document.getElementById('saveprfimg');
+        let blur = document.getElementById('blur');
+
+        prfpicinput.onchange = evt => {
+            const [file] = prfpicinput.files
+            if (file) {
+                imgprw.src = URL.createObjectURL(file)
+                blur.style.opacity = '0.3'
+                blur.style.zIndex = '100'
+                imgprwbox.style.opacity = '1'
+                imgprwbox.style.zIndex = '110'
+            }
+        }
+
+        function setToDefault() {
+            imgprwbox.style.zIndex = '0'
+            imgprwbox.style.opacity = '0'
+            blur.style.opacity = '0'
+            blur.style.zIndex = '0'
+        }
+
+        blur.addEventListener('click', function handleClick() {
+            setToDefault();
+        });
+
+        discardprfimg.addEventListener('click', function handleClick() {
+            setToDefault();
+        });
+    </script>
+{% endblock %}

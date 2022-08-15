@@ -27,64 +27,65 @@
             {{ message }}
         </div>
     {% endfor %}
-    <div class="flex">
-        <nav class="w-[359px] h-[100vh]" id="dashboard-nav">
-            <div class="w-[359px] h-[68px] pl-[20px]">
-                <a href="{{ path('home') }}" class="relative inline-block font-inter w-[94%] h-[100%] hover:text-grey transition text-[20px] pt-[24px] pl-[60px]">
-                    Metaverse
-                </a>
-            </div>
-            <div class="w-[100%] h-[22px] pt-[10px]">
-                <div class="relative left-[3%] w-[94%] h-[2px] bg-[#ebebeb]"></div>
-            </div>
-            <div class="w-full h-[68px] pl-[20px]">
-                <a href="{{ path('dashboard') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
-                    Dashboard
-                </a>
-            </div>
-            <div class="w-[100%] h-[2px]"></div>
-            <div class="w-full h-[68px] pl-[20px]">
-                <a href="{{ path('dashboard_account') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_account') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
-                    Account
-                </a>
-            </div>
-            <div class="w-[100%] h-[2px]"></div>
-            <div class="w-full h-[68px] pl-[20px]">
-                <a href="{{ path('dashboard_inventory') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_inventory') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
-                    Inventory
-                </a>
-            </div>
-            <div class="w-[100%] h-[2px]"></div>
-            <div class="w-full h-[68px] pl-[20px]">
-                <a href="{{ path('dashboard_creator') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_creator') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
-                    Creator
-                </a>
-            </div>
-            <div class="w-[100%] h-[2px]"></div>
-            <div class="w-full h-[68px] pl-[20px]">
-                <a href="{{ path('dashboard_developer') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_developer') %} active-menu-dashboard pointer-events-none {% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
-                    Developer
-                </a>
-            </div>
-            <div class="absolute bottom-[0px] w-[359px]">
+    <div class="absolute w-full h-[100vh] left-[0px] top-[0px] right-[0px] bg-black bottom-[0px] opacity-0 z-0 transition-all" id="blur"></div>
+        <div class="flex">
+            <nav class="w-[359px] h-[100vh]" id="dashboard-nav">
+                <div class="w-[359px] h-[68px] pl-[20px]">
+                    <a href="{{ path('home') }}" class="relative inline-block font-inter w-[94%] h-[100%] hover:text-grey transition text-[20px] pt-[24px] pl-[60px]">
+                        Metaverse
+                    </a>
+                </div>
                 <div class="w-[100%] h-[22px] pt-[10px]">
                     <div class="relative left-[3%] w-[94%] h-[2px] bg-[#ebebeb]"></div>
                 </div>
-                <div class="w-full h-[80px] pb-[12px] pl-[20px]">
-                    <a href="{{ path('logout') }}" class="relative inline-block font-inter w-[100%] h-[100%] hover:text-grey transition text-[20px] pt-[20px] pl-[60px] flex">
-                        Logout
-                        <div class="relative top-[8px] left-[40px]">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
-                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-                            </svg>
-                        </div>
+                <div class="w-full h-[68px] pl-[20px]">
+                    <a href="{{ path('dashboard') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
+                        Dashboard
                     </a>
                 </div>
-            </div>
-            <div class="bg-[#ebebeb] w-[2px] h-[94%] absolute top-[3%] rounded left-[357px]"></div>
-        </nav>
-        {% block body %}{% endblock %}
-    </div>
+                <div class="w-[100%] h-[2px]"></div>
+                <div class="w-full h-[68px] pl-[20px]">
+                    <a href="{{ path('dashboard_profile') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_profile') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
+                        Profile
+                    </a>
+                </div>
+                <div class="w-[100%] h-[2px]"></div>
+                <div class="w-full h-[68px] pl-[20px]">
+                    <a href="{{ path('dashboard_inventory') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_inventory') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
+                        Inventory
+                    </a>
+                </div>
+                <div class="w-[100%] h-[2px]"></div>
+                <div class="w-full h-[68px] pl-[20px]">
+                    <a href="{{ path('dashboard_creator') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_creator') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
+                        Creator
+                    </a>
+                </div>
+                <div class="w-[100%] h-[2px]"></div>
+                <div class="w-full h-[68px] pl-[20px]">
+                    <a href="{{ path('dashboard_developer') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_developer') %} active-menu-dashboard pointer-events-none {% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
+                        Developer
+                    </a>
+                </div>
+                <div class="absolute bottom-[0px] w-[359px]">
+                    <div class="w-[100%] h-[22px] pt-[10px]">
+                        <div class="relative left-[3%] w-[94%] h-[2px] bg-[#ebebeb]"></div>
+                    </div>
+                    <div class="w-full h-[80px] pb-[12px] pl-[20px]">
+                        <a href="{{ path('logout') }}" class="relative inline-block font-inter w-[100%] h-[100%] hover:text-grey transition text-[20px] pt-[20px] pl-[60px] flex">
+                            Logout
+                            <div class="relative top-[8px] left-[40px]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                                    <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                                </svg>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="bg-[#ebebeb] w-[2px] h-[94%] absolute top-[3%] rounded left-[357px]"></div>
+            </nav>
+            {% block body %}{% endblock %}
+        </div>
     </body>
 </html>

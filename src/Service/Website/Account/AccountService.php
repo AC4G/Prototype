@@ -46,5 +46,15 @@ class AccountService
         sleep(1);
     }
 
+    public function updateProfilePrivacy(
+        bool $privacy,
+        UserInterface $user
+    )
+    {
+        $user->setIsPrivate($privacy);
+
+        $this->userRepository->flushEntity();
+    }
+
 
 }

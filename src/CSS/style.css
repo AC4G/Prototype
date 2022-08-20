@@ -6,6 +6,10 @@
     @apply font-inter w-fit h-[22px] hover:text-grey transition text-[18px];
 }
 
+#collection-box {
+    @apply cursor-not-allowed;
+}
+
 #registration_form > div {
     @apply mt-[20px] w-[384px] h-fit relative mx-auto;
 }

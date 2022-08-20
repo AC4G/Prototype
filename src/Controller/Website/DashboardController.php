@@ -40,12 +40,37 @@ final class DashboardController extends AbstractController
         if ($request->isMethod('POST')) {
             if ($request->request->get('form-type') === 'picture') {
                 $file = $request->files->get('profile-picture');
+                $types = [
+                    'image/gif',
+                    'image/jpeg',
+                    'image/jpg',
+                    'image/png',
+                    'image/jfif'
+                ];
 
                 if (is_null($file)) {
                     goto a;
                 }
 
+                if (!in_array($file->getMimeType(), $types)) {
+                    goto a;
+                }
+
                 $this->accountService->saveProfilePicture($file, $user);
+            }
+
+            if ($request->request->get('form-type') === 'privacy') {
+                $privacy = $request->request->get('privacy');
+
+                if (is_null($privacy)) {
+                    $privacy = true;
+                }
+
+                if ($privacy === 'on') {
+                    $privacy = false;
+                }
+
+                $this->accountService->updateProfilePrivacy($privacy, $user);
             }
         }
 

@@ -12,6 +12,7 @@ use App\Entity\Client;
 use App\Entity\AuthToken;
 use App\Entity\AccessToken;
 use App\Entity\RefreshToken;
+use App\Repository\UserRepository;
 use App\Repository\AuthTokenRepository;
 use App\Repository\UserRolesRepository;
 use App\Repository\AccessTokenRepository;
@@ -23,7 +24,8 @@ final class SecurityService
         private RefreshTokenRepository $refreshTokenRepository,
         private AccessTokenRepository $accessTokenRepository,
         private AuthTokenRepository $authTokenRepository,
-        private UserRolesRepository $userRolesRepository
+        private UserRolesRepository $userRolesRepository,
+        private UserRepository $userRepository
     )
     {
     }
@@ -258,6 +260,15 @@ final class SecurityService
         }
 
         return false;
+    }
+
+    public function nicknameExists(
+        string $nickname
+    ): bool
+    {
+        $user = $this->userRepository->findOneBy(['nickname' => $nickname]);
+
+        return !is_null($user);
     }
 
 

@@ -139,5 +139,18 @@ final class SecurityController extends AbstractController
         );
     }
 
+    /**
+     * @Route("/api/nickname/{nickname}", name="nickname_exists", methods={"GET"})
+     */
+    public function nicknameExists(
+        Request $request,
+        string $nickname
+    ): Response {
+        return new JsonResponse([
+            'pointer' => $request->getUri(),
+            'nickname' => $nickname,
+            'massage' => (int)$this->securityService->nicknameExists($nickname)
+        ]);
+    }
 
 }

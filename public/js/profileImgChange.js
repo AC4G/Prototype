@@ -45,7 +45,6 @@ function setToDefault() {
     blur.style.opacity = '0'
     blur.style.zIndex = '-1'
     error.style.display = 'none'
-    nicknameLoading.style.display = 'none';
     imgSubmitBox.style.removeProperty('bottom')
     imgSubmit.style.removeProperty('pointer-events')
     imgSubmitBox.classList.remove('cursor-not-allowed')

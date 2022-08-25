@@ -1,11 +1,11 @@
 let xhr = new XMLHttpRequest();
 let nickname = document.getElementById('nickname-input');
-let typingTimer;
-let message;
 let nicknameLoading = document.getElementById('nickname-loading');
 let nicknameAvailable = document.getElementById('nickname-available');
 let nicknameNotAvailable = document.getElementById('nickname-not-available');
 let nicknameButton = document.getElementById('nickname-button');
+let typingTimer;
+let message;
 
 nickname.addEventListener('keyup', function () {
     if (nickname.value.length < 1) {
@@ -24,6 +24,7 @@ nickname.addEventListener('keydown', function () {
     if (nickname.value.length > 1) {
         setNicknameDefault();
     }
+
     clearTimeout(typingTimer);
 });
 

@@ -72,6 +72,17 @@ final class DashboardController extends AbstractController
 
                 $this->accountService->updateProfilePrivacy($privacy, $user);
             }
+
+
+            if ($request->request->get('form-type') === 'nickname') {
+                $nickname = $request->request->get('nickname');
+
+                if (is_null($nickname)) {
+                    goto a;
+                }
+
+                $this->accountService->updateNickname($nickname, $user);
+            }
         }
 
         a:

@@ -56,5 +56,19 @@ class AccountService
         $this->userRepository->flushEntity();
     }
 
+    public function updateNickname(
+        string $nickname,
+        UserInterface $user
+    )
+    {
+        if (!is_null($this->userRepository->findOneBy(['nickname' => $nickname]))) {
+            return;
+        }
+
+        $user->setNickname($nickname);
+
+        $this->userRepository->flushEntity();
+    }
+
 
 }

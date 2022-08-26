@@ -1,5 +1,6 @@
-let xhr = new XMLHttpRequest();
+let xhrNickname = new XMLHttpRequest();
 let nickname = document.getElementById('nickname-input');
+let nicknameSubmit = document.getElementById('nickname-submit');
 let nicknameLoading = document.getElementById('nickname-loading');
 let nicknameAvailable = document.getElementById('nickname-available');
 let nicknameNotAvailable = document.getElementById('nickname-not-available');
@@ -17,7 +18,7 @@ nickname.addEventListener('keyup', function () {
     nicknameLoading.style.opacity = '1';
 
     clearTimeout(2000);
-    typingTimer = setTimeout(doneTyping, 2000);
+    typingTimer = setTimeout(doneNicknameTyping, 2000);
 });
 
 nickname.addEventListener('keydown', function () {
@@ -28,28 +29,29 @@ nickname.addEventListener('keydown', function () {
     clearTimeout(typingTimer);
 });
 
-function doneTyping() {
+function doneNicknameTyping() {
     if (nickname.value.length < 1) {
         return false;
     }
 
-    xhr.open('GET', '/api/nickname/' + nickname.value);
-    xhr.send();
+    xhrNickname.open('GET', '/api/nickname/' + nickname.value);
+    xhrNickname.send();
 }
 
-xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-        message = Object.values(JSON.parse(xhr.responseText))[2];
-        onResponse(message);
+xhrNickname.onreadystatechange = function () {
+    if (xhrNickname.readyState === 4) {
+        message = Object.values(JSON.parse(xhrNickname.responseText))[2];
+        onNicknameResponse(message);
     }
 };
 
-function onResponse(message) {
+function onNicknameResponse(message) {
     if (message === 0) {
         setNicknameDefault();
 
         nicknameAvailable.style.zIndex = '110';
         nicknameAvailable.style.opacity = '1';
+        nicknameSubmit.classList.remove('cursor-not-allowed');
         nicknameButton.style.pointerEvents = 'auto';
         nicknameButton.style.cursor = 'pointer';
     }
@@ -71,4 +73,5 @@ function setNicknameDefault() {
     nicknameNotAvailable.style.zIndex = '-1';
     nicknameButton.style.pointerEvents = 'none';
     nicknameButton.style.removeProperty('cursor');
+    nicknameSubmit.classList.add('cursor-not-allowed');
 }

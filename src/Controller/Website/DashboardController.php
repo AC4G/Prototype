@@ -83,6 +83,20 @@ final class DashboardController extends AbstractController
 
                 $this->accountService->updateNickname($nickname, $user);
             }
+
+            if ($request->request->get('form-type') === 'email') {
+                $email = $request->request->get('email');
+
+                if (is_null($email)) {
+                    goto a;
+                }
+
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    goto a;
+                }
+
+                $this->accountService->updateEmail($email, $user);
+            }
         }
 
         a:

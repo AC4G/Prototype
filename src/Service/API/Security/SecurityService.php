@@ -266,9 +266,14 @@ final class SecurityService
         string $nickname
     ): bool
     {
-        $user = $this->userRepository->findOneBy(['nickname' => $nickname]);
+        return !is_null($this->userRepository->findOneBy(['nickname' => $nickname]));
+    }
 
-        return !is_null($user);
+    public function emailExists(
+        string $email
+    ): bool
+    {
+        return !is_null($this->userRepository->findOneBy(['email' => $email]));
     }
 
 

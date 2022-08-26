@@ -115,7 +115,9 @@
                             </div>
                             <input type="hidden" name="form-type" value="nickname">
                             <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
-                                <button id="nickname-button" type="submit" class="pointer-events-none cursor-not-allowed border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition">Save your new nickname</button>
+                                <div id="nickname-submit" class="w-fit h-fit cursor-not-allowed">
+                                    <button id="nickname-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition">Save your new nickname</button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -147,9 +149,9 @@
                                 </svg>
                             </button>
                         </div>
-                        <form method="post" action="{{ path('dashboard_profile') }}" class="w-full mt-[20px]">
+                        <form id="email-change-form" method="post" action="{{ path('dashboard_profile') }}" class="w-full mt-[20px]">
                             <div class="w-fit mx-auto mt-[40px]">
-                                <input id="email-input" type="text" name="email" class="rounded-lg pl-[12px] w-[260px] pb-[12px] text-white bg-black text-[16px] font-inter focus:outline-none" placeholder="type here...">
+                                <input id="email-input" type="email" name="email" class="rounded-lg pl-[12px] w-[260px] pb-[12px] text-white bg-black text-[16px] font-inter focus:outline-none" placeholder="type here...">
                             </div>
                             <div class="border w-[244px] border-[#e5e7eb] rounded mx-auto"></div>
                             <div class="relative w-fit h-[40px] w-[40px] mx-auto mt-[20px]">
@@ -169,7 +171,9 @@
                             </div>
                             <input type="hidden" name="form-type" value="email">
                             <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
-                                <button id="email-button" type="submit" class="pointer-events-none cursor-not-allowed border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition">Save your new Email</button>
+                                <div id="email-submit" class="w-fit h-fit cursor-not-allowed">
+                                    <button id="email-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition">Save your new Email</button>
+                                </div>
                             </div>
                         </form>
                     </div>

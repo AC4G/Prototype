@@ -70,5 +70,19 @@ class AccountService
         $this->userRepository->flushEntity();
     }
 
+    public function updateEmail(
+        string $email,
+        UserInterface $user
+    )
+    {
+        if (!is_null($this->userRepository->findOneBy(['email' => $email]))) {
+            return;
+        }
+
+        $user->setEmail($email);
+
+        $this->userRepository->flushEntity();
+    }
+
 
 }

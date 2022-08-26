@@ -11,6 +11,16 @@ let imgSubmitBox = document.getElementById('img-submit-box');
 let nickchgbox = document.getElementById('nickname-change-box');
 let nickchgbutton = document.getElementById('nick-chg-button');
 let discardnickchg = document.getElementById('discardnickchg');
+let emailChangeBox = document.getElementById('email-change-box');
+let emailChangeButton = document.getElementById('email-chg-button');
+let discardEmailChg = document.getElementById('discardEmailchg');
+
+emailChangeButton.addEventListener('click', function () {
+    blur.style.opacity = '0.3'
+    blur.style.zIndex = '100'
+    emailChangeBox.style.opacity = '1'
+    emailChangeBox.style.zIndex = '110'
+})
 
 nickchgbutton.addEventListener('click', function (){
     blur.style.opacity = '0.3'
@@ -38,6 +48,8 @@ prfpicinput.onchange = evt => {
 }
 
 function setToDefault() {
+    emailChangeBox.style.zIndex = '-1'
+    emailChangeBox.style.opacity = '0'
     nickchgbox.style.zIndex = '-1'
     nickchgbox.style.opacity = '0'
     imgprwbox.style.zIndex = '-1'
@@ -50,14 +62,18 @@ function setToDefault() {
     imgSubmitBox.classList.remove('cursor-not-allowed')
 }
 
-blur.addEventListener('click', function handleClick() {
-    setToDefault();
+blur.addEventListener('click', function () {
+    setToDefault()
 });
 
-discardprfimg.addEventListener('click', function handleClick() {
-    setToDefault();
+discardprfimg.addEventListener('click', function () {
+    setToDefault()
 });
 
 discardnickchg.addEventListener('click', function () {
     setToDefault()
+});
+
+discardEmailChg.addEventListener('click', function () {
+   setToDefault()
 });

@@ -3,31 +3,11 @@ let imgprwbox = document.getElementById('imgprwbox');
 let imgprw = document.getElementById('imgprw');
 let discardprfimg = document.getElementById('discardprfimg');
 let saveprfimg = document.getElementById('saveprfimg');
-let blur = document.getElementById('blur');
+var blur = document.getElementById('blur');
 const imgTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/jpg'];
 let error = document.getElementById('picture-error');
 let imgSubmit = document.getElementById('img-submit');
 let imgSubmitBox = document.getElementById('img-submit-box');
-let nickchgbox = document.getElementById('nickname-change-box');
-let nickchgbutton = document.getElementById('nick-chg-button');
-let discardnickchg = document.getElementById('discardnickchg');
-let emailChangeBox = document.getElementById('email-change-box');
-let emailChangeButton = document.getElementById('email-chg-button');
-let discardEmailChg = document.getElementById('discardEmailchg');
-
-emailChangeButton.addEventListener('click', function () {
-    blur.style.opacity = '0.3'
-    blur.style.zIndex = '100'
-    emailChangeBox.style.opacity = '1'
-    emailChangeBox.style.zIndex = '110'
-})
-
-nickchgbutton.addEventListener('click', function (){
-    blur.style.opacity = '0.3'
-    blur.style.zIndex = '100'
-    nickchgbox.style.opacity = '1'
-    nickchgbox.style.zIndex = '110'
-});
 
 prfpicinput.onchange = evt => {
     const [file] = prfpicinput.files
@@ -47,11 +27,15 @@ prfpicinput.onchange = evt => {
     }
 }
 
-function setToDefault() {
-    emailChangeBox.style.zIndex = '-1'
-    emailChangeBox.style.opacity = '0'
-    nickchgbox.style.zIndex = '-1'
-    nickchgbox.style.opacity = '0'
+blur.addEventListener('click', function () {
+    setToDefaultImg()
+});
+
+discardprfimg.addEventListener('click', function () {
+    setToDefaultImg()
+});
+
+function setToDefaultImg() {
     imgprwbox.style.zIndex = '-1'
     imgprwbox.style.opacity = '0'
     blur.style.opacity = '0'
@@ -61,19 +45,3 @@ function setToDefault() {
     imgSubmit.style.removeProperty('pointer-events')
     imgSubmitBox.classList.remove('cursor-not-allowed')
 }
-
-blur.addEventListener('click', function () {
-    setToDefault()
-});
-
-discardprfimg.addEventListener('click', function () {
-    setToDefault()
-});
-
-discardnickchg.addEventListener('click', function () {
-    setToDefault()
-});
-
-discardEmailChg.addEventListener('click', function () {
-   setToDefault()
-});

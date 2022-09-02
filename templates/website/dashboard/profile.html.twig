@@ -62,7 +62,7 @@
                     </div>
                     <div class="flex relative top-[30px]">
                         <p class="font-inter text-[18px] mr-[30px] select-none">Public</p>
-                        <input class="checked:accent-black" name="privacy" id="privacy" type="checkbox" {% if not user.isPrivate %} checked {% endif %}>
+                        <input class="checked:accent-black cursor-pointer" name="privacy" id="privacy" type="checkbox" {% if not user.isPrivate %} checked {% endif %}>
                     </div>
                     <input name="form-type" type="hidden" value="privacy">
                 </form>
@@ -95,11 +95,11 @@
                         </div>
                         <form id="nick-chg-form" action="{{ path('dashboard_profile') }}" method="post" class="w-full mt-[20px]">
                             <div class="w-fit mx-auto mt-[40px]">
-                                <input id="nickname-input" type="text" name="nickname" class="rounded-lg pl-[12px] w-[260px] pb-[12px] text-white bg-black text-[16px] font-inter focus:outline-none" placeholder="type here...">
+                                <input id="nickname-input" type="text" name="nickname" class="rounded-lg pl-[12px] pr-[12px] w-[260px] pb-[12px] text-white bg-black text-[16px] font-inter focus:outline-none" placeholder="type here...">
                             </div>
                             <div class="border w-[244px] border-[#e5e7eb] rounded mx-auto"></div>
                             <div class="relative w-fit h-[40px] w-[40px] mx-auto mt-[20px]">
-                                <div id="nickname-not-available" class="absolute z-[-1] h-full w-full transition-all">
+                                <div id="nickname-not-available" class="absolute z-[-1] opacity-0 h-full w-full transition-all">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" class="fill-red-500" viewBox="0 0 16 16">
                                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                                     </svg>
@@ -151,7 +151,7 @@
                         </div>
                         <form id="email-change-form" method="post" action="{{ path('dashboard_profile') }}" class="w-full mt-[20px]">
                             <div class="w-fit mx-auto mt-[40px]">
-                                <input id="email-input" type="email" name="email" class="rounded-lg pl-[12px] w-[260px] pb-[12px] text-white bg-black text-[16px] font-inter focus:outline-none" placeholder="type here...">
+                                <input id="email-input" type="email" name="email" class="rounded-lg pl-[12px] pr-[12px] w-[260px] pb-[12px] text-white bg-black text-[16px] font-inter focus:outline-none" placeholder="type here...">
                             </div>
                             <div class="border w-[244px] border-[#e5e7eb] rounded mx-auto"></div>
                             <div class="relative w-fit h-[40px] w-[40px] mx-auto mt-[20px]">
@@ -180,10 +180,69 @@
                 </div>
             </div>
         </div>
+        <div class="relative w-full">
+            <div class="mt-[60px] max-w-[600px] mx-auto">
+                <div class="w-full pl-[36px] mb-[12px]">
+                    <p class="font-inter text-[20px] select-none w-fit">Security</p>
+                </div>
+                <div class="mx-auto h-[2px] bg-[#ebebeb] w-[94%] rounded"></div>
+            </div>
+            <div class="w-[460px] mx-auto mt-[40px]">
+                <div class="w-fit">
+                    <button class="w-[200px] h-[40px] font-inter text-[-380px] border-2 border-[#e5e7eb] rounded-lg transition-all hover:bg-[#2e4053] hover:text-white hover:border-[#888888]" type="button" id="change-password-button">Change password</button>
+                </div>
+                <div id="password-chg-box" class="absolute top-[-330px] opacity-0 z-[-1] transition-all left-[0px] right-[0px] ml-auto mr-auto w-fit h-fit">
+                    <div class="w-[300px] h-fit bg-black rounded">
+                        <div class="absolute top-[14px] pl-[28px]">
+                            <p class="font-inter text-white text-[14px] select-none">Password change</p>
+                        </div>
+                        <div class="relative top-[10px] h-fit w-fit left-[80%]">
+                            <button id="discardPasswordchg" type="button" class="text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <form method="post" action="{{ path('dashboard_profile') }}" class="w-full mt-[20px]">
+                            <div class="w-fit mx-auto mt-[40px]">
+                                <input id="password-input-1" type="password" name="password-1" class="rounded-lg pl-[12px] pr-[12px] w-[260px] pb-[12px] text-white bg-black text-[16px] font-inter focus:outline-none" placeholder="type your password...">
+                            </div>
+                            <div class="border w-[244px] border-[#e5e7eb] rounded mx-auto"></div>
+                            <div class="w-fit mx-auto mt-[20px]">
+                                <input id="password-input-2" type="password" name="password-2" class="rounded-lg pl-[12px] pr-[12px] w-[260px] pb-[12px] text-white bg-black text-[16px] font-inter focus:outline-none" placeholder="repeat...">
+                            </div>
+                            <div class="border w-[244px] border-[#e5e7eb] rounded mx-auto"></div>
+                            <div class="relative w-fit h-[40px] w-[40px] mx-auto mt-[20px]">
+                                <div id="password-not-allowed" class="absolute z-[-1] h-full w-full transition-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" class="fill-red-500" viewBox="0 0 16 16">
+                                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                    </svg>
+                                </div>
+                                <div id="password-loading" class="absolute z-[-1] opacity-0 h-full w-full transition-all">
+                                    <div class="lds-dual-ring"></div>
+                                </div>
+                                <div id="password-allowed" class="absolute z-[-1] h-full w-full transition-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" class="fill-green-400" viewBox="0 0 16 16">
+                                        <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <input type="hidden" name="form-type" value="password">
+                            <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
+                                <div id="password-submit" class="w-fit h-fit cursor-not-allowed">
+                                    <button id="password-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition">Save password</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <script src="{{ asset('js/profilePasswordChange.js') }}"></script>
     <script src="{{ asset('js/profileMailChange.js') }}"></script>
     <script src="{{ asset('js/profileNickChange.js') }}"></script>
-    <script src="{{ asset('js/profileForms.js') }}"></script>
+    <script src="{{ asset('js/profileImgChange.js') }}"></script>
     <script>
         let privacy = document.getElementById('privacy');
         let form = document.getElementById('form-privacy');

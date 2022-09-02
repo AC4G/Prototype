@@ -1,12 +1,38 @@
 let xhrNickname = new XMLHttpRequest();
+let nickchgbox = document.getElementById('nickname-change-box');
+let nickchgbutton = document.getElementById('nick-chg-button');
+let discardnickchg = document.getElementById('discardnickchg');
 let nickname = document.getElementById('nickname-input');
 let nicknameSubmit = document.getElementById('nickname-submit');
 let nicknameLoading = document.getElementById('nickname-loading');
 let nicknameAvailable = document.getElementById('nickname-available');
 let nicknameNotAvailable = document.getElementById('nickname-not-available');
 let nicknameButton = document.getElementById('nickname-button');
+var blur = document.getElementById('blur');
 let typingTimer;
 let message;
+
+nickchgbutton.addEventListener('click', function (){
+    blur.style.opacity = '0.3'
+    blur.style.zIndex = '100'
+    nickchgbox.style.opacity = '1'
+    nickchgbox.style.zIndex = '110'
+});
+
+discardnickchg.addEventListener('click', function () {
+    setToDefaultNick()
+});
+
+blur.addEventListener('click', function () {
+    setToDefaultNick()
+});
+
+function setToDefaultNick() {
+    blur.style.opacity = '0'
+    blur.style.zIndex = '-1'
+    nickchgbox.style.zIndex = '-1'
+    nickchgbox.style.opacity = '0'
+}
 
 nickname.addEventListener('keyup', function () {
     if (nickname.value.length < 1) {
@@ -59,8 +85,8 @@ function onNicknameResponse(message) {
     if (message === 1) {
         setNicknameDefault();
 
-        nicknameNotAvailable.style.zIndex = '110';
         nicknameNotAvailable.style.opacity = '1';
+        nicknameNotAvailable.style.zIndex = '110';
     }
 }
 

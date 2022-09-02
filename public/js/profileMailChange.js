@@ -5,6 +5,32 @@ let emailButton = document.getElementById('email-button');
 let emailLoading = document.getElementById('email-loading');
 let emailAvailable = document.getElementById('email-available');
 let emailNotAvailable = document.getElementById('email-not-available');
+let emailChangeBox = document.getElementById('email-change-box');
+let emailChangeButton = document.getElementById('email-chg-button');
+let discardEmailChg = document.getElementById('discardEmailchg');
+var blur = document.getElementById('blur');
+
+emailChangeButton.addEventListener('click', function () {
+    blur.style.opacity = '0.3'
+    blur.style.zIndex = '100'
+    emailChangeBox.style.opacity = '1'
+    emailChangeBox.style.zIndex = '110'
+})
+
+discardEmailChg.addEventListener('click', function () {
+    setToDefaultEmail()
+});
+
+blur.addEventListener('click', function () {
+    setToDefaultEmail()
+});
+
+function setToDefaultEmail() {
+    blur.style.opacity = '0'
+    blur.style.zIndex = '-1'
+    emailChangeBox.style.zIndex = '-1'
+    emailChangeBox.style.opacity = '0'
+}
 
 email.addEventListener('keyup', function () {
     if (email.value.length < 1) {

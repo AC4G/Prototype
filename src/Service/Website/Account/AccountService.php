@@ -5,10 +5,12 @@ namespace App\Service\Website\Account;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AccountService
 {
     public function __construct(
+        private UserPasswordHasherInterface $passwordHasher,
         private UserRepository $userRepository
     )
     {
@@ -84,5 +86,20 @@ class AccountService
         $this->userRepository->flushEntity();
     }
 
+    public function updatePassword(
+        string $password,
+        UserInterface $user
+    )
+    {
+        if (password_verify($password, $user->getPassword())) {
+            return;
+        }
+
+        $user->setPassword($this->passwordHasher->hashPassword($user, $password));
+
+        $this->userRepository->flushEntity();
+    }
+
 
 }
+

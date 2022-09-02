@@ -2,7 +2,9 @@
 
 namespace App\Controller\Website;
 
+use App\Entity\Project;
 use App\Serializer\UserNormalizer;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -13,7 +15,8 @@ final class DashboardController extends AbstractController
 {
     public function __construct(
         private UserNormalizer $userNormalizer,
-        private AccountService $accountService
+        private AccountService $accountService,
+        private Security $security
     )
     {
     }
@@ -35,7 +38,7 @@ final class DashboardController extends AbstractController
         Request $request
     ): Response
     {
-        $user = $this->getUser();
+        $user = $this->security->getUser();
 
         if ($request->isMethod('POST')) {
             if ($request->request->get('form-type') === 'picture') {
@@ -48,11 +51,7 @@ final class DashboardController extends AbstractController
                     'image/jfif'
                 ];
 
-                if (is_null($file)) {
-                    goto a;
-                }
-
-                if (!in_array($file->getMimeType(), $types)) {
+                if (is_null($file) || !in_array($file->getMimeType(), $types)) {
                     goto a;
                 }
 
@@ -87,15 +86,22 @@ final class DashboardController extends AbstractController
             if ($request->request->get('form-type') === 'email') {
                 $email = $request->request->get('email');
 
-                if (is_null($email)) {
-                    goto a;
-                }
-
-                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                if (is_null($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     goto a;
                 }
 
                 $this->accountService->updateEmail($email, $user);
+            }
+
+            if ($request->request->get('form-type') === 'password') {
+                $password1 = $request->request->get('password-1');
+                $password2 = $request->request->get('password-2');
+
+                if ((is_null($password1) || is_null($password2)) || $password1 !== $password2 || $password2 < 10) {
+                    goto a;
+                }
+
+                $this->accountService->updatePassword($password2, $user);
             }
         }
 

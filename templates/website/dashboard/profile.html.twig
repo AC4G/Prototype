@@ -16,7 +16,16 @@
                             <p class="font-inter text-[14px] select-none">Profile picture</p>
                         </div>
                         <div class="relative w-[124px] h-[124px] rounded-full bg-[#2e4053]">
-                            <img src="{% if user.profilePic is not null %} {{ asset(user.profilePic) }} {% else %} {{ asset('files/profile/default.jpg') }} {% endif %}" class="relative top-[2px] left-[2px] object-cover w-[120px] h-[120px] rounded-full select-none">
+                            {% if user.profilePic is not null %}
+                            <img src="{{ asset(user.profilePic) }}" class="relative top-[2px] left-[2px] object-cover w-[120px] h-[120px] rounded-full select-none">
+                            {% else %}
+                                <div class="rounded-full w-fit h-fit bg-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="124" height="124" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                                    </svg>
+                                </div>
+                            {% endif %}
                             <div class="z-10 border-2 border-[#2e4053] bg-white hover:bg-[#2e4053] group absolute rounded w-[40px] h-[30px] left-[90px] top-[80px] transition" id="edit-prf-pic">
                                 <input id="prf-pic-input" name="profile-picture" type="file" class="opacity-0 cursor-pointer w-[36px] h-[26px] absolute">
                                 <input name="form-type" type="hidden" value="picture">

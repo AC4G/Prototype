@@ -117,7 +117,16 @@
                <div class="group w-fit absolute right-[5.2%] top-[16.5px]">
                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                        <div class="w-[42px] h-[42px] rounded-full bg-[#2e4053] cursor-pointer group-hover:bg-[#c5ffef] transition">
-                            <img src="{% if user.profilePic is not null %} {{ asset(user.profilePic) }} {% else %} {{ asset('files/profile/default.jpg') }} {% endif %}" class="relative top-[2px] left-[2px] w-[38px] h-[38px] rounded-full">
+                           {% if user.profilePic is not null %}
+                               <img src="{{ asset(user.profilePic) }}" class="relative top-[2px] left-[2px] w-[38px] h-[38px] rounded-full">
+                           {% else %}
+                               <div class="rounded-full w-fit h-fit bg-white">
+                                   <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                       <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                       <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                                   </svg>
+                               </div>
+                           {% endif %}
                        </div>
                        <div class="absolute z-10 invisible opacity-0 delay-100 rounded shadow-md group-hover:visible group-hover:opacity-100 transition-opacity w-[175px] h-[242px] right-[5.2%] bg-white">
                            <ul class="relative w-fit left-[29px] top-[45px]">

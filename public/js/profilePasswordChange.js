@@ -8,6 +8,8 @@ let passwordallowed = document.getElementById('password-allowed');
 let passwordloading = document.getElementById('password-loading');
 let passwordsubmit = document.getElementById('password-submit');
 let passwordbutton = document.getElementById('password-button');
+let passworderror = document.getElementById('password-error');
+let passworderrormessage = document.getElementById('password-error-message');
 var blur = document.getElementById('blur');
 
 passwordchgbutton.addEventListener('click', function () {
@@ -18,14 +20,17 @@ passwordchgbutton.addEventListener('click', function () {
 });
 
 blur.addEventListener('click', function () {
-    setToDefaultPassword()
-    setPasswordDefault()
-    passwordinput1.value = ''
-    passwordinput2.value = ''
+    setToDefaultPassword();
+    setPasswordDefault();
+    passwordinput1.value = '';
+    passwordinput2.value = '';
 });
 
 discardPasswordChg.addEventListener('click', function () {
-    setToDefaultPassword()
+    setToDefaultPassword();
+    setPasswordDefault();
+    passwordinput1.value = '';
+    passwordinput2.value = '';
 });
 
 function setToDefaultPassword() {
@@ -46,8 +51,8 @@ passwordinput1.addEventListener('keyup', function () {
         passwordloading.style.opacity = '1';
     }
 
-    clearTimeout(1000);
-    typingTimer = setTimeout(donePasswordTyping, 1000);
+    clearTimeout(2000);
+    typingTimer = setTimeout(donePasswordTyping, 2000);
 });
 
 passwordinput1.addEventListener('keydown', function () {
@@ -69,8 +74,8 @@ passwordinput2.addEventListener('keyup', function () {
         passwordloading.style.opacity = '1';
     }
 
-    clearTimeout(1000);
-    typingTimer = setTimeout(donePasswordTyping, 1000);
+    clearTimeout(2000);
+    typingTimer = setTimeout(donePasswordTyping, 2000);
 });
 
 passwordinput2.addEventListener('keydown', function () {
@@ -92,14 +97,18 @@ function donePasswordTyping() {
     if (passwordinput1.value !== passwordinput2.value) {
         passwordnotallowed.style.opacity = '1';
         passwordnotallowed.style.zIndex = '110';
+        passworderrormessage.innerText = 'Passwords are not equal!';
+        passworderror.classList.remove('hidden');
     }
 
     if (passwordinput1.value === passwordinput2.value && passwordinput1.value.length < 10) {
         passwordnotallowed.style.opacity = '1';
         passwordnotallowed.style.zIndex = '110';
+        passworderrormessage.innerText = 'Password must have 10 or more characters!';
+        passworderror.classList.remove('hidden');
     }
 
-    if (passwordinput1.value === passwordinput2.value && passwordinput1.value.length > 10) {
+    if (passwordinput1.value === passwordinput2.value && passwordinput1.value.length > 9) {
         passwordallowed.style.opacity = '1';
         passwordallowed.style.zIndex = '110';
         passwordsubmit.classList.remove('cursor-not-allowed');
@@ -118,5 +127,6 @@ function setPasswordDefault() {
     passwordsubmit.classList.add('cursor-not-allowed');
     passwordbutton.style.pointerEvents = 'none';
     passwordbutton.style.cursor = 'none';
+    passworderror.classList.add('hidden');
 }
 

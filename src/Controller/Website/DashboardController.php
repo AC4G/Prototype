@@ -97,7 +97,7 @@ final class DashboardController extends AbstractController
                 $password1 = $request->request->get('password-1');
                 $password2 = $request->request->get('password-2');
 
-                if ((is_null($password1) || is_null($password2)) || $password1 !== $password2 || $password2 < 10) {
+                if ((is_null($password1) || is_null($password2)) || $password1 !== $password2 || strlen($password2) < 10) {
                     goto a;
                 }
 

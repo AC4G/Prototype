@@ -2,9 +2,16 @@
 
 {% block body %}
     <div class="overflow-x-hidden overflow-y-scroll w-full h-[100vh]">
-        <div class="h-[80px] w-full">
-            <div class="h-[78px] w-[80%] mx-auto pt-[19.5px]">
-                <p class="font-inter text-[26px] select-none">Profile</p>
+        <div class="h-[80px] mx-auto w-full">
+            <div id="profile-top" class="flex justify-between mx-auto w-[80%] max-w-[900px]">
+                <div class="h-[78px] w-fit pt-[19.5px]">
+                    <p class="font-inter text-[26px] select-none">Profile</p>
+                </div>
+                <div id="profile-menu" class="h-fit hidden w-[20px] mt-[25px]">
+                    <div class="h-[2px] bg-black my-[6px]"></div>
+                    <div class="h-[2px] bg-black my-[6px]"></div>
+                    <div class="h-[2px] bg-black my-[6px]"></div>
+                </div>
             </div>
             <div id="profile-bar-responsive" class="relative mx-auto h-[2px] bg-[#ebebeb] w-[80%] rounded"></div>
         </div>
@@ -71,7 +78,7 @@
                     </div>
                     <div class="flex relative top-[30px]">
                         <p class="font-inter text-[18px] mr-[30px] select-none">Public</p>
-                        <input class="checked:accent-black cursor-pointer" name="privacy" id="privacy" type="checkbox" {% if not user.isPrivate %} checked {% endif %}>
+                        <input class="rounded checked:accent-black cursor-pointer" name="privacy" id="privacy" type="checkbox" {% if not user.isPrivate %} checked {% endif %}>
                     </div>
                     <input name="form-type" type="hidden" value="privacy">
                 </form>

@@ -117,7 +117,8 @@ function donePasswordTyping() {
     }
 }
 
-function setPasswordDefault() {
+function setPasswordDefault()
+{
     passwordloading.style.zIndex = '-1';
     passwordloading.style.opacity = '0';
     passwordnotallowed.style.opacity = '0';

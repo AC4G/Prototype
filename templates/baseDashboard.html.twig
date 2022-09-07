@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Welcome!{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🔒</text></svg>">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +13,6 @@
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
@@ -30,11 +30,16 @@
     {% endfor %}
         <div class="absolute w-full h-[100vh] left-[0px] top-[0px] right-[0px] bg-black bottom-[0px] opacity-0 z-[-1] transition-all" id="blur"></div>
         <div class="flex">
-            <nav id="navbar" class="w-[359px] h-[100vh]" id="dashboard-nav">
-                <div class="w-[359px] h-[68px] pl-[20px]">
-                    <a href="{{ path('home') }}" class="relative inline-block font-inter w-[94%] h-[100%] hover:text-grey transition text-[20px] pt-[24px] pl-[60px]">
+            <nav id="navbar" class="w-[320px] h-[100vh] bg-white transition-all">
+                <div class="w-[320px] h-[68px] pl-[20px] flex">
+                    <a id="navbar-link-home" href="{{ path('home') }}" class="relative inline-block font-inter w-[94%] h-[100%] hover:text-grey transition text-[20px] pt-[24px] pl-[60px]">
                         Metaverse
                     </a>
+                    <div id="menu-close" class="w-fit h-fit flex-none hidden mt-[30px] cursor-pointer ml-[20px]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                        </svg>
+                    </div>
                 </div>
                 <div class="w-[100%] h-[22px] pt-[10px]">
                     <div class="relative left-[3%] w-[94%] h-[2px] bg-[#ebebeb]"></div>
@@ -68,8 +73,8 @@
                         Developer
                     </a>
                 </div>
-                <div class="absolute bottom-[0px] w-[359px]">
-                    <div class="w-[100%] h-[22px] pt-[10px]">
+                <div class="absolute bottom-[0px] w-[320px]">
+                    <div class="w-full h-[22px] pt-[10px]">
                         <div class="relative left-[3%] w-[94%] h-[2px] bg-[#ebebeb]"></div>
                     </div>
                     <div class="w-full h-[80px] pb-[12px] pl-[20px]">
@@ -84,7 +89,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="bg-[#ebebeb] w-[2px] h-[94%] absolute top-[3%] rounded left-[357px]"></div>
+                <div class="bg-[#ebebeb] w-[2px] h-[94%] absolute top-[3%] rounded left-[318px]"></div>
             </nav>
             {% block body %}{% endblock %}
         </div>

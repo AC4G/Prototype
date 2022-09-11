@@ -30,50 +30,52 @@
     {% endfor %}
         <div class="absolute w-full h-[100vh] left-[0px] top-[0px] right-[0px] bg-black bottom-[0px] opacity-0 z-[-1] transition-all" id="blur"></div>
         <div class="flex">
-            <nav id="navbar" class="w-[320px] h-[100vh] bg-white transition-all">
-                <div class="w-[320px] h-[68px] pl-[20px] flex">
-                    <a id="navbar-link-home" href="{{ path('home') }}" class="relative inline-block font-inter w-[94%] h-[100%] hover:text-grey transition text-[20px] pt-[24px] pl-[60px]">
-                        Metaverse
-                    </a>
-                    <div id="menu-close" class="w-fit h-fit flex-none hidden mt-[30px] cursor-pointer ml-[20px]">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
-                        </svg>
+            <nav id="navbar" class="w-[320px] opacity-0 z-[-1] h-[100vh] bg-white absolute overflow-x-hidden overflow-y-scroll scrollbar-hide transition-all border-r-2">
+                <div id="trigger1" class="h-fit w-full">
+                    <div class="w-full h-[68px] pl-[20px] flex">
+                        <a id="navbar-link-home" href="{{ path('home') }}" class="relative inline-block font-inter w-[80%] h-[100%] hover:text-grey transition text-[20px] pt-[24px] pl-[60px]">
+                            Metaverse
+                        </a>
+                        <div id="menu-close" class="w-fit h-fit flex-none mt-[30px] cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="w-[100%] h-[22px] pt-[10px]">
+                        <div class="relative left-[3%] w-[94%] h-[2px] bg-[#ebebeb]"></div>
+                    </div>
+                    <div class="w-full h-[68px] pl-[20px]">
+                        <a href="{{ path('dashboard') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
+                            Dashboard
+                        </a>
+                    </div>
+                    <div class="w-[100%] h-[2px]"></div>
+                    <div class="w-full h-[68px] pl-[20px]">
+                        <a href="{{ path('dashboard_profile') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_profile') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
+                            Profile
+                        </a>
+                    </div>
+                    <div class="w-[100%] h-[2px]"></div>
+                    <div class="w-full h-[68px] pl-[20px]">
+                        <a href="{{ path('dashboard_inventory') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_inventory') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
+                            Inventory
+                        </a>
+                    </div>
+                    <div class="w-[100%] h-[2px]"></div>
+                    <div class="w-full h-[68px] pl-[20px]">
+                        <a href="{{ path('dashboard_creator') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_creator') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
+                            Creator
+                        </a>
+                    </div>
+                    <div class="w-[100%] h-[2px]"></div>
+                    <div class="w-full h-[68px] pl-[20px]">
+                        <a href="{{ path('dashboard_developer') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_developer') %} active-menu-dashboard pointer-events-none {% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
+                            Developer
+                        </a>
                     </div>
                 </div>
-                <div class="w-[100%] h-[22px] pt-[10px]">
-                    <div class="relative left-[3%] w-[94%] h-[2px] bg-[#ebebeb]"></div>
-                </div>
-                <div class="w-full h-[68px] pl-[20px]">
-                    <a href="{{ path('dashboard') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
-                        Dashboard
-                    </a>
-                </div>
-                <div class="w-[100%] h-[2px]"></div>
-                <div class="w-full h-[68px] pl-[20px]">
-                    <a href="{{ path('dashboard_profile') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_profile') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
-                        Profile
-                    </a>
-                </div>
-                <div class="w-[100%] h-[2px]"></div>
-                <div class="w-full h-[68px] pl-[20px]">
-                    <a href="{{ path('dashboard_inventory') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_inventory') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
-                        Inventory
-                    </a>
-                </div>
-                <div class="w-[100%] h-[2px]"></div>
-                <div class="w-full h-[68px] pl-[20px]">
-                    <a href="{{ path('dashboard_creator') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_creator') %} active-menu-dashboard pointer-events-none{% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
-                        Creator
-                    </a>
-                </div>
-                <div class="w-[100%] h-[2px]"></div>
-                <div class="w-full h-[68px] pl-[20px]">
-                    <a href="{{ path('dashboard_developer') }}" class="relative inline-block font-inter w-[94%] h-[100%] {% if app.request.pathInfo == path('dashboard_developer') %} active-menu-dashboard pointer-events-none {% endif %} hover:text-grey transition text-[20px] pt-[20px] pl-[60px]">
-                        Developer
-                    </a>
-                </div>
-                <div class="absolute bottom-[0px] w-[320px]">
+                <div id="trigger2" class="absolute h-fit w-full bottom-[0px]">
                     <div class="w-full h-[22px] pt-[10px]">
                         <div class="relative left-[3%] w-[94%] h-[2px] bg-[#ebebeb]"></div>
                     </div>
@@ -89,7 +91,6 @@
                         </a>
                     </div>
                 </div>
-                <div class="bg-[#ebebeb] w-[2px] h-[94%] absolute top-[3%] rounded left-[318px]"></div>
             </nav>
             {% block body %}{% endblock %}
         </div>

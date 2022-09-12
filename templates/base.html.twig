@@ -19,6 +19,7 @@
         {% endblock %}
     </head>
     <body>
+        <div class="absolute w-full h-[100vh] left-[0px] top-[0px] right-[0px] bg-black bottom-[0px] opacity-0 z-[-1] transition-all" id="blur"></div>
         {% for message in app.flashes('success') %}
             <div class="w-100 h-[40px] font-inter text-black bg-green-100 flex justify-center pt-[6px] border-b-2 border-green-400">
                 {{ message }}

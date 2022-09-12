@@ -1,5 +1,5 @@
 let navbar = document.getElementById('navbar');
-let profilemenu = document.getElementById('profile-menu');
+let menu = document.getElementById('menu');
 var blur = document.getElementById('blur');
 let menuclose = document.getElementById('menu-close');
 let trigger1 = document.getElementById('trigger1');
@@ -13,7 +13,7 @@ window.addEventListener('resize', function () {
     collisionDetection();
 });
 
-profilemenu.addEventListener('click', function (){
+menu.addEventListener('click', function (){
     blur.style.opacity = '0.3'
     blur.style.zIndex = '100'
     navbar.style.zIndex = '110'

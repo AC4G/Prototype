@@ -4,7 +4,9 @@
 
 {% block body %}
     <div id="navbar" class="absolute w-[320px] opacity-0 z-[-1] h-[100vh] bg-white absolute overflow-x-hidden overflow-y-scroll scrollbar-hide transition-all border-r-2">
+        <div class="w-full">
 
+        </div>
     </div>
     <header>
        <nav class="w-full">
@@ -17,7 +19,7 @@
                    </div>
                </div>
                <div id="name" class="w-fit absolute left-[5.2%] top-[31px]">
-                   <p class="p hover:text-black pointer-events-none">Metaverse</p>
+                   <p class="p hover:text-black pointer-events-none select-none">Metaverse</p>
                </div>
                <div class="w-full absolute flex justify-center">
                    <div class="w-fit absolute top-[31px] flex">
@@ -124,7 +126,7 @@
                        </div>
                    </div>
                </div>
-               <div class="group w-fit absolute right-[5.2%] top-[16.5px]" onclick="">
+               <div id="account" class="group w-fit absolute right-[5.2%] top-[16.5px]" onclick="">
                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                        <div class="w-[42px] h-[42px] rounded-full bg-[#2e4053] cursor-pointer group-hover:bg-[#c5ffef] transition">
                            {% if user.profilePic is not null %}
@@ -138,7 +140,7 @@
                                </div>
                            {% endif %}
                        </div>
-                       <div class="absolute z-10 invisible opacity-0 delay-100 rounded shadow-md group-hover:visible group-hover:opacity-100 transition-opacity w-[175px] h-[242px] right-[5.2%] bg-white">
+                       <div id="account-dropdown" class="absolute z-10 invisible opacity-0 delay-100 rounded shadow-md transition-opacity w-[175px] h-[242px] right-[5.2%] bg-white">
                            <ul class="relative w-fit left-[29px] top-[45px]">
                                <li>
                                    <a href="{{ path('dashboard') }}">
@@ -181,5 +183,6 @@
            <div class="h-[2px] bg-[#ebebeb] w-[93.74%] rounded m-auto"></div>
        </nav>
     </header>
+    <script src="{{ asset('js/home/dropdown.js') }}"></script>
     <script src="{{ asset('js/home/navbar.js') }}"></script>
 {% endblock %}

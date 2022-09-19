@@ -1,38 +1,32 @@
-let xhrNickname = new XMLHttpRequest();
-let nickchgbox = document.getElementById('nickname-change-box');
-let nickchgbutton = document.getElementById('nick-chg-button');
-let discardnickchg = document.getElementById('discardnickchg');
-let nickname = document.getElementById('nickname-input');
-let nicknameSubmit = document.getElementById('nickname-submit');
-let nicknameLoading = document.getElementById('nickname-loading');
-let nicknameAvailable = document.getElementById('nickname-available');
-let nicknameNotAvailable = document.getElementById('nickname-not-available');
-let nicknameButton = document.getElementById('nickname-button');
+const xhrNickname = new XMLHttpRequest();
+const nickchgform = document.getElementById('nick-chg-form');
+const nickchgbox = document.getElementById('nickname-change-box');
+const nickchgbutton = document.getElementById('nick-chg-button');
+const discardnickchg = document.getElementById('discardnickchg');
+const nickname = document.getElementById('nickname-input');
+const nicknameSubmit = document.getElementById('nickname-submit');
+const nicknameLoading = document.getElementById('nickname-loading');
+const nicknameAvailable = document.getElementById('nickname-available');
+const nicknameNotAvailable = document.getElementById('nickname-not-available');
+const nicknameButton = document.getElementById('nickname-button');
 var blur = document.getElementById('blur');
 let typingTimer;
 let message;
 
-nickchgbutton.addEventListener('click', function (){
-    blur.style.opacity = '0.3'
-    blur.style.zIndex = '100'
-    nickchgbox.style.opacity = '1'
-    nickchgbox.style.zIndex = '110'
+nickchgbutton.addEventListener('click', function () {
+    show(blur, 0.3, 100);
+    show(nickchgbox);
 });
 
-discardnickchg.addEventListener('click', function () {
-    setToDefaultNick()
+nickchgform.addEventListener('keypress', function (event) {
+   if (event.key === 'Enter' && nicknameSubmit.classList.contains('cursor-not-allowed')) {
+       event.preventDefault();
+   }
 });
 
-blur.addEventListener('click', function () {
-    setToDefaultNick()
-});
+discardnickchg.addEventListener('click', setToDefaultNick);
 
-function setToDefaultNick() {
-    blur.style.opacity = '0'
-    blur.style.zIndex = '-1'
-    nickchgbox.style.zIndex = '-1'
-    nickchgbox.style.opacity = '0'
-}
+blur.addEventListener('click', setToDefaultNick);
 
 nickname.addEventListener('keyup', function () {
     if (nickname.value.length < 1) {
@@ -40,8 +34,7 @@ nickname.addEventListener('keyup', function () {
         return false;
     }
 
-    nicknameLoading.style.zIndex = '110';
-    nicknameLoading.style.opacity = '1';
+    show(nicknameLoading);
 
     clearTimeout(2000);
     typingTimer = setTimeout(doneNicknameTyping, 2000);
@@ -55,6 +48,13 @@ nickname.addEventListener('keydown', function () {
     clearTimeout(typingTimer);
 });
 
+xhrNickname.onreadystatechange = function () {
+    if (xhrNickname.readyState === 4) {
+        message = Object.values(JSON.parse(xhrNickname.responseText))[2];
+        onNicknameResponse(message);
+    }
+};
+
 function doneNicknameTyping() {
     if (nickname.value.length < 1) {
         return false;
@@ -64,40 +64,50 @@ function doneNicknameTyping() {
     xhrNickname.send();
 }
 
-xhrNickname.onreadystatechange = function () {
-    if (xhrNickname.readyState === 4) {
-        message = Object.values(JSON.parse(xhrNickname.responseText))[2];
-        onNicknameResponse(message);
-    }
-};
+function setToDefaultNick() {
+    hide(blur);
+    hide(nickchgbox);
+}
 
 function onNicknameResponse(message) {
-    if (message === 0) {
-        setNicknameDefault();
+    setNicknameDefault();
 
-        nicknameAvailable.style.zIndex = '110';
-        nicknameAvailable.style.opacity = '1';
-        nicknameSubmit.classList.remove('cursor-not-allowed');
-        nicknameButton.style.pointerEvents = 'auto';
-        nicknameButton.style.cursor = 'pointer';
+    if (message === 0) {
+        show(nicknameAvailable);
     }
 
     if (message === 1) {
-        setNicknameDefault();
-
-        nicknameNotAvailable.style.opacity = '1';
-        nicknameNotAvailable.style.zIndex = '110';
+        show(nicknameNotAvailable);
     }
 }
 
 function setNicknameDefault() {
-    nicknameLoading.style.opacity = '0';
-    nicknameLoading.style.zIndex = '-1';
-    nicknameAvailable.style.zIndex = '-1';
-    nicknameAvailable.style.opacity = '0';
-    nicknameNotAvailable.style.opacity = '0';
-    nicknameNotAvailable.style.zIndex = '-1';
-    nicknameButton.style.pointerEvents = 'none';
-    nicknameButton.style.removeProperty('cursor');
-    nicknameSubmit.classList.add('cursor-not-allowed');
+    hide(nicknameLoading);
+    hide(nicknameAvailable)
+    hide(nicknameNotAvailable);
+    hide(nicknameButton);
+}
+
+function show(element, opacity = 1, zIndex = 110) {
+    element.style.opacity =  opacity.toString();
+    element.style.zIndex = zIndex.toString();
+
+    if (element === nicknameAvailable) {
+        nicknameSubmit.classList.remove('cursor-not-allowed');
+        nicknameButton.style.pointerEvents = 'auto';
+        nicknameButton.style.cursor = 'pointer';
+    }
+}
+
+function hide(element) {
+    if (element === nicknameButton) {
+        element.style.pointerEvents = 'none';
+        element.style.removeProperty('cursor');
+        nicknameSubmit.classList.add('cursor-not-allowed');
+
+        return;
+    }
+
+    element.style.opacity = '0';
+    element.style.zIndex = '-1';
 }

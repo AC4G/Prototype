@@ -624,6 +624,10 @@ video {
   bottom: 0px;
 }
 
+.left-\[82px\] {
+  left: 82px;
+}
+
 .left-\[3\%\] {
   left: 3%;
 }
@@ -770,26 +774,6 @@ video {
 
 .top-\[108px\] {
   top: 108px;
-}
-
-.left-\[60px\] {
-  left: 60px;
-}
-
-.left-\[120px\] {
-  left: 120px;
-}
-
-.left-\[80px\] {
-  left: 80px;
-}
-
-.left-\[81px\] {
-  left: 81px;
-}
-
-.left-\[82px\] {
-  left: 82px;
 }
 
 .z-\[-1\] {
@@ -1009,14 +993,14 @@ video {
   width: 320px;
 }
 
-.w-\[80\%\] {
-  width: 80%;
-}
-
 .w-fit {
   width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
+}
+
+.w-\[70\%\] {
+  width: 70%;
 }
 
 .w-\[100\%\] {
@@ -1025,6 +1009,10 @@ video {
 
 .w-\[94\%\] {
   width: 94%;
+}
+
+.w-\[80\%\] {
+  width: 80%;
 }
 
 .w-\[20px\] {
@@ -1097,10 +1085,6 @@ video {
 
 .w-\[80px\] {
   width: 80px;
-}
-
-.w-\[70\%\] {
-  width: 70%;
 }
 
 .max-w-\[900px\] {
@@ -1298,16 +1282,16 @@ video {
   padding-top: 24px;
 }
 
-.pl-\[60px\] {
-  padding-left: 60px;
-}
-
 .pt-\[10px\] {
   padding-top: 10px;
 }
 
 .pt-\[20px\] {
   padding-top: 20px;
+}
+
+.pl-\[60px\] {
+  padding-left: 60px;
 }
 
 .pb-\[12px\] {
@@ -1628,6 +1612,13 @@ video {
   100% {
     transform: rotate(360deg);
   }
+}
+
+#nickname-input, #email-input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px black inset !important;
+  -webkit-text-fill-color: white !important;
 }
 
 .checked\:accent-black:checked {

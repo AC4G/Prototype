@@ -67,7 +67,24 @@ class AccountService
             return;
         }
 
+        $newPath = null;
+        $path = 'files/profile/';
+        $lowerNickname = strtolower($nickname);
+        $oldLowerNickname = strtolower($user->getNickname());
+
+        if (is_dir($path .  $oldLowerNickname)) {
+            $extension = pathinfo(scandir($path . $oldLowerNickname)[2])['extension'];
+
+            if (strlen($extension) > 0) {
+                rename($path . $oldLowerNickname . '/' . $oldLowerNickname . '.' . $extension, $path .  $oldLowerNickname . '/' . $lowerNickname . '.' . $extension);
+            }
+
+            rename($path .  $oldLowerNickname . '/', $path . $lowerNickname . '/');
+            $newPath = $path . $lowerNickname . '/' . $lowerNickname . '.' . $extension;
+        }
+
         $user->setNickname($nickname);
+        $user->setProfilePic($newPath);
 
         $this->userRepository->flushEntity();
     }

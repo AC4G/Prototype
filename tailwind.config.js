@@ -30,6 +30,7 @@ module.exports = {
     },
   },
   plugins: [
+    require("tailwindcss-autofill"),
     require('tailwind-scrollbar-hide')
   ],
 }

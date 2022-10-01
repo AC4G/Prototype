@@ -985,6 +985,10 @@ video {
   height: 242px;
 }
 
+.h-\[99vh\] {
+  height: 99vh;
+}
+
 .w-full {
   width: 100%;
 }
@@ -1614,7 +1618,7 @@ video {
   }
 }
 
-#nickname-input, #email-input:-webkit-autofill,
+#nickname-input:-webkit-autofill, #email-input:-webkit-autofill,
 textarea:-webkit-autofill,
 select:-webkit-autofill {
   -webkit-box-shadow: 0 0 0 1000px black inset !important;
@@ -1681,4 +1685,3 @@ select:-webkit-autofill {
 .group:hover .group-hover\:opacity-100 {
   opacity: 1;
 }
-

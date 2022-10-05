@@ -26,8 +26,11 @@ final class DashboardController extends AbstractController
      */
     public function showDashboard(): Response
     {
-        return $this->render('website/dashboard/index.html.twig', [
+        $user = $this->userNormalizer->normalize($this->getUser());
 
+        return $this->render('website/dashboard/index.html.twig', [
+            'user' => $user,
+            'path_name' => 'dashboard'
         ]);
     }
 
@@ -56,6 +59,8 @@ final class DashboardController extends AbstractController
                 }
 
                 $this->accountService->saveProfilePicture($file, $user);
+
+                sleep(2);
             }
 
             if ($request->request->get('form-type') === 'privacy') {
@@ -110,7 +115,8 @@ final class DashboardController extends AbstractController
         $user = $this->userNormalizer->normalize($this->getUser());
 
         return $this->render('website/dashboard/profile.html.twig', [
-            'user' => $user
+            'user' => $user,
+            'path_name' => 'profile'
         ]);
     }
 
@@ -130,8 +136,11 @@ final class DashboardController extends AbstractController
      */
     public function showInventory(): Response
     {
-        return $this->render('website/dashboard/inventory.html.twig', [
+        $user = $this->userNormalizer->normalize($this->getUser());
 
+        return $this->render('website/dashboard/inventory.html.twig', [
+            'user' => $user,
+            'path_name' => 'inventory'
         ]);
     }
 
@@ -140,8 +149,10 @@ final class DashboardController extends AbstractController
      */
     public function showCreator(): Response
     {
-        return $this->render('website/dashboard/creator.html.twig', [
 
+
+        return $this->render('website/dashboard/creator.html.twig', [
+            'path_name' => 'creator'
         ]);
     }
 

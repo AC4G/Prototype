@@ -16,8 +16,7 @@ window.addEventListener('resize', function () {
 menu.addEventListener('click', function (){
     blur.style.opacity = '0.3'
     blur.style.zIndex = '100'
-    navbar.style.zIndex = '110'
-    navbar.style.opacity = '1'
+    navbar.style.left = '0px'
 });
 
 blur.addEventListener('click', function () {
@@ -32,8 +31,7 @@ function navbarOnClose()
 {
     blur.style.opacity = '0'
     blur.style.zIndex = '-1'
-    navbar.style.opacity = '0'
-    navbar.style.zIndex = '-1'
+    navbar.style.left = '-320px'
 }
 
 function collisionDetection()

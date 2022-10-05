@@ -2,19 +2,7 @@
 
 {% block body %}
     <div class="overflow-x-hidden overflow-y-scroll scrollbar-hide w-full h-[100vh]">
-        <div class="h-[80px] mx-auto w-full">
-            <div id="profile-top" class="flex justify-between mx-auto w-[80%] max-w-[900px]">
-                <div class="h-[78px] w-fit pt-[19.5px]">
-                    <p class="font-inter text-[26px] select-none">Profile</p>
-                </div>
-                <div id="menu" class="h-fit cursor-pointer w-[20px] mt-[25px]">
-                    <div class="h-[2px] bg-black my-[6px]"></div>
-                    <div class="h-[2px] bg-black my-[6px]"></div>
-                    <div class="h-[2px] bg-black my-[6px]"></div>
-                </div>
-            </div>
-            <div id="profile-bar-responsive" class="relative mx-auto h-[2px] bg-[#ebebeb] w-[80%] rounded"></div>
-        </div>
+        {% include 'website/dashboard/components/navbar.html.twig' %}
         <div class="flex max-w-[1000px] mx-auto h-fit pt-[40px]">
             <div class="relative w-full flex justify-evenly">
                 <form action="{{ path('dashboard_profile') }}" method="post" enctype="multipart/form-data" name="profile-pic-form" class="h-fit">

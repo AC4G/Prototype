@@ -3,11 +3,63 @@
 {% block body %}
     <div class="overflow-x-hidden overflow-y-scroll scrollbar-hide w-full h-[100vh]">
         {% include 'website/dashboard/components/navbar.html.twig' %}
-        <div class="flex max-w-[1000px] mx-auto h-fit pt-[40px]">
-            <div class="relative w-full flex justify-evenly">
-
+        <div id="content-box" class="mx-auto h-fit pt-[40px]">
+            <div class="w-full flex justify-between">
+                <div class="w-fit">
+                    <p class="font-inter inline">{% if amount == 1 %} Item {% else %} Items {% endif %}</p>
+                    <p class="font-inter inline">{{ amount }}</p>
+                </div>
+                <div class="w-fit">
+                    <div class="w-fit h-fit relative float-left mr-[30px]">
+                        <button id="filter" class="h-[22px] w-[22px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="w-fit relative float-left">
+                        <button id="create-button" class="w-[40px] h-[22px] border-2 border-green-400 rounded bg-green-100 hover:bg-green-400 transition pl-[10px]">
+                            <div class="w-fit h-fit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                </svg>
+                            </div>
+                        </button>
+                        <div id="create-menu" class="absolute w-[120px] h-[170px] rounded bg-black opacity-0 z-10 shadow-xl transition" style="visibility: hidden">
+                            <div class="w-fit h-fit relative mt-[11px] mb-[11px] mx-auto">
+                                <p class="font-inter text-[16px] text-white pointer-events-none">Create</p>
+                            </div>
+                            <div class="h-[2px] w-[94%] bg-[#ebebeb] rounded mx-auto"></div>
+                            <div class="w-[90%] h-fit pl-[8px] mx-auto mt-[12px] rounded hover:bg-[#575957] transition">
+                                <a href="{{ path('creator_create_item') }}">
+                                    <p class="font-inter text-[15px] text-white w-fit">Item</p>
+                                </a>
+                            </div>
+                            <div class="w-[90%] h-fit pl-[8px] mx-auto mt-[12px] rounded hover:bg-[#575957] transition">
+                                <a href="{{ path('creator_create_group') }}">
+                                    <p class="font-inter text-[15px] text-white w-fit">Group</p>
+                                </a>
+                            </div>
+                            <div class="w-[90%] h-fit pl-[8px] mx-auto mt-[12px] rounded hover:bg-[#575957] transition">
+                                <a href="{{ path('creator_create_collection') }}">
+                                    <p class="font-inter text-[15px] text-white w-fit">Collection</p>
+                                </a>
+                            </div>
+                        </div>
+                        <script src="{{ asset('js/creator/menu.js') }}"></script>
+                    </div>
+                </div>
             </div>
-
+            <div id="item-content-box" class="flex flex-wrap gap-4 justify-evenly pl-[12px] pr-[12px] mt-[20px]">
+                {% for item in items %}
+                <div class="w-[200px] h-[244px] rounded bg-[#e5e7eb] shadow-md">
+                    <div class="">
+                        <img class="object-cover w-[200px] h-[244px] rounded h-full w-full" src="{{ asset('files/profile/%userNickname%/items/%itemName%/pictures/%itemPicture%'|replace({'%userNickname%': user.nickname|lower, '%itemName%': item.name, '%itemPicture%': item.path.pictures.1})) }}">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
+        <script src="{{ asset('js/creator/contentBox.js') }}"></script>
     </div>
 {% endblock %}

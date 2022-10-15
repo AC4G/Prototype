@@ -15,8 +15,9 @@ class ItemNormalizer
         return [
             'id' => $item->getId(),
             'name' => $item->getName(),
-            'gameName' => $item->getGameName(),
+            'project' => $item->getProject(),
             'parameter' => json_decode($item->getParameter(), true),
+            'path' => json_decode($item->getPath(), true),
             'creationDate' => $item->getCreationDate(),
             'creator' => [
                 'id' => $item->getUser()->getId(),

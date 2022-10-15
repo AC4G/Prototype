@@ -32,14 +32,14 @@ class Item
     private string $name;
 
     /**
-     * @var Project
+     * @var ?Project
      *
      * @ORM\ManyToOne(targetEntity="Project")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="project_id", referencedColumnName="id", onDelete="CASCADE")
      * })
      */
-    private Project $project;
+    private ?Project $project = null;
 
     /**
      * @var string

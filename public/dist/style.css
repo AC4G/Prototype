@@ -800,6 +800,10 @@ video {
   z-index: 10;
 }
 
+.z-\[10\] {
+  z-index: 10;
+}
+
 .z-\[11\] {
   z-index: 11;
 }
@@ -817,6 +821,11 @@ video {
   margin-right: auto;
 }
 
+.my-auto {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
 .my-\[6px\] {
   margin-top: 6px;
   margin-bottom: 6px;
@@ -825,11 +834,6 @@ video {
 .mx-\[127px\] {
   margin-left: 127px;
   margin-right: 127px;
-}
-
-.my-auto {
-  margin-top: auto;
-  margin-bottom: auto;
 }
 
 .mt-\[30px\] {
@@ -900,18 +904,6 @@ video {
   margin-top: 48px;
 }
 
-.ml-\[10px\] {
-  margin-left: 10px;
-}
-
-.mt-\[10px\] {
-  margin-top: 10px;
-}
-
-.mt-\[5px\] {
-  margin-top: 5px;
-}
-
 .block {
   display: block;
 }
@@ -970,8 +962,12 @@ video {
   height: 170px;
 }
 
-.h-\[200px\] {
-  height: 200px;
+.h-\[244px\] {
+  height: 244px;
+}
+
+.h-full {
+  height: 100%;
 }
 
 .h-\[30px\] {
@@ -990,12 +986,12 @@ video {
   height: 26px;
 }
 
-.h-full {
-  height: 100%;
-}
-
 .h-\[360px\] {
   height: 360px;
+}
+
+.h-\[200px\] {
+  height: 200px;
 }
 
 .h-\[70px\] {
@@ -1004,10 +1000,6 @@ video {
 
 .h-\[73px\] {
   height: 73px;
-}
-
-.h-\[244px\] {
-  height: 244px;
 }
 
 .h-\[419px\] {
@@ -1028,14 +1020,6 @@ video {
 
 .h-\[78px\] {
   height: 78px;
-}
-
-.h-\[180px\] {
-  height: 180px;
-}
-
-.h-\[190px\] {
-  height: 190px;
 }
 
 .w-full {
@@ -1150,14 +1134,6 @@ video {
 
 .w-\[60\%\] {
   width: 60%;
-}
-
-.w-\[180px\] {
-  width: 180px;
-}
-
-.w-\[190px\] {
-  width: 190px;
 }
 
 .max-w-\[1000px\] {
@@ -1341,29 +1317,9 @@ video {
   fill: #4ade80;
 }
 
-.object-contain {
-  -o-object-fit: contain;
-     object-fit: contain;
-}
-
 .object-cover {
   -o-object-fit: cover;
      object-fit: cover;
-}
-
-.object-fill {
-  -o-object-fit: fill;
-     object-fit: fill;
-}
-
-.object-none {
-  -o-object-fit: none;
-     object-fit: none;
-}
-
-.object-scale-down {
-  -o-object-fit: scale-down;
-     object-fit: scale-down;
 }
 
 .px-4 {
@@ -1539,6 +1495,14 @@ video {
 
 .opacity-0 {
   opacity: 0;
+}
+
+.opacity-\[0\.8\] {
+  opacity: 0.8;
+}
+
+.opacity-\[0\.9\] {
+  opacity: 0.9;
 }
 
 .shadow-xl {
@@ -1749,6 +1713,11 @@ select:-webkit-autofill {
   -webkit-text-fill-color: white !important;
 }
 
+.item-box {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  border-radius: 2px;
+}
+
 .checked\:accent-black:checked {
   accent-color: #000;
 }
@@ -1816,6 +1785,11 @@ select:-webkit-autofill {
   color: rgb(136 136 136 / var(--tw-text-opacity));
 }
 
+.group:hover .group-hover\:opacity-\[0\.4\] {
+  opacity: 0.4;
+}
+
 .group:hover .group-hover\:opacity-100 {
   opacity: 1;
 }
+

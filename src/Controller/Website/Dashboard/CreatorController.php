@@ -2,13 +2,16 @@
 
 namespace App\Controller\Website\Dashboard;
 
+use App\Repository\ItemRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class CreatorController extends AbstractController
 {
-    public function __construct()
+    public function __construct(
+        private ItemRepository $itemRepository
+    )
     {
 
     }
@@ -38,5 +41,24 @@ final class CreatorController extends AbstractController
     {
 
         return new Response();
+    }
+
+    /**
+     * @Route("/dashboard/creator/item/{id}", name="creator_item_by_id")
+     */
+    public function itemById(
+        int $id
+    ): Response
+    {
+        $user = $this->getUser();
+        $item = $this->itemRepository->findOneBy(['user' => $user, 'id' => $id]);
+
+        if (is_null($item)) {
+            return $this->render('error/website/permissionDenied.html.twig');
+        }
+
+        return $this->render('website/dashboard/creator/infoAndSettingsForItem.html.twig', [
+            'path_name' => 'creator'
+        ]);
     }
 }

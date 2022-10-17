@@ -2,7 +2,6 @@
 
 namespace App\Controller\Website\Dashboard;
 
-use App\Serializer\ItemNormalizer;
 use App\Repository\ItemRepository;
 use App\Serializer\UserNormalizer;
 use Symfony\Component\Security\Core\Security;
@@ -10,16 +9,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Account\AccountService;
+use App\Service\Website\Dashboard\DashboardService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class DashboardController extends AbstractController
 {
     public function __construct(
+        private DashboardService $dashboardService,
         private UserNormalizer $userNormalizer,
         private AccountService $accountService,
-        private Security $security,
         private ItemRepository $itemRepository,
-        private ItemNormalizer $itemNormalizer
+        private Security $security
     )
     {
     }
@@ -153,11 +153,7 @@ final class DashboardController extends AbstractController
     public function showCreator(): Response
     {
         $user = $this->security->getUser();
-        $items = $this->itemRepository->findBy(['user' => $user]);
-
-        foreach ($items as $key => $item) {
-            $items[$key] = $this->itemNormalizer->normalize($item);
-        }
+        $items = $this->dashboardService->normalizeItems($this->itemRepository->findBy(['user' => $user]));
 
         $user = $this->userNormalizer->normalize($this->getUser());
 

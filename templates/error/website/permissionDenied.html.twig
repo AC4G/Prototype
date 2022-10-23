@@ -1,1 +1,10 @@
-<p class="font-inter">Permission denied!</p>
+{% extends 'baseDashboard.html.twig' %}
+
+{% block body %}
+    <div class="overflow-x-hidden overflow-y-scroll scrollbar-hide w-full h-[100vh]">
+        {% include 'website/dashboard/components/navbar.html.twig' %}
+        <div id="content-box" class="mx-auto h-fit pt-[40px]">
+            <p class="font-inter text-[28px]">Permission denied!</p>
+        </div>
+    </div>
+{% endblock %}

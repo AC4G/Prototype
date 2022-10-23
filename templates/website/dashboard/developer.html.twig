@@ -1,1 +1,10 @@
 {% extends 'baseDashboard.html.twig' %}
+
+{% block body %}
+    <div class="overflow-x-hidden overflow-y-scroll scrollbar-hide w-full h-[100vh]">
+        {% include 'website/dashboard/components/navbar.html.twig' %}
+        <div id="content-box" class="mx-auto h-fit pt-[40px]">
+
+        </div>
+    </div>
+{% endblock %}

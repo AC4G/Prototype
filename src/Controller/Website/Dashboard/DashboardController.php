@@ -130,7 +130,7 @@ final class DashboardController extends AbstractController
     public function showItems(): Response
     {
         return $this->render('website/dashboard/items.html.twig', [
-
+            'path_name' => 'items'
         ]);
     }
 
@@ -171,7 +171,7 @@ final class DashboardController extends AbstractController
     public function showDeveloper(): Response
     {
         return $this->render('website/dashboard/developer.html.twig', [
-
+            'path_name' => 'developer'
         ]);
     }
 

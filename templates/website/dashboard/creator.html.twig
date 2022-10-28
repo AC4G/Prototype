@@ -6,8 +6,8 @@
         <div id="content-box" class="mx-auto h-fit pt-[40px]">
             <div class="w-full flex justify-between">
                 <div class="w-fit">
-                    <p class="font-inter inline">{% if amount == 1 %} Item {% else %} Items {% endif %}</p>
-                    <p class="font-inter inline">{{ amount }}</p>
+                    <p id="item-amount-text" class="font-inter inline">Items</p>
+                    <p id="item-amount" class="font-inter inline"></p>
                 </div>
                 <div class="w-fit">
                     <div class="w-fit h-fit relative float-left mr-[30px]">
@@ -51,10 +51,11 @@
                 </div>
             </div>
             <div id="item-content-box" class="flex flex-wrap gap-4 justify-evenly pl-[12px] pr-[12px] mt-[20px]">
+                <input id="currentPage" value="1" hidden>
                 {% for item in items %}
-                <div class="relative w-[200px] h-[244px] bg-[#e5e7eb] item-box group">
+                <div class="relative w-[244px] h-[244px] bg-[#e5e7eb] item-box group">
                     <div class="absolute w-full h-full">
-                        <img class="object-cover w-[200px] h-[244px] h-full w-full" src="{{ asset('files/profile/%userNickname%/items/%itemName%/pictures/%itemPicture%'|replace({'%userNickname%': user.nickname|lower, '%itemName%': item.name, '%itemPicture%': item.path.pictures.1})) }}">
+                        <img class="object-cover w-[244px] h-[244px] h-full w-full" src="{{ asset('files/profile/%userNickname%/items/%itemName%/pictures/%itemPicture%'|replace({'%userNickname%': user.nickname|lower, '%itemName%': item.name, '%itemPicture%': item.path.pictures.1})) }}">
                     </div>
                     <div class="absolute w-full h-full z-[10] transition-all opacity-0 bg-black group-hover:opacity-[0.4]"></div>
                     <div class="absolute bottom-[0px] w-full h-fit z-[11] opacity-0 group-hover:opacity-100 transition-all">
@@ -70,8 +71,8 @@
                                                 <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
                                             </svg>
                                         </button>
-                                        <div id="{{ item.id }}_menu" class="absolute w-[200px] h-[80px] opacity-0 left-[0px] top-[0px] bg-black z-[18] transition-all" style="border-radius: 0 0 2px 2px; visibility: hidden;">
-                                            <div class="absolute w-full h-fit pl-[12px] mt-[11px] flex justify-between pr-[12px]">
+                                        <div id="{{ item.id }}_menu" class="absolute w-[244px] h-[80px] opacity-0 left-[0px] top-[0px] bg-black z-[18] transition-all" style="border-radius: 0 0 2px 2px; visibility: hidden;">
+                                            <div class="absolute w-full h-fit pl-[12px] mt-[11px] flex justify-between pr-[18px]">
                                                 <div class="w-fit">
                                                     <a href="{{ path('creator_item_by_id', {'id': item.id}) }}">
                                                         <p class="font-inter text-white text-[14px]">Settings</p>
@@ -100,6 +101,10 @@
                 </div>
                 {% endfor %}
             </div>
+            <div class="relative w-fit h-fit mx-auto">
+                <button id="load-items" class="font-inter text-[16px]">Load more Items...</button>
+            </div>
+            <script src="{{ asset('js/creator/loadItems.js') }}"></script>
         </div>
         <script src="{{ asset('js/creator/contentBox.js') }}"></script>
     </div>

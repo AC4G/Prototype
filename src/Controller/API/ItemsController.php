@@ -11,11 +11,13 @@ use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Service\Website\Pagination\Item\ItemPaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class ItemsController extends AbstractController
 {
     public function __construct(
+        private ItemPaginationService $itemPaginationService,
         private SecurityService $securityService,
         private UserRepository $userRepository,
         private ItemRepository $itemRepository,
@@ -159,5 +161,19 @@ final class ItemsController extends AbstractController
         return $this->customResponse->notificationResponse($request, sprintf('Parameter successfully removed from item %s', $id));
     }
 
+    /**
+     * @Route("/api/website/items/{page}/{limit}", name="api_website_item_pagination", methods={"GET"}, requirements={"page" = "\d+", "limit" = "\d+"})
+     */
+    public function getItemsWithPagination(
+        int $page,
+        int $limit
+    ): Response
+    {
+        $user = $this->getUser();
+
+        $items = $this->itemPaginationService->getDataByPage($limit, $page, $user);
+
+        return new JsonResponse($this->itemsService->prepareData($items, ['pagination']));
+    }
 
 }

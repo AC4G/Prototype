@@ -75,17 +75,18 @@ final class ItemsService
     }
 
     public function prepareData(
-        array|Item $items
+        array|Item $items,
+        array $context = []
     ): array
     {
         if (is_object($items)) {
-            return $this->itemNormalizer->normalize($items);
+            return $this->itemNormalizer->normalize($items, null, $context);
         }
 
         $itemsList = [];
 
         foreach ($items as $item) {
-            $itemsList[] = $this->itemNormalizer->normalize($item);
+            $itemsList[] = $this->itemNormalizer->normalize($item, null, $context);
         }
 
         return $itemsList;

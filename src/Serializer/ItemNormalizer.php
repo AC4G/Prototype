@@ -3,9 +3,16 @@
 namespace App\Serializer;
 
 use App\Entity\Item;
+use App\Serializer\ProjectNormalizer;
 
 class ItemNormalizer
 {
+    public function __construct(
+        private ProjectNormalizer $projectNormalizer
+    )
+    {
+    }
+
     public function normalize(
         Item $item,
         string $format = null,
@@ -15,7 +22,7 @@ class ItemNormalizer
         return [
             'id' => $item->getId(),
             'name' => $item->getName(),
-            'project' => $item->getProject(),
+            'project' => $this->projectNormalizer->normalize($item->getProject(), null, in_array('pagination', $context) ? ['pagination'] : []),
             'parameter' => json_decode($item->getParameter(), true),
             'path' => json_decode($item->getPath(), true),
             'creationDate' => $item->getCreationDate(),

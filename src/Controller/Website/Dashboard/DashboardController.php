@@ -4,21 +4,25 @@ namespace App\Controller\Website\Dashboard;
 
 use App\Repository\ItemRepository;
 use App\Serializer\UserNormalizer;
+use App\Service\API\Items\ItemsService;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Account\AccountService;
 use App\Service\Website\Dashboard\DashboardService;
+use App\Service\Website\Pagination\Item\ItemPaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class DashboardController extends AbstractController
 {
     public function __construct(
+        private ItemPaginationService $itemPaginationService,
         private DashboardService $dashboardService,
+        private ItemRepository $itemRepository,
         private UserNormalizer $userNormalizer,
         private AccountService $accountService,
-        private ItemRepository $itemRepository,
+        private ItemsService $itemsService,
         private Security $security
     )
     {
@@ -150,10 +154,18 @@ final class DashboardController extends AbstractController
     /**
      * @Route("/dashboard/creator", name="dashboard_creator")
      */
-    public function showCreator(): Response
+    public function showCreator(
+        Request $request
+    ): Response
     {
+        $query = $request->query->all();
+
+        $page = array_key_exists('page', $query) ? (int)$query['page'] : 1;
+        $limit = array_key_exists('limit', $query) ? (int)$query['limit'] : 20;
+
         $user = $this->security->getUser();
-        $items = $this->dashboardService->normalizeItems($this->itemRepository->findBy(['user' => $user]));
+        $items = $this->itemsService->prepareData($this->itemPaginationService->getDataByPage($limit, $page, $user));
+        $amount = count($this->itemRepository->findBy(['user' => $user]));
 
         $user = $this->userNormalizer->normalize($this->getUser());
 
@@ -161,7 +173,7 @@ final class DashboardController extends AbstractController
             'path_name' => 'creator',
             'items' => $items,
             'user' => $user,
-            'amount' => count($items)
+            'amount' => $amount
         ]);
     }
 

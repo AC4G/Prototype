@@ -8,6 +8,8 @@
   "dependencies": {
     "jquery": "^3.6.0",
     "tailwind-scrollbar-hide": "^1.1.7",
-    "tailwindcss-autofill": "^1.0.2"
+    "tailwindcss-autofill": "^1.0.2",
+    "twig": "^1.15.4",
+    "vite": "^3.2.2"
   }
 }

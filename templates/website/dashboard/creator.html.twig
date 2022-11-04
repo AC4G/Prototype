@@ -6,8 +6,8 @@
         <div id="content-box" class="mx-auto h-fit pt-[40px]">
             <div class="w-full flex justify-between">
                 <div class="w-fit">
-                    <p id="item-amount-text" class="font-inter inline">Items</p>
-                    <p id="item-amount" class="font-inter inline"></p>
+                    <p id="item-amount-text" class="font-inter inline">{% if not amount == 1 %} Items {% else %} Item {% endif %}</p>
+                    <p id="item-amount" class="font-inter inline">{{ amount }}</p>
                 </div>
                 <div class="w-fit">
                     <div class="w-fit h-fit relative float-left mr-[30px]">
@@ -50,8 +50,8 @@
                     </div>
                 </div>
             </div>
+            <input id="currentPage" value="1" hidden>
             <div id="item-content-box" class="flex flex-wrap gap-4 justify-evenly pl-[12px] pr-[12px] mt-[20px]">
-                <input id="currentPage" value="1" hidden>
                 {% for item in items %}
                 <div class="relative w-[244px] h-[244px] bg-[#e5e7eb] item-box group">
                     <div class="absolute w-full h-full">
@@ -104,7 +104,7 @@
             <div class="relative w-fit h-fit mx-auto">
                 <button id="load-items" class="font-inter text-[16px]">Load more Items...</button>
             </div>
-            <script src="{{ asset('js/creator/loadItems.js') }}"></script>
+            <script type="module" src="{{ asset('js/creator/loadItems.js') }}"></script>
         </div>
         <script src="{{ asset('js/creator/contentBox.js') }}"></script>
     </div>

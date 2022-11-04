@@ -20,6 +20,11 @@ final class ItemPaginationService
     ): array
     {
         $currentPage = $this->getCurrentPage($this->getMaxPages($limit, $user), $page);
+
+        if ($currentPage === 0) {
+            return [];
+        }
+
         $offset = ($currentPage - 1) * $limit;
 
         return $this->itemRepository->findBy(['user' => $user], [], $limit, $offset);
@@ -38,6 +43,10 @@ final class ItemPaginationService
         int $page
     ): int
     {
+        if ($maxPages === 0) {
+            return 0;
+        }
+
         return min(max($page, 1), $maxPages);
     }
 }

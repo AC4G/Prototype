@@ -9,15 +9,22 @@
                     <p id="item-amount-text" class="font-inter inline">{% if not amount == 1 %} Items {% else %} Item {% endif %}</p>
                     <p id="item-amount" class="font-inter inline">{{ amount }}</p>
                 </div>
-                <div class="w-fit">
-                    <div class="w-fit h-fit relative float-left mr-[30px]">
+                <div class="w-fit flex justify-evenly">
+                    <div class="w-[24px] h-[24px] relative pt-[2px] pl-[4px]">
+                        <button class="">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="w-fit h-fit ml-[10px] mr-[10px]">
                         <button id="filter" class="h-[22px] w-[22px]">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
                                 <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
                             </svg>
                         </button>
                     </div>
-                    <div class="w-fit relative float-left">
+                    <div class="w-fit relative">
                         <button id="create-button" class="w-[40px] h-[22px] border-2 border-green-400 rounded bg-green-100 hover:bg-green-400 transition pl-[10px]">
                             <div class="w-fit h-fit">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
@@ -50,14 +57,13 @@
                     </div>
                 </div>
             </div>
-            <input id="currentPage" value="1" hidden>
-            <div id="item-content-box" class="flex flex-wrap gap-4 justify-evenly pl-[12px] pr-[12px] mt-[20px]">
+            <div id="item-content-box" class="flex flex-wrap gap-4 justify-evenly mt-[20px] mb-[60px]">
                 {% for item in items %}
                 <div class="relative w-[244px] h-[244px] bg-[#e5e7eb] item-box group">
                     <div class="absolute w-full h-full">
                         <img class="object-cover w-[244px] h-[244px] h-full w-full" src="{{ asset('files/profile/%userNickname%/items/%itemName%/pictures/%itemPicture%'|replace({'%userNickname%': user.nickname|lower, '%itemName%': item.name, '%itemPicture%': item.path.pictures.1})) }}">
                     </div>
-                    <div class="absolute w-full h-full z-[10] transition-all opacity-0 bg-black group-hover:opacity-[0.4]"></div>
+                    <div class="absolute w-full h-full z-[10] transition-all opacity-0 bg-black group-hover:opacity-[0.4] rounded-t-sm"></div>
                     <div class="absolute bottom-[0px] w-full h-fit z-[11] opacity-0 group-hover:opacity-100 transition-all">
                         <div class="relative w-full h-[80px] bg-blue-100 opacity-[0.9]">
                             <div class="w-full h-fit absolute my-auto">
@@ -71,11 +77,11 @@
                                                 <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
                                             </svg>
                                         </button>
-                                        <div id="{{ item.id }}_menu" class="absolute w-[244px] h-[80px] opacity-0 left-[0px] top-[0px] bg-black z-[18] transition-all" style="border-radius: 0 0 2px 2px; visibility: hidden;">
+                                        <div id="{{ item.id }}_menu" class="absolute w-full h-[80px] opacity-0 left-[0px] top-[0px] bg-black z-[18] transition-all" style="border-radius: 0 0 2px 2px; visibility: hidden;">
                                             <div class="absolute w-full h-fit pl-[12px] mt-[11px] flex justify-between pr-[18px]">
                                                 <div class="w-fit">
                                                     <a href="{{ path('creator_item_by_id', {'id': item.id}) }}">
-                                                        <p class="font-inter text-white text-[14px]">Settings</p>
+                                                        <p class="font-inter text-white text-[14px] hover:text-grey transition">Settings</p>
                                                     </a>
                                                 </div>
                                                 <div class="w-fit h-fit">
@@ -89,8 +95,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                {% set projectName = item.project.projectName %}
-                                {% if projectName is not null %}
+                                {% if item.project is not null %}
+                                    {% set projectName = item.project.projectName %}
                                     <div class="w-fit h-fit pl-[12px] mt-[10px]">
                                         <p class="font-inter text-[14px]">{{ projectName|length > 23 ? projectName|slice(0,23) ~ '...' : projectName }}</p>
                                     </div>
@@ -101,9 +107,7 @@
                 </div>
                 {% endfor %}
             </div>
-            <div class="relative w-fit h-fit mx-auto">
-                <button id="load-items" class="font-inter text-[16px]">Load more Items...</button>
-            </div>
+            {% include 'website/components/pagination/pagination.html.twig' %}
             <script type="module" src="{{ asset('js/creator/loadItems.js') }}"></script>
         </div>
         <script src="{{ asset('js/creator/contentBox.js') }}"></script>

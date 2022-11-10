@@ -18,15 +18,11 @@
         {% endblock %}
     </head>
     <body>
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">
-            {{ message }}
-        </div>
+    {% for key, message in app.flashes('success') %}
+        {% include 'components/flashMessages/succes.twig' %}
     {% endfor %}
-    {% for message in app.flashes('error') %}
-        <div class="alert alert-danger">
-            {{ message }}
-        </div>
+    {% for key, message in app.flashes('error') %}
+        {% include 'components/flashMessages/error.twig' %}
     {% endfor %}
         <div class="absolute w-full h-[100vh] left-[0px] top-[0px] right-[0px] bg-black bottom-[0px] opacity-0 z-[-1] transition-all" id="blur"></div>
         <div class="flex">
@@ -97,5 +93,6 @@
             {% block body %}{% endblock %}
         </div>
         <script src="{{ asset('js/dashboard/navbar.js') }}"></script>
+        <script src="{{ asset('js/basic/closeFlashMessage.js') }}"></script>
     </body>
 </html>

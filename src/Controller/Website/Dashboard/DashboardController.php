@@ -173,7 +173,9 @@ final class DashboardController extends AbstractController
             'path_name' => 'creator',
             'items' => $items,
             'user' => $user,
-            'amount' => $amount
+            'amount' => $amount,
+            'current_page' => $this->itemPaginationService->currentPage(),
+            'max_pages' => $this->itemPaginationService->maxPages()
         ]);
     }
 

@@ -1,0 +1,7 @@
+<div class="h-fit w-fit rounded ml-[6px] mr-[6px] {% if current_page == i %} bg-[#b0e5f5] {% else %} hover:shadow-md transition {% endif %}">
+    <a href="{{ path('dashboard_creator') }}?page={{ i }}" class="h-[30px] w-[30px] {% if current_page == i %} pointer-events-none {% endif %} select-none">
+        <div class="w-[32px] h-[32px] pt-[4px] text-center">
+            <p class="font-inter text-[16px]">{{ i }}</p>
+        </div>
+    </a>
+</div>

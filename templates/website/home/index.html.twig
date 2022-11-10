@@ -130,7 +130,7 @@
                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                        <div class="w-[42px] h-[42px] rounded-full bg-[#2e4053] cursor-pointer group-hover:bg-[#c5ffef] transition">
                            {% if user.profilePic is not null %}
-                               <img src="{{ asset(user.profilePic) }}" class="relative top-[2px] left-[2px] w-[38px] h-[38px] rounded-full">
+                               <img src="{{ asset(user.profilePic) }}" class="relative top-[2px] left-[2px] w-[38px] h-[38px] rounded-full object-cover">
                            {% else %}
                                <div class="rounded-full w-fit h-fit bg-white">
                                    <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">

@@ -22,7 +22,7 @@ class ItemNormalizer
         return [
             'id' => $item->getId(),
             'name' => $item->getName(),
-            'project' => is_null($item->getProject()) ? '' : $this->projectNormalizer->normalize($item->getProject(), null, in_array('pagination', $context) ? ['pagination'] : []),
+            'project' => is_null($item->getProject()) ? null : $this->projectNormalizer->normalize($item->getProject(), null, in_array('pagination', $context) ? ['pagination'] : []),
             'parameter' => json_decode($item->getParameter(), true),
             'path' => json_decode($item->getPath(), true),
             'creationDate' => $item->getCreationDate(),

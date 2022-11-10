@@ -1,0 +1,63 @@
+<div class="relative w-fit h-fit mx-auto shadow-xl rounded flex justify-evenly pl-[8px] pr-[8px] pt-[4px] pb-[4px]">
+    <div class="h-fit w-fit rounded {% if current_page != 1 %} hover:shadow-md transition {% endif %}">
+        <a href="{{ path('dashboard_creator') }}?page={{ current_page - 1 }}" class="h-[30px] w-[30px] {% if current_page == 1 %} pointer-events-none {% endif %}">
+            <div class="w-[32px] h-[32px] pt-[4px]">
+                <svg class="ml-[4px]" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                </svg>
+            </div>
+        </a>
+    </div>
+    <div class="flex justify-evenly">
+        {% if max_pages > 5 %}
+            {% if current_page == 1 or current_page == 2 %}
+                {% for i in 1..3 %}
+                    {% include 'website/components/pagination/number.html.twig' %}
+                {% endfor %}
+                {% include 'website/components/pagination/dots.html.twig' %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': max_pages} %}
+            {% elseif current_page == 3 %}
+                {% for i in 1..4 %}
+                    {% include 'website/components/pagination/number.html.twig' %}
+                {% endfor %}
+                {% include 'website/components/pagination/dots.html.twig' %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': max_pages} %}
+            {% elseif  current_page == max_pages - 1 %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': 1} %}
+                {% include 'website/components/pagination/dots.html.twig' %}
+                {% for i in current_page - 1..max_pages %}
+                    {% include 'website/components/pagination/number.html.twig' %}
+                {% endfor %}
+            {% elseif current_page == max_pages %}
+                {% for i in 1..2 %}
+                    {% include 'website/components/pagination/number.html.twig' %}
+                {% endfor %}
+                {% include 'website/components/pagination/dots.html.twig' %}
+                {% for i in current_page - 1..max_pages %}
+                    {% include 'website/components/pagination/number.html.twig' %}
+                {% endfor %}
+            {% else %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': 1} %}
+                {% include 'website/components/pagination/dots.html.twig' %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': current_page - 1} %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': current_page} %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': current_page + 1} %}
+                {% include 'website/components/pagination/dots.html.twig' %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': max_pages} %}
+            {% endif %}
+        {% else %}
+            {% for i in 1..max_pages %}
+                {% include 'website/components/pagination/number.html.twig' %}
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="h-[30px] w-[30px] rounded {% if current_page != max_pages %} hover:shadow-md transition {% endif %}">
+        <a href="{{ path('dashboard_creator') }}?page={{ current_page + 1 }}" class="h-[30px] w-[30px] {% if current_page == max_pages %} pointer-events-none {% endif %}">
+            <div class="w-[32px] h-[32px] pt-[4px]">
+                <svg class="ml-[4px]" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"></path>
+                </svg>
+            </div>
+        </a>
+    </div>
+</div>

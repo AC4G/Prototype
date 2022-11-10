@@ -7,6 +7,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 final class ItemPaginationService
 {
+    private int $maxPages = 1;
+    private int $currentPage = 1;
+
     public function __construct(
         private ItemRepository $itemRepository
     )
@@ -35,7 +38,7 @@ final class ItemPaginationService
         UserInterface $user
     ): int
     {
-        return (int)ceil(count($this->itemRepository->findBy(['user' => $user])) / $limit);
+        return $this->maxPages = (int)ceil(count($this->itemRepository->findBy(['user' => $user])) / $limit);
     }
 
     private function getCurrentPage(
@@ -47,6 +50,18 @@ final class ItemPaginationService
             return 0;
         }
 
-        return min(max($page, 1), $maxPages);
+        return $this->currentPage = min(max($page, 1), $maxPages);
     }
+
+    public function maxPages():int
+    {
+        return $this->maxPages;
+    }
+
+    public function currentPage():int
+    {
+        return $this->currentPage;
+    }
+
+
 }

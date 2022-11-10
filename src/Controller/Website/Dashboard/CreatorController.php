@@ -56,9 +56,8 @@ final class CreatorController extends AbstractController
         $item = $this->itemRepository->findOneBy(['user' => $user, 'id' => $id]);
 
         if (is_null($item)) {
-            return $this->render('error/website/permissionDenied.html.twig', [
-                'path_name' => 'creator'
-            ]);
+            $this->addFlash('error', 'You cannot edit this item because you did not create it!');
+            return $this->redirectToRoute('dashboard_creator');
         }
 
         return $this->render('website/dashboard/creator/infoAndSettingsForItem.html.twig', [

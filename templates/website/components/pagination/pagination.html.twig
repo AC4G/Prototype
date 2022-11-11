@@ -28,6 +28,14 @@
                 {% for i in current_page - 1..max_pages %}
                     {% include 'website/components/pagination/number.html.twig' %}
                 {% endfor %}
+            {% elseif current_page == max_pages - 2 %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': 1} %}
+                {% include 'website/components/pagination/dots.html.twig' %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': current_page - 1} %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': current_page} %}
+                {% for i in max_pages - 1..max_pages %}
+                    {% include 'website/components/pagination/number.html.twig' %}
+                {% endfor %}
             {% elseif current_page == max_pages %}
                 {% for i in 1..2 %}
                     {% include 'website/components/pagination/number.html.twig' %}

@@ -161,7 +161,7 @@ final class DashboardController extends AbstractController
         $query = $request->query->all();
 
         $page = array_key_exists('page', $query) ? (int)$query['page'] : 1;
-        $limit = array_key_exists('limit', $query) ? (int)$query['limit'] : 20;
+        $limit = array_key_exists('limit', $query) ? (int)$query['limit'] : 1;
 
         $user = $this->security->getUser();
         $items = $this->itemsService->prepareData($this->itemPaginationService->getDataByPage($limit, $page, $user));

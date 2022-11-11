@@ -22,6 +22,12 @@
                 {% endfor %}
                 {% include 'website/components/pagination/dots.html.twig' %}
                 {% include 'website/components/pagination/number.html.twig' with {'i': max_pages} %}
+            {% elseif current_page == 4 %}
+                {% for i in 1..5 %}
+                    {% include 'website/components/pagination/number.html.twig' %}
+                {% endfor %}
+                {% include 'website/components/pagination/dots.html.twig' %}
+                {% include 'website/components/pagination/number.html.twig' with {'i': max_pages} %}
             {% elseif  current_page == max_pages - 1 %}
                 {% include 'website/components/pagination/number.html.twig' with {'i': 1} %}
                 {% include 'website/components/pagination/dots.html.twig' %}

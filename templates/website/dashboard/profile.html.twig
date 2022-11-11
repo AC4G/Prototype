@@ -38,7 +38,7 @@
                                 <p class="font-inter text-white text-[14px] select-none">Picture change</p>
                             </div>
                             <div class="relative top-[10px] h-fit left-[80%]">
-                                <button type="button" class="text-white" id="discardprfimg">
+                                <button type="button" class="text-white hover:text-grey transition" id="discardprfimg">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                                     </svg>
@@ -53,7 +53,7 @@
                             <div id="img-submit-box" class="absolute bottom-[40px] w-full h-fit">
                                 <div class="w-fit mx-auto">
                                     <div id="img-submit" class="relative h-fit">
-                                        <button type="submit" class="border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition" id="saveprfimg">Save new profile picture</button>
+                                        <button type="submit" class="border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition select-none" id="saveprfimg">Save new profile picture</button>
                                     </div>
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
                             <p class="font-inter text-white text-[14px] select-none">Nickname change</p>
                         </div>
                         <div class="relative top-[10px] h-fit left-[80%]">
-                            <button id="discardnickchg" type="button" class="text-white">
+                            <button id="discardnickchg" type="button" class="text-white hover:text-grey transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                                     <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                                 </svg>
@@ -120,7 +120,7 @@
                             <input type="hidden" name="form-type" value="nickname">
                             <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
                                 <div id="nickname-submit" class="w-fit h-fit cursor-not-allowed">
-                                    <button id="nickname-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition">Save your new nickname</button>
+                                    <button id="nickname-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition select-none">Save your new nickname</button>
                                 </div>
                             </div>
                         </form>
@@ -147,7 +147,7 @@
                             <p class="font-inter text-white text-[14px] select-none">Email change</p>
                         </div>
                         <div class="relative top-[10px] h-fit left-[80%]">
-                            <button id="discardEmailchg" type="button" class="text-white">
+                            <button id="discardEmailchg" type="button" class="text-white hover:text-grey transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                                     <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                                 </svg>
@@ -176,7 +176,7 @@
                             <input type="hidden" name="form-type" value="email">
                             <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
                                 <div id="email-submit" class="w-fit h-fit cursor-not-allowed">
-                                    <button id="email-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition">Save your new Email</button>
+                                    <button id="email-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition select-none">Save your new Email</button>
                                 </div>
                             </div>
                         </form>
@@ -201,7 +201,7 @@
                             <p class="font-inter text-white text-[14px] select-none">Password change</p>
                         </div>
                         <div class="relative top-[10px] h-fit w-fit left-[80%]">
-                            <button id="discardPasswordchg" type="button" class="text-white">
+                            <button id="discardPasswordchg" type="button" class="text-white hover:text-grey transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                                     <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                                 </svg>
@@ -237,7 +237,7 @@
                             <input type="hidden" name="form-type" value="password">
                             <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
                                 <div id="password-submit" class="w-fit h-fit cursor-not-allowed">
-                                    <button id="password-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition">Save password</button>
+                                    <button id="password-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition select-none">Save password</button>
                                 </div>
                             </div>
                         </form>

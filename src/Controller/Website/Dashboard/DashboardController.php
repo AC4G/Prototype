@@ -73,11 +73,11 @@ final class DashboardController extends AbstractController
             if ($request->request->get('form-type') === 'privacy') {
                 $privacy = $request->request->get('privacy');
 
-                if (is_null($privacy)) {
+                if ($privacy === '1') {
                     $privacy = true;
                 }
 
-                if ($privacy === 'on') {
+                if ($privacy === '0') {
                     $privacy = false;
                 }
 

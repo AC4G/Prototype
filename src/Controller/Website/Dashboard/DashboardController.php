@@ -5,25 +5,27 @@ namespace App\Controller\Website\Dashboard;
 use App\Repository\ItemRepository;
 use App\Serializer\UserNormalizer;
 use App\Service\API\Items\ItemsService;
+use App\Engine\Search\ItemSearchEngine;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Account\AccountService;
 use App\Service\Website\Dashboard\DashboardService;
-use App\Service\Website\Pagination\Item\ItemPaginationService;
+use App\Service\Website\Pagination\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class DashboardController extends AbstractController
 {
     public function __construct(
-        private ItemPaginationService $itemPaginationService,
-        private DashboardService $dashboardService,
-        private ItemRepository $itemRepository,
-        private UserNormalizer $userNormalizer,
-        private AccountService $accountService,
-        private ItemsService $itemsService,
-        private Security $security
+        private PaginationService $paginationService,
+        private DashboardService  $dashboardService,
+        private ItemSearchEngine  $itemSearchEngine,
+        private ItemRepository    $itemRepository,
+        private UserNormalizer    $userNormalizer,
+        private AccountService    $accountService,
+        private ItemsService      $itemsService,
+        private Security          $security
     )
     {
     }
@@ -162,9 +164,19 @@ final class DashboardController extends AbstractController
 
         $page = array_key_exists('page', $query) ? (int)$query['page'] : 1;
         $limit = array_key_exists('limit', $query) ? (int)$query['limit'] : 1;
+        $phrase = array_key_exists('search', $query) ? $query['search'] : null;
 
         $user = $this->security->getUser();
-        $items = $this->itemsService->prepareData($this->itemPaginationService->getDataByPage($limit, $page, $user));
+
+        if (!is_null($phrase)) {
+            $items = $this->itemsService->prepareData($this->paginationService->getDataByPage($this->itemSearchEngine->search($phrase, $user), $limit, $page));
+            goto a;
+        }
+
+        $items = $this->itemsService->prepareData($this->paginationService->getDataByPage($this->itemRepository->findBy(['user' => $user]), $limit, $page));
+
+        a:
+
         $amount = count($this->itemRepository->findBy(['user' => $user]));
 
         $user = $this->userNormalizer->normalize($this->getUser());
@@ -174,8 +186,8 @@ final class DashboardController extends AbstractController
             'items' => $items,
             'user' => $user,
             'amount' => $amount,
-            'current_page' => $this->itemPaginationService->currentPage(),
-            'max_pages' => $this->itemPaginationService->maxPages()
+            'current_page' => $this->paginationService->currentPage(),
+            'max_pages' => $this->paginationService->maxPages()
         ]);
     }
 

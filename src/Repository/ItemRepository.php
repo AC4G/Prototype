@@ -21,4 +21,9 @@ class ItemRepository extends AbstractRepository
             $registry, Item::class
         );
     }
+
+    public function getEntityManager()
+    {
+        return parent::getEntityManager();
+    }
 }

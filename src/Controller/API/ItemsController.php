@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
+use App\Engine\Search\ItemSearchEngine;
 use App\Service\API\Items\ItemsService;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,18 +12,19 @@ use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Service\Website\Pagination\Item\ItemPaginationService;
+use App\Service\Website\Pagination\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class ItemsController extends AbstractController
 {
     public function __construct(
-        private ItemPaginationService $itemPaginationService,
-        private SecurityService $securityService,
-        private UserRepository $userRepository,
-        private ItemRepository $itemRepository,
-        private CustomResponse $customResponse,
-        private ItemsService $itemsService
+        private PaginationService $paginationService,
+        private ItemSearchEngine $itemSearchEngine,
+        private SecurityService   $securityService,
+        private UserRepository    $userRepository,
+        private ItemRepository    $itemRepository,
+        private CustomResponse    $customResponse,
+        private ItemsService      $itemsService
     )
     {
     }
@@ -162,16 +164,26 @@ final class ItemsController extends AbstractController
     }
 
     /**
-     * @Route("/api/website/items/{page}/{limit}", name="api_website_item_pagination", methods={"GET"}, requirements={"page" = "\d+", "limit" = "\d+"})
+     * @Route("/api/items/{page}/{limit}/{userId}", name="api_item_pagination", methods={"GET"}, requirements={"page" = "\d+", "limit" = "\d+", "userId" = "\d+"})
      */
     public function getItemsWithPagination(
+        Request $request,
         int $page,
-        int $limit
+        int $limit,
+        ?string $userId
     ): Response
     {
-        $user = $this->getUser();
+        $user = $this->userRepository->findOneBy(['id' => $userId]);
 
-        $items = $this->itemPaginationService->getDataByPage($limit, $page, $user);
+        if (is_null($user)) {
+            return $this->customResponse->errorResponse($request, sprintf('User with id %s don\'t exists!', $userId), 404);
+        }
+
+        $items = $this->paginationService->getDataByPage($this->itemRepository->findBy(['user' => $user]), $limit, $page);
+
+        if (count($items) === 0) {
+            return $this->customResponse->errorResponse($request, 'Items not found', 404);
+        }
 
         return new JsonResponse($this->itemsService->prepareData($items, ['pagination']));
     }

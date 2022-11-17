@@ -1,28 +1,25 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Website\Pagination\Item;
+namespace App\Service\Website\Pagination;
 
-use App\Repository\ItemRepository;
-use Symfony\Component\Security\Core\User\UserInterface;
-
-final class ItemPaginationService
+final class PaginationService
 {
     private int $maxPages = 1;
     private int $currentPage = 1;
 
     public function __construct(
-        private ItemRepository $itemRepository
+
     )
     {
     }
 
     public function getDataByPage(
+        array $content,
         int $limit,
-        int $page,
-        UserInterface $user
+        int $page
     ): array
     {
-        $currentPage = $this->getCurrentPage($this->getMaxPages($limit, $user), $page);
+        $currentPage = $this->getCurrentPage($this->getMaxPages($content, $limit), $page);
 
         if ($currentPage === 0) {
             return [];
@@ -30,15 +27,15 @@ final class ItemPaginationService
 
         $offset = ($currentPage - 1) * $limit;
 
-        return $this->itemRepository->findBy(['user' => $user], [], $limit, $offset);
+        return array_slice($content, $offset, $limit);
     }
 
     private function getMaxPages(
-        int $limit,
-        UserInterface $user
+        array $content,
+        int $limit
     ): int
     {
-        return $this->maxPages = (int)ceil(count($this->itemRepository->findBy(['user' => $user])) / $limit);
+        return $this->maxPages = (int)ceil(count($content) / $limit);
     }
 
     private function getCurrentPage(

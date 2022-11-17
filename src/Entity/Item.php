@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Item
  *
- * @ORM\Table(name="item", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"})}, indexes={@ORM\Index(name="fk_Item_User_idx", columns={"user_id"})}, indexes={@ORM\Index(name="fk_Item_Project1_idx", columns={"project_id"})})
+ * @ORM\Table(name="item", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"})}, indexes={@ORM\Index(name="name_fulltext", columns={"name"}, flags={"fulltext"}), @ORM\Index(name="fk_Item_User_idx", columns={"user_id"}), @ORM\Index(name="fk_Item_Project1_idx", columns={"project_id"})})
  * @ORM\Entity(repositoryClass="App\Repository\ItemRepository")
  */
 class Item

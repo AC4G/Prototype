@@ -28,20 +28,17 @@ final class ItemSearchEngine
         ?UserInterface $user = null
     ): null|Query
     {
-        if (!is_null($user)) {
-            return $this->itemRepository->createQueryBuilder('i')
-                ->where('i.user = :user')
-                ->andWhere('MATCH (i.name) AGAINST (:phrase IN NATURAL LANGUAGE MODE)')
-                ->setParameter('user', $user)
-                ->setParameter('phrase', $phrase)
-                ->getQuery()
-            ;
-        }
-
-        return $this->itemRepository->createQueryBuilder('i')
-            ->where('i.name LIKE :phrase')
-            ->setParameter('phrase', '%' . $phrase . '%')
-            ->getQuery()
+        $query = $this->itemRepository->createQueryBuilder('i')
+                ->where('MATCH (i.name) AGAINST (:phrase) > 0')
+                ->setParameter('phrase', '%' . $phrase . '%')
         ;
+
+        !is_null($user) ??
+            $query
+                ->andWhere('i.user = :user')
+                ->setParameter('user', $user)
+        ;
+
+        return $query->getQuery();
     }
 }

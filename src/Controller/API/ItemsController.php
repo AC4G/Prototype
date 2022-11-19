@@ -163,29 +163,5 @@ final class ItemsController extends AbstractController
         return $this->customResponse->notificationResponse($request, sprintf('Parameter successfully removed from item %s', $id));
     }
 
-    /**
-     * @Route("/api/items/{page}/{limit}/{userId}", name="api_item_pagination", methods={"GET"}, requirements={"page" = "\d+", "limit" = "\d+", "userId" = "\d+"})
-     */
-    public function getItemsWithPagination(
-        Request $request,
-        int $page,
-        int $limit,
-        ?string $userId
-    ): Response
-    {
-        $user = $this->userRepository->findOneBy(['id' => $userId]);
-
-        if (is_null($user)) {
-            return $this->customResponse->errorResponse($request, sprintf('User with id %s don\'t exists!', $userId), 404);
-        }
-
-        $items = $this->paginationService->getDataByPage($this->itemRepository->findBy(['user' => $user]), $limit, $page);
-
-        if (count($items) === 0) {
-            return $this->customResponse->errorResponse($request, 'Items not found', 404);
-        }
-
-        return new JsonResponse($this->itemsService->prepareData($items, ['pagination']));
-    }
 
 }

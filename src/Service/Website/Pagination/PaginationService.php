@@ -6,6 +6,7 @@ final class PaginationService
 {
     private int $maxPages = 1;
     private int $currentPage = 1;
+    private int $amount = 0;
 
     public function __construct(
 
@@ -20,6 +21,7 @@ final class PaginationService
     ): array
     {
         $currentPage = $this->getCurrentPage($this->getMaxPages($content, $limit), $page);
+        $this->amount = count($content);
 
         if ($currentPage === 0) {
             return [];
@@ -35,7 +37,13 @@ final class PaginationService
         int $limit
     ): int
     {
-        return $this->maxPages = (int)ceil(count($content) / $limit);
+        $max = (int)ceil(count($content) / $limit);
+
+        if ($max === 0) {
+            $max = 1;
+        }
+
+        return $this->maxPages = $max;
     }
 
     private function getCurrentPage(
@@ -43,10 +51,6 @@ final class PaginationService
         int $page
     ): int
     {
-        if ($maxPages === 0) {
-            return 0;
-        }
-
         return $this->currentPage = min(max($page, 1), $maxPages);
     }
 
@@ -58,6 +62,11 @@ final class PaginationService
     public function currentPage():int
     {
         return $this->currentPage;
+    }
+
+    public function getAmount(): int
+    {
+        return $this->amount;
     }
 
 

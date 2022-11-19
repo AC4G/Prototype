@@ -168,18 +168,7 @@ final class DashboardController extends AbstractController
 
         $user = $this->security->getUser();
 
-        if (!is_null($phrase)) {
-            $foundItems = $this->itemSearchEngine->search($phrase, $user);
-            goto a;
-        }
-
-        $foundItems = $this->itemRepository->findBy(['user' => $user]);
-
-        a:
-
-        $items = $this->itemsService->prepareData($this->paginationService->getDataByPage($foundItems, $limit, $page));
-
-        $amount = count($foundItems);
+        $items = $this->itemsService->prepareData($this->paginationService->getDataByPage($this->itemSearchEngine->search($phrase, $user), $limit, $page));
 
         $user = $this->userNormalizer->normalize($this->getUser());
 
@@ -187,7 +176,7 @@ final class DashboardController extends AbstractController
             'path_name' => 'creator',
             'items' => $items,
             'user' => $user,
-            'amount' => $amount,
+            'amount' => $this->paginationService->getAmount(),
             'current_page' => $this->paginationService->currentPage(),
             'max_pages' => $this->paginationService->maxPages()
         ]);

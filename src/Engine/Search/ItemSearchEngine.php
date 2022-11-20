@@ -27,12 +27,17 @@ final class ItemSearchEngine
 
         if (strpos($phrase, ':') > 0) {
             $phraseWithParameter = explode(':', $phrase);
+
+            if (strlen($phraseWithParameter[1]) === 0) goto a;
+
             $parameter = $this->preparePhraseParameter($phraseWithParameter[1]);
 
             $items = $this->buildQuery($phraseWithParameter[0], $user)->execute();
 
             return $this->findItemByParameter($items, $parameter);
         }
+
+        a:
 
         return $this->itemsService->prepareData($this->buildQuery($phrase, $user)->execute());
     }
@@ -42,7 +47,21 @@ final class ItemSearchEngine
     ): array|string
     {
         if (strpos($parameter, ',') > 0) {
-            return array_map('trim',explode(',', $parameter));
+            $parameters =  array_map('trim',explode(',', $parameter));
+
+            foreach ($parameters as $key => $parameter) {
+                if (strpos($parameter, '->') > 0) {
+                    $keyWithValue = explode('->', $parameter);
+                    $parameters[$key] = '"' . $keyWithValue[0] . '": ' . (is_numeric($keyWithValue[1]) ? (int)$keyWithValue[1] : '"' . $keyWithValue[1] . '"');
+                }
+            }
+
+            return $parameters;
+        }
+
+        if (strpos($parameter, '->') > 0) {
+            $keyWithValue = explode('->', $parameter);
+            $parameter = '"' . $keyWithValue[0] . '": ' . (is_numeric($keyWithValue[1]) ? (int)$keyWithValue[1] : '"' . $keyWithValue[1] . '"');
         }
 
         return $parameter;

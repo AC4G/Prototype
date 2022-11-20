@@ -44,7 +44,7 @@ final class InventoryController extends AbstractController
 
         if (count($inventory) !== 0) {
             return new JsonResponse(
-                $this->inventoriesService->prepareInventories($inventory)
+                $this->inventoriesService->prepareData($inventory)
             );
         }
 
@@ -78,7 +78,7 @@ final class InventoryController extends AbstractController
         }
 
         return new JsonResponse(
-            $this->inventoriesService->prepareInventories($inventory)
+            $this->inventoriesService->prepareData($inventory)
         );
     }
 
@@ -159,7 +159,7 @@ final class InventoryController extends AbstractController
          */
         if ($request->isMethod('GET')) {
             return new JsonResponse(
-              $this->inventoriesService->prepareInventories($inventory)
+              $this->inventoriesService->prepareData($inventory)
             );
         }
 

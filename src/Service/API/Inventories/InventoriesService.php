@@ -98,7 +98,7 @@ final class InventoriesService
         $this->inventoryRepository->flushEntity();
     }
 
-    public function prepareInventories(
+    public function prepareData(
         array|Inventory $inventories
     ): array
     {

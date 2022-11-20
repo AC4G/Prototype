@@ -2,9 +2,7 @@
 
 namespace App\Controller\Website\Dashboard;
 
-use App\Repository\ItemRepository;
 use App\Serializer\UserNormalizer;
-use App\Service\API\Items\ItemsService;
 use App\Engine\Search\ItemSearchEngine;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,10 +19,8 @@ final class DashboardController extends AbstractController
         private PaginationService $paginationService,
         private DashboardService  $dashboardService,
         private ItemSearchEngine  $itemSearchEngine,
-        private ItemRepository    $itemRepository,
         private UserNormalizer    $userNormalizer,
         private AccountService    $accountService,
-        private ItemsService      $itemsService,
         private Security          $security
     )
     {
@@ -162,13 +158,13 @@ final class DashboardController extends AbstractController
     {
         $query = $request->query->all();
 
-        $page = array_key_exists('page', $query) ? (int)$query['page'] : 1;
-        $limit = array_key_exists('limit', $query) ? (int)$query['limit'] : 1;
-        $phrase = array_key_exists('search', $query) ? $query['search'] : null;
-
         $user = $this->security->getUser();
 
-        $items = $this->itemsService->prepareData($this->paginationService->getDataByPage($this->itemSearchEngine->search($phrase, $user), $limit, $page));
+        $items = $this->paginationService->getDataByPage($this->itemSearchEngine->search(
+            array_key_exists('search', $query) ? $query['search'] : null, $user),
+            array_key_exists('limit', $query) ? (int)$query['limit'] : 1,
+            array_key_exists('page', $query) ? (int)$query['page'] : 1
+        );
 
         $user = $this->userNormalizer->normalize($this->getUser());
 

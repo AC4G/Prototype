@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class AccountService
+final class AccountService
 {
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
@@ -34,6 +34,7 @@ class AccountService
                 }
             }
         }
+
         if (!file_exists($dir)) {
             mkdir('files/profile/' . $nickname);
         }

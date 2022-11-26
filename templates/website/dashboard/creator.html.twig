@@ -63,7 +63,7 @@
                             <div class="w-full h-fit absolute my-auto">
                                 <div class="w-full h-fit pl-[12px] mt-[11px] flex justify-between pr-[12px]">
                                     <div class="w-fit h-fit">
-                                        <p class="font-inter text-[14px]">{{ item.name|length > 12 ? item.name|slice(0,12) ~ '...' : item.name }}</p>
+                                        <p class="font-inter text-[14px]">{{ item.name|length > 18 ? item.name|slice(0,18) ~ '...' : item.name }}</p>
                                     </div>
                                     <div class="w-fit h-fit z-[16]">
                                         <button id="{{ item.id }}_button" class="h-[22px] w-[22px] pl-[3px] rounded hover:shadow-md transition" onclick="openItemMenu(this.id)">

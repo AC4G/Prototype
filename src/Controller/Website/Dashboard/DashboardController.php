@@ -59,13 +59,11 @@ final class DashboardController extends AbstractController
                     'image/jfif'
                 ];
 
-                if (is_null($file) || !in_array($file->getMimeType(), $types)) {
-                    goto a;
+                if (!is_null($file) && in_array($file->getMimeType(), $types)) {
+                    $this->accountService->saveProfilePicture($file, $user);
+
+                    sleep(2);
                 }
-
-                $this->accountService->saveProfilePicture($file, $user);
-
-                sleep(2);
             }
 
             if ($request->request->get('form-type') === 'privacy') {
@@ -86,32 +84,26 @@ final class DashboardController extends AbstractController
             if ($request->request->get('form-type') === 'nickname') {
                 $nickname = $request->request->get('nickname');
 
-                if (is_null($nickname)) {
-                    goto a;
+                if (!is_null($nickname) && strlen($nickname) > 0) {
+                    $this->accountService->updateNickname($nickname, $user);
                 }
-
-                $this->accountService->updateNickname($nickname, $user);
             }
 
             if ($request->request->get('form-type') === 'email') {
                 $email = $request->request->get('email');
 
-                if (is_null($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    goto a;
+                if (!is_null($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $this->accountService->updateEmail($email, $user);
                 }
-
-                $this->accountService->updateEmail($email, $user);
             }
 
             if ($request->request->get('form-type') === 'password') {
                 $password1 = $request->request->get('password-1');
                 $password2 = $request->request->get('password-2');
 
-                if ((is_null($password1) || is_null($password2)) || $password1 !== $password2 || strlen($password2) < 10) {
-                    goto a;
+                if ((!is_null($password1) && !is_null($password2)) && $password1 === $password2 && strlen($password2) >= 10) {
+                    $this->accountService->updatePassword($password2, $user);
                 }
-
-                $this->accountService->updatePassword($password2, $user);
             }
         }
 
@@ -162,7 +154,7 @@ final class DashboardController extends AbstractController
 
         $items = $this->paginationService->getDataByPage($this->itemSearchEngine->search(
             array_key_exists('search', $query) ? $query['search'] : null, $user),
-            array_key_exists('limit', $query) ? (int)$query['limit'] : 1,
+            array_key_exists('limit', $query) ? (int)$query['limit'] : 20,
             array_key_exists('page', $query) ? (int)$query['page'] : 1
         );
 

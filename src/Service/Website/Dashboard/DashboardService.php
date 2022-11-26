@@ -3,22 +3,11 @@
 namespace App\Service\Website\Dashboard;
 
 use App\Serializer\ItemNormalizer;
+use App\Service\Website\Account\AccountService;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 final class DashboardService
 {
-    public function __construct(
-        public ItemNormalizer $itemNormalizer
-    )
-    {
-    }
 
-    public function normalizeItems(
-        array $items
-    ): array
-    {
-        foreach ($items as $key => $item) {
-            $items[$key] = $this->itemNormalizer->normalize($item);
-        }
-       return $items;
-    }
 }

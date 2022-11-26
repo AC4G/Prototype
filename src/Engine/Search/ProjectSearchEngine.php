@@ -3,14 +3,19 @@
 namespace App\Engine\Search;
 
 use App\Repository\ProjectRepository;
+use App\Service\API\Project\ProjectService;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class ProjectSearchEngine
+final class ProjectSearchEngine extends AbstractSearchEngine
 {
     public function __construct(
-        private ProjectRepository $projectRepository
+        private ProjectRepository $projectRepository,
+        private ProjectService $projectService
     )
     {
+        parent::__construct(
+            $this->projectService
+        );
     }
 
     public function search(
@@ -18,8 +23,8 @@ class ProjectSearchEngine
         ?UserInterface $user = null
     ): array
     {
-
-
-
+        return [];
     }
+
+
 }

@@ -24,21 +24,19 @@ final class ItemSearchEngine extends AbstractSearchEngine
         ?UserInterface $user = null
     ): array
     {
-        if (is_null($phrase) || strlen($phrase) === 0) return $this->itemRepository->findBy(['user' => $user]);
+        if (is_null($phrase) || strlen($phrase) === 0) return $this->itemsService->prepareData($this->itemRepository->findBy(['user' => $user]));
 
         if (strpos($phrase, ':') > 0) {
             $phraseWithParameter = explode(':', $phrase);
 
-            if (strlen($phraseWithParameter[1]) === 0) goto a;
+            if (strlen($phraseWithParameter[1]) > 0) {
+                $parameter = $this->preparePhraseParameter($phraseWithParameter[1]);
 
-            $parameter = $this->preparePhraseParameter($phraseWithParameter[1]);
+                $items = $this->buildQuery($phraseWithParameter[0], $user)->execute();
 
-            $items = $this->buildQuery($phraseWithParameter[0], $user)->execute();
-
-            return $this->findItemByParameter($items, $parameter);
+                return $this->findItemByParameter($items, $parameter);
+            }
         }
-
-        a:
 
         return $this->itemsService->prepareData($this->buildQuery($phrase, $user)->execute());
     }

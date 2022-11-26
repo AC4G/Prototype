@@ -10,4 +10,6 @@ interface InterfaceSearchEngine
         ?string $phrase,
         ?UserInterface $user = null
     ): array;
+
+
 }

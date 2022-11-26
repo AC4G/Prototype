@@ -91,11 +91,9 @@ abstract class AbstractSearchEngine implements InterfaceSearchEngine
         }
 
         foreach ($percentageOfOccurrence as $key => $percent) {
-            if ($percent >= 75) {
-                $normalizedItem = $this->service->prepareData($foundContent[$key]);
-                $normalizedItem['relevance'] = $percent;
-                $filteredByRelevance[] = $normalizedItem;
-            }
+            $normalizedItem = $this->service->prepareData($foundContent[$key]);
+            $normalizedItem['relevance'] = $percent;
+            $filteredByRelevance[] = $normalizedItem;
         }
 
         uasort($filteredByRelevance, function ($a, $b) {

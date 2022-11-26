@@ -175,7 +175,7 @@ final class InventoryController extends AbstractController
     /**
      * @Route("/api/inventories/{property}/{itemId}/parameters", name="api_inventories_item_by_id_remove_parameters", methods={"DELETE", "GET"}, requirements={"itemId" = "\d+"})
      */
-    public function deleteParameterFromItemInInventory(
+    public function deleteOrGetParameterFromItemInInventory(
         Request $request,
         string $property,
         int $itemId

@@ -13,9 +13,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ProfileController extends AbstractController
 {
     public function __construct(
-        private UserNormalizer $userNormalizer,
-        private ProfileService $profileService,
-        private Security $security
+        private readonly UserNormalizer $userNormalizer,
+        private readonly ProfileService $profileService,
+        private readonly Security $security
     )
     {
     }
@@ -30,7 +30,7 @@ class ProfileController extends AbstractController
         $user = $this->security->getUser();
 
         if ($request->isMethod('POST')) {
-            $this->profileService->updateEntries($user, $request);
+            $this->profileService->updateProfile($user, $request);
         }
 
         $user = $this->userNormalizer->normalize($this->getUser());

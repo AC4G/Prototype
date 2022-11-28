@@ -14,40 +14,18 @@ final class ProfileService
     {
     }
 
-    public function updateEntries(
+    public function updateProfile(
         UserInterface $user,
         Request $request
     ): void
     {
-        $currentForm = $request->request->get('form-type');
+        $currentFormName = $request->request->get('form');
 
-        if ($this->isFormType($currentForm, 'picture')) {
-            $this->updatePicture($user, $request);
+        $functionName = 'update' . ucfirst($currentFormName);
+
+        if (method_exists(ProfileService::class, $functionName)) {
+            $this->$functionName($user, $request);
         }
-
-        if ($this->isFormType($currentForm, 'privacy')) {
-            $this->updatePrivacy($user, $request);
-        }
-
-        if ($this->isFormType($currentForm, 'nickname')) {
-            $this->updateNickname($user, $request);
-        }
-
-        if ($this->isFormType($currentForm, 'email')) {
-            $this->updateEmail($user, $request);
-        }
-
-        if ($this->isFormType($currentForm, 'password')) {
-            $this->updatePassword($user, $request);
-        }
-    }
-
-    private function isFormType(
-        string $currentForm,
-        string $neededForm
-    ): bool
-    {
-        return $currentForm === $neededForm;
     }
 
     private function updatePicture(
@@ -118,10 +96,11 @@ final class ProfileService
         Request $request
     ): void
     {
-        $email = $request->request->get('email');
+        $password1 = $request->request->get('password-1');
+        $password2 = $request->request->get('password-2');
 
-        if (!is_null($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $this->accountService->updateEmail($email, $user);
+        if ((!is_null($password1) && !is_null($password2)) && $password1 === $password2 && strlen($password2) >= 10) {
+            $this->accountService->updatePassword($password2, $user);
         }
     }
 

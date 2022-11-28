@@ -10,8 +10,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 final class ItemSearchEngine extends AbstractSearchEngine
 {
     public function __construct(
-        private ItemRepository $itemRepository,
-        private ItemsService $itemsService
+        private readonly ItemRepository $itemRepository,
+        private readonly ItemsService $itemsService
     )
     {
         parent::__construct(
@@ -20,22 +20,21 @@ final class ItemSearchEngine extends AbstractSearchEngine
     }
 
     public function search(
-        ?string $phrase,
+        array $query,
         ?UserInterface $user = null
     ): array
     {
-        if (is_null($phrase) || strlen($phrase) === 0) return $this->itemsService->prepareData($this->itemRepository->findBy(['user' => $user]));
+        $phrase = array_key_exists('search', $query) ? $query['search'] : null;
 
-        if (strpos($phrase, ':') > 0) {
-            $phraseWithParameter = explode(':', $phrase);
+        if ($this->isPhraseNullOrHasNoCharacters($phrase)) return $this->itemsService->prepareData($this->itemRepository->findBy(['user' => $user]));
 
-            if (strlen($phraseWithParameter[1]) > 0) {
-                $parameter = $this->preparePhraseParameter($phraseWithParameter[1]);
+        $phraseWithParameter = ($this->phraseContainsColon($phrase)) ? explode(':', $phrase) : '';
 
-                $items = $this->buildQuery($phraseWithParameter[0], $user)->execute();
+        if ($this->isParameterLongerThanZero($phraseWithParameter[1])) {
+            $parameters = $this->preparePhraseParameter($phraseWithParameter[1]);
+            $items = $this->buildQuery($phraseWithParameter[0], $user)->execute();
 
-                return $this->findItemByParameter($items, $parameter);
-            }
+            return $this->findItemByParameter($items, $parameters);
         }
 
         return $this->itemsService->prepareData($this->buildQuery($phrase, $user)->execute());
@@ -59,6 +58,27 @@ final class ItemSearchEngine extends AbstractSearchEngine
         ;
 
         return $query->getQuery();
+    }
+
+    private function phraseContainsColon(
+        string $haystack
+    ): bool
+    {
+        return strpos($haystack, ':') > 0;
+    }
+
+    private function isParameterLongerThanZero(
+        string $parameter
+    ): bool
+    {
+        return strlen($parameter) > 0;
+    }
+
+    private function isPhraseNullOrHasNoCharacters(
+        ?string $phrase
+    ): bool
+    {
+        return is_null($phrase) || strlen($phrase) === 0;
     }
 
 

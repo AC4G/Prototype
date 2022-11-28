@@ -7,7 +7,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 interface InterfaceSearchEngine
 {
     public function search(
-        ?string $phrase,
+        array $query,
         ?UserInterface $user = null
     ): array;
 

@@ -10,8 +10,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 final class AccountService
 {
     public function __construct(
-        private UserPasswordHasherInterface $passwordHasher,
-        private UserRepository $userRepository
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly UserRepository $userRepository
     )
     {
     }
@@ -19,7 +19,7 @@ final class AccountService
     public function saveProfilePicture(
         UploadedFile $file,
         UserInterface $user
-    )
+    ): void
     {
         $extension = substr($file->getClientOriginalName(), strpos($file->getClientOriginalName(), '.') + 1);
 
@@ -52,7 +52,7 @@ final class AccountService
     public function updateProfilePrivacy(
         bool $privacy,
         UserInterface $user
-    )
+    ): void
     {
         $user->setIsPrivate($privacy);
 
@@ -62,7 +62,7 @@ final class AccountService
     public function updateNickname(
         string $nickname,
         UserInterface $user
-    )
+    ): void
     {
         if (!is_null($this->userRepository->findOneBy(['nickname' => $nickname]))) {
             return;
@@ -93,7 +93,7 @@ final class AccountService
     public function updateEmail(
         string $email,
         UserInterface $user
-    )
+    ): void
     {
         if (!is_null($this->userRepository->findOneBy(['email' => $email]))) {
             return;
@@ -107,7 +107,7 @@ final class AccountService
     public function updatePassword(
         string $password,
         UserInterface $user
-    )
+    ): void
     {
         if (password_verify($password, $user->getPassword())) {
             return;

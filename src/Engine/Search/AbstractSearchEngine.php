@@ -11,7 +11,7 @@ abstract class AbstractSearchEngine implements InterfaceSearchEngine
     private array $amountOfOccurrence = [];
 
     public function __construct(
-        private ItemsService
+        private readonly ItemsService
         |InventoriesService
         |ProjectService $service
     )

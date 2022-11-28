@@ -3,18 +3,48 @@
 namespace App\Controller\Website\Dashboard;
 
 use App\Repository\ItemRepository;
+use App\Serializer\UserNormalizer;
+use App\Engine\Search\ItemSearchEngine;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\Website\Pagination\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class CreatorController extends AbstractController
 {
     public function __construct(
-        private ItemRepository $itemRepository
+        private readonly PaginationService $paginationService,
+        private readonly ItemSearchEngine $itemSearchEngine,
+        private readonly ItemRepository $itemRepository,
+        private readonly UserNormalizer $userNormalizer
     )
     {
 
+    }
+
+    /**
+     * @Route("/dashboard/creator", name="dashboard_creator")
+     */
+    public function showCreator(
+        Request $request
+    ): Response
+    {
+        $user = $this->getUser();
+        $query = $request->query->all();
+
+        $items = $this->paginationService->getDataByPage($this->itemSearchEngine->search($query, $user), $query);
+
+        $user = $this->userNormalizer->normalize($this->getUser());
+
+        return $this->render('website/dashboard/creator.html.twig', [
+            'path_name' => 'creator',
+            'items' => $items,
+            'user' => $user,
+            'amount' => $this->paginationService->getAmountOfItems(),
+            'current_page' => $this->paginationService->getCurrentPage(),
+            'max_pages' => $this->paginationService->getMaxPages()
+        ]);
     }
 
     /**
@@ -64,4 +94,6 @@ final class CreatorController extends AbstractController
             'path_name' => 'creator'
         ]);
     }
+
+
 }

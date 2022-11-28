@@ -8,31 +8,34 @@ final class PaginationService
     private int $currentPage = 1;
     private int $amount = 0;
 
-    public function __construct(
-
-    )
-    {
-    }
-
     public function getDataByPage(
         array $content,
-        int $limit,
-        int $page
+        array $query
     ): array
     {
-        $currentPage = $this->getCurrentPage($this->getMaxPages($content, $limit), $page);
+        $limit = array_key_exists('limit', $query) ? (int)$query['limit'] : 20;
+        $page = array_key_exists('page', $query) ? (int)$query['page'] : 1;
+
+        $currentPage = $this->decideForCurrentPage($this->calculateMaxPages($content, $limit), $page);
         $this->amount = count($content);
 
         if ($currentPage === 0) {
             return [];
         }
 
-        $offset = ($currentPage - 1) * $limit;
+        $offset = $this->calculateOffset($currentPage, $limit);
 
         return array_slice($content, $offset, $limit);
     }
 
-    private function getMaxPages(
+    private function calculateOffset(
+        int $currentPage,
+        int $limit
+    ): int{
+        return ($currentPage - 1) * $limit;
+    }
+
+    private function calculateMaxPages(
         array $content,
         int $limit
     ): int
@@ -46,7 +49,7 @@ final class PaginationService
         return $this->maxPages = $max;
     }
 
-    private function getCurrentPage(
+    private function decideForCurrentPage(
         int $maxPages,
         int $page
     ): int
@@ -54,17 +57,17 @@ final class PaginationService
         return $this->currentPage = min(max($page, 1), $maxPages);
     }
 
-    public function maxPages():int
+    public function getMaxPages():int
     {
         return $this->maxPages;
     }
 
-    public function currentPage():int
+    public function getCurrentPage():int
     {
         return $this->currentPage;
     }
 
-    public function getAmount(): int
+    public function getAmountOfItems(): int
     {
         return $this->amount;
     }

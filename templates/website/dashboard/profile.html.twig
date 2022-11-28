@@ -23,7 +23,7 @@
                             {% endif %}
                             <div class="z-10 border-2 border-[#2e4053] bg-white hover:bg-[#2e4053] group absolute rounded w-[40px] h-[30px] left-[90px] top-[80px] transition" id="edit-prf-pic">
                                 <input id="prf-pic-input" name="profile-picture" type="file" class="opacity-0 cursor-pointer w-[36px] h-[26px] absolute">
-                                <input name="form-type" type="hidden" value="picture">
+                                <input name="form" type="hidden" value="picture">
                                 <div class="w-full h-full pt-[6px] pl-[10px]">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-pencil fill-black group-hover:fill-white transition" viewBox="0 0 16 16">
                                         <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
@@ -74,7 +74,7 @@
                         </div>
                         <input class="opacity-0 z-[-1] w-[0px]" name="privacy" id="privacy" type="text" value="{% if not user.isPrivate %}1{% else %}0{% endif %}">
                     </div>
-                    <input name="form-type" type="hidden" value="privacy">
+                    <input name="form" type="hidden" value="privacy">
                 </form>
             </div>
         </div>
@@ -123,7 +123,7 @@
                                     </svg>
                                 </div>
                             </div>
-                            <input type="hidden" name="form-type" value="nickname">
+                            <input type="hidden" name="form" value="nickname">
                             <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
                                 <div id="nickname-submit" class="w-fit h-fit cursor-not-allowed">
                                     <button id="nickname-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition select-none">Save your new nickname</button>
@@ -179,7 +179,7 @@
                                     </svg>
                                 </div>
                             </div>
-                            <input type="hidden" name="form-type" value="email">
+                            <input type="hidden" name="form" value="email">
                             <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
                                 <div id="email-submit" class="w-fit h-fit cursor-not-allowed">
                                     <button id="email-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition select-none">Save your new Email</button>
@@ -240,7 +240,7 @@
                                     </svg>
                                 </div>
                             </div>
-                            <input type="hidden" name="form-type" value="password">
+                            <input type="hidden" name="form" value="password">
                             <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
                                 <div id="password-submit" class="w-fit h-fit cursor-not-allowed">
                                     <button id="password-button" type="submit" class="pointer-events-none border-2 border-[#17ddff] text-white h-[30px] w-[200px] rounded bg-[#06b6d4] hover:bg-[#17ddff] transition select-none">Save password</button>

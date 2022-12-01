@@ -10,7 +10,7 @@ final class ProjectSearchEngine extends AbstractSearchEngine
 {
     public function __construct(
         private ProjectRepository $projectRepository,
-        private ProjectService $projectService
+        private readonly ProjectService $projectService
     )
     {
         parent::__construct(
@@ -19,7 +19,7 @@ final class ProjectSearchEngine extends AbstractSearchEngine
     }
 
     public function search(
-        ?string $phrase,
+        array $query,
         ?UserInterface $user = null
     ): array
     {

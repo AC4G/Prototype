@@ -30,11 +30,10 @@ final class ItemSearchEngine extends AbstractSearchEngine
 
         $phraseWithParameter = ($this->phraseContainsColon($phrase)) ? explode(':', $phrase) : '';
 
-        if ($this->isParameterLongerThanZero($phraseWithParameter[1])) {
-            $parameters = $this->preparePhraseParameter($phraseWithParameter[1]);
+        if ($this->isPhraseArrayAndParameterLongerThanZero($phraseWithParameter)) {
             $items = $this->buildQuery($phraseWithParameter[0], $user)->execute();
 
-            return $this->findItemByParameter($items, $parameters);
+            return $this->findItemByParameters($items, $phraseWithParameter[1], 'parameter');
         }
 
         return $this->itemsService->prepareData($this->buildQuery($phrase, $user)->execute());
@@ -67,11 +66,11 @@ final class ItemSearchEngine extends AbstractSearchEngine
         return strpos($haystack, ':') > 0;
     }
 
-    private function isParameterLongerThanZero(
-        string $parameter
+    private function isPhraseArrayAndParameterLongerThanZero(
+        string|array $phraseWithParameter
     ): bool
     {
-        return strlen($parameter) > 0;
+        return is_array($phraseWithParameter) && strlen($phraseWithParameter[1]) > 0;
     }
 
     private function isPhraseNullOrHasNoCharacters(

@@ -57,6 +57,9 @@ final class SecurityController extends AbstractController
     }
 
     /**
+     * fix this shit ngl and clean it up (╯°□°）╯︵ ┻━┻
+     */
+    /**
      * @Route("/login/oauth/authorize", name="oauth_user_login", methods={"GET", "POST"})
      */
     public function oauthLoginAction(

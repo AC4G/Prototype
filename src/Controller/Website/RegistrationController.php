@@ -96,7 +96,7 @@ final class RegistrationController extends AbstractController
         }
 
         return $this->renderForm('website/registration/index.html.twig', [
-            'registration_form' => $form,
+            'registration_form' => $form->createView(),
             'errors' => $errors,
         ]);
     }

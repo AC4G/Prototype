@@ -24,9 +24,8 @@ abstract class AbstractSearchEngine
         string $columnName
     ): array
     {
-        $columnFunctionName = $this->buildColumnFunctionName($columnName);
         $parameters = $this->prepareParameters($parameters);
-        $foundContent = $this->findItemBySearchParameters($items, $parameters, $columnFunctionName);
+        $foundContent = $this->findItemBySearchParameters($items, $parameters, $this->buildColumnFunctionName($columnName));
 
         if (is_string($parameters)) {
             return $this->service->prepareData($foundContent);
@@ -52,7 +51,7 @@ abstract class AbstractSearchEngine
 
         foreach ($items as $item) {
             if (is_string($parameters)) {
-                if (strpos($item->$columnFunctionName(), $parameters) > 0) {
+                if ($this->containsParameterInSearchedItemColumn($item, $columnFunctionName, $parameters)) {
                     $foundContent[] = $item;
                 }
 
@@ -60,7 +59,7 @@ abstract class AbstractSearchEngine
             }
 
             foreach ($parameters as $parameter) {
-                if (strpos($item->$columnFunctionName(), $parameter) > 0) {
+                if ($this->containsParameterInSearchedItemColumn($item, $columnFunctionName, $parameter)) {
                     (array_key_exists($item->getId(), $this->amountOfOccurrence)) ? $this->amountOfOccurrence[$item->getId()] = $this->amountOfOccurrence[$item->getId()] + 1 : $this->amountOfOccurrence[$item->getId()] = 1;
 
                     if (!array_key_exists($item->getId(), $foundContent)) $foundContent[$item->getId()] = $item;
@@ -71,12 +70,21 @@ abstract class AbstractSearchEngine
         return $foundContent;
     }
 
+    private function containsParameterInSearchedItemColumn(
+        Object $item,
+        string $columnFunctionName,
+        string $parameter
+    ): bool
+    {
+        return strpos($item->$columnFunctionName(), $parameter) > 0;
+    }
+
     private function prepareParameters(
         string $parameters
     ): array|string
     {
         if ($this->parameterContainsNeedle(',', $parameters)) {
-            $parameters =  $this->explodeAndTrimSpacesFromParameter($parameters);
+            $parameters =  $this->explodeByCommaAndTrimSpacesFromParameter($parameters);
         }
 
         if (is_array($parameters)) {
@@ -90,7 +98,7 @@ abstract class AbstractSearchEngine
         return $this->parameterContainsNeedle('->', $parameters) ? $this->createPreciseParameter($parameters) : $parameters;
     }
 
-    private function explodeAndTrimSpacesFromParameter(
+    private function explodeByCommaAndTrimSpacesFromParameter(
         string $parameters
     ): array
     {
@@ -126,7 +134,6 @@ abstract class AbstractSearchEngine
         return '"' . $keyWithValue[0] . '": ' . (is_numeric($keyWithValue[1]) ? (int)$keyWithValue[1] : '"' . $keyWithValue[1] . '"');
     }
 
-    //relevance of the searched items
     private function sortContentByRelevance(
         array $foundContent,
         int $amountOfParameters

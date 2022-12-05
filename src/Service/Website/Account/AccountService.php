@@ -84,8 +84,10 @@ final class AccountService
             $newPath = $path . $lowerNickname . '/' . $lowerNickname . '.' . $extension;
         }
 
-        $user->setNickname($nickname);
-        $user->setProfilePic($newPath);
+        $user
+            ->setNickname($nickname)
+            ->setProfilePic($newPath)
+        ;
 
         $this->userRepository->flushEntity();
     }

@@ -21,25 +21,14 @@ final class AccountService
         UserInterface $user
     ): void
     {
-        $extension = substr($file->getClientOriginalName(), strpos($file->getClientOriginalName(), '.') + 1);
-
-        $nickname = strtolower($user->getNickname());
+        $nickname = $user->getNickname();
         $dir = 'files/profile/' . $nickname . '/';
-
-        if (file_exists($dir) && count(scandir($dir)) > 0) {
-            $files = glob($dir . '*', GLOB_MARK);
-            foreach ($files as $fileOld) {
-                if (is_file($fileOld)) {
-                    unlink($fileOld);
-                }
-            }
-        }
-
-        if (!file_exists($dir)) {
-            mkdir('files/profile/' . $nickname);
-        }
-
+        $extension = $this->getFileExtension($file);
         $newFileName = $nickname . '.' . $extension;
+
+        $this->deleteProfilePicture($user->getProfilePic(), $newFileName);
+
+        $this->ifProfileFolderDoNotExistsCreateIt($dir, $nickname);
 
         $file->move($dir, $newFileName);
 
@@ -49,14 +38,52 @@ final class AccountService
         sleep(1);
     }
 
-    public function updateProfilePrivacy(
-        bool $privacy,
-        UserInterface $user
+    private function getFileExtension(
+        UploadedFile $file
+    ): string
+    {
+        return substr($file->getClientOriginalName(), strpos($file->getClientOriginalName(), '.') + 1);
+    }
+
+    private function ifProfileFolderDoNotExistsCreateIt(
+        string $dir,
+        string $nickname
     ): void
     {
-        $user->setIsPrivate($privacy);
+        if (!file_exists($dir)) {
+            mkdir('files/profile/' . $nickname);
+        }
+    }
 
-        $this->userRepository->flushEntity();
+    private function deleteProfilePicture(
+        ?string $oldProfilePicture,
+        string $newFileName
+    ): void
+    {
+        if (is_null($oldProfilePicture) || !$this->fileExists($oldProfilePicture)) {
+            return;
+        }
+
+        if ($this->newFileNameMatchesOldOne($oldProfilePicture, $newFileName)) {
+            return;
+        }
+
+        unlink($oldProfilePicture);
+    }
+
+    private function newFileNameMatchesOldOne(
+        string $oldProfilePicture,
+        string $newFileName
+    ): bool
+    {
+        return strpos($oldProfilePicture, $newFileName) > 0;
+    }
+
+    private function fileExists(
+        ?string $oldProfilePicture
+    ): bool
+    {
+        return file_exists($oldProfilePicture);
     }
 
     public function updateNickname(
@@ -68,26 +95,46 @@ final class AccountService
             return;
         }
 
-        $newPath = null;
-        $path = 'files/profile/';
-        $lowerNickname = strtolower($nickname);
-        $oldLowerNickname = strtolower($user->getNickname());
+        $oldNickname = $user->getNickname();
 
-        if (is_dir($path .  $oldLowerNickname)) {
-            $extension = pathinfo(scandir($path . $oldLowerNickname)[2])['extension'];
-
-            if (strlen($extension) > 0) {
-                rename($path . $oldLowerNickname . '/' . $oldLowerNickname . '.' . $extension, $path .  $oldLowerNickname . '/' . $lowerNickname . '.' . $extension);
-            }
-
-            rename($path .  $oldLowerNickname . '/', $path . $lowerNickname . '/');
-            $newPath = $path . $lowerNickname . '/' . $lowerNickname . '.' . $extension;
-        }
+        $newPath = $this->renameFolderAndReturnNewPath($oldNickname, $nickname);
 
         $user
             ->setNickname($nickname)
             ->setProfilePic($newPath)
         ;
+
+        $this->userRepository->flushEntity();
+    }
+
+    private function renameFolderAndReturnNewPath(
+        string $oldNickname,
+        string $nickname
+    ): null|string
+    {
+        $path = 'files/profile/';
+
+        if (!is_dir($path .  $oldNickname)) {
+            return null;
+        }
+
+        $extension = pathinfo(scandir($path . $oldNickname)[2])['extension'];
+
+        if (strlen($extension) > 0) {
+            rename($path . $oldNickname . '/' . $oldNickname . '.' . $extension, $path .  $oldNickname . '/' . $nickname . '.' . $extension);
+        }
+
+        rename($path .  $oldNickname . '/', $path . $nickname . '/');
+
+        return $path . $nickname . '/' . $nickname . '.' . $extension;
+    }
+
+    public function updateProfilePrivacy(
+        bool $privacy,
+        UserInterface $user
+    ): void
+    {
+        $user->setIsPrivate($privacy);
 
         $this->userRepository->flushEntity();
     }

@@ -39,3 +39,8 @@ private.pem
 ##> ddev ##
 /.ddev
 ##< ddev ##
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###

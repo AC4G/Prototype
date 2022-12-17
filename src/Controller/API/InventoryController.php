@@ -52,7 +52,7 @@ final class InventoryController extends AbstractController
     }
 
     /**
-     * @Route("/api/inventories/{property}", name="api_inventories_by_property", methods={"GET"})
+     * @Route("/api/inventories/{property}", name="api_inventory_by_property", methods={"GET"})
      */
     public function getInventoryByProperty(
         Request $request,
@@ -83,7 +83,7 @@ final class InventoryController extends AbstractController
     }
 
     /**
-     * @Route("/api/inventories/{property}/{itemId}", name="api_inventories_by_property_and_item_id", methods={"GET", "POST", "PATCH", "DELETE"}, requirements={"itemId" = "\d+"})
+     * @Route("/api/inventories/{property}/{itemId}", name="api_inventory_by_property_and_item_id", methods={"GET", "POST", "PATCH", "DELETE"}, requirements={"itemId" = "\d+"})
      */
     public function processInventoryByItem(
         Request $request,

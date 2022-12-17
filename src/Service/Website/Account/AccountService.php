@@ -19,7 +19,7 @@ final class AccountService
     public function saveProfilePicture(
         UploadedFile $file,
         UserInterface $user
-    ): void
+    ): UserInterface
     {
         $nickname = $user->getNickname();
         $dir = 'files/profile/' . $nickname . '/';
@@ -28,14 +28,14 @@ final class AccountService
 
         $this->deleteProfilePicture($user->getProfilePic(), $newFileName);
 
-        $this->ifProfileFolderDoNotExistsCreateIt($dir, $nickname);
+        $this->createUserProfileFolder($dir, $nickname);
 
         $file->move($dir, $newFileName);
 
         $user->setProfilePic($dir . $newFileName);
         $this->userRepository->flushEntity();
 
-        sleep(1);
+        return $user;
     }
 
     private function getFileExtension(
@@ -45,7 +45,7 @@ final class AccountService
         return substr($file->getClientOriginalName(), strpos($file->getClientOriginalName(), '.') + 1);
     }
 
-    private function ifProfileFolderDoNotExistsCreateIt(
+    private function createUserProfileFolder(
         string $dir,
         string $nickname
     ): void

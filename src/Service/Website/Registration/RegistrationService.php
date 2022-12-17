@@ -10,44 +10,48 @@ use App\Entity\RoleIdent;
 use App\Repository\UserRepository;
 use App\Repository\RoleIdentRepository;
 use App\Repository\UserRolesRepository;
+use App\Service\Website\Email\EmailService;
+use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class RegistrationService
 {
-    private User $user;
-    private array $errors = [];
-    private array $errorSet = [
-        'saving' => 'An error occurred while saving, please try again in a few seconds.'
-    ];
-
     public function __construct(
+        private VerifyEmailHelperInterface $verifyEmailHelper,
         private UserPasswordHasherInterface $passwordHasher,
         private RoleIdentRepository $roleIdentRepository,
         private UserRolesRepository $userRolesRepository,
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
+        private EmailService $emailService
     )
     {
     }
 
     public function registerUser(
-        User $user
-    ): void
+        User $user,
+        array $data
+    ): User
     {
         $hashedPassword = $this->passwordHasher->hashPassword(
             $user,
-            $user->getPassword()
+            $data['password']['first']
         );
 
-        $user
-            ->setNickName($user->getNickname())
-            ->setEmail($user->getEmail())
-            ->setPassword($hashedPassword)
-            ->setCreationDate(new DateTime())
-        ;
+        $user = $this->persistUser($user, $data, $hashedPassword);
 
-        $this->userRepository->persistAndFlushEntity($user);
+        $this->assignRoleToUser($user, 'ROLE_USER');
 
-        $roleIdent = $this->roleIdentRepository->findOneBy(['roleName' => 'ROLE_USER']);
+        $this->buildAndSendVerificationEmail($user);
+
+        return $user;
+    }
+
+    private function assignRoleToUser(
+        User $user,
+        string $roleName
+    ): void
+    {
+        $roleIdent = $this->roleIdentRepository->findOneBy(['roleName' => $roleName]);
 
         if (is_null($roleIdent)) {
             $roleIdent = new RoleIdent();
@@ -65,26 +69,68 @@ final class RegistrationService
         ;
 
         $this->userRolesRepository->persistAndFlushEntity($userRoles);
-
-        $this->user = $user;
     }
 
-    private function createError(
-        string $key,
-        string $area
-    ): string
+    private function persistUser(
+        User $user,
+        array $data,
+        string $hashedPassword
+    ): User
     {
-        return $this->errorSet[$key] . ' Area: ' . $area;
+        $user
+            ->setNickName($data['nickname'])
+            ->setEmail($data['email'])
+            ->setPassword($hashedPassword)
+            ->setCreationDate(new DateTime())
+        ;
+
+        $this->userRepository->persistAndFlushEntity($user);
+
+        return $user;
     }
 
-    public function getErrors(): array
+    private function buildAndSendVerificationEmail(
+        User $user
+    ): void
     {
-        return $this->errors;
+        $signatureComponents = $this->verifyEmailHelper->generateSignature(
+            'verify_email',
+            (string)$user->getId(),
+            $user->getEmail(),
+            ['id' => $user->getId()]
+        );
+        $this->emailService->createEmail(
+            $user->getEmail(),
+            'Email verification',
+            'website/email/registration/index.html.twig',
+            ['verify_url' => $signatureComponents->getSignedUrl()]
+        );
+        $this->emailService->sendEmail();
     }
 
-    public function getUser(): User
+    public function getValidationErrors(
+        array $data
+    ): array
     {
-        return $this->user;
+        $errors = [];
+
+        if($this->userRepository->isNicknameAlreadyUsed($data['nickname'])) {
+            $errors[] =  "Nickname with the same characters is already in use.";
+        }
+
+        if ($this->userRepository->isEmailAlreadyUsed($data['email'])) {
+            $errors[] = 'The specified email is invalid.';
+        }
+
+        return $errors;
+    }
+
+    public function setEmailVerifiedDate(
+        User $user
+    ): void
+    {
+        $user->setEmailVerified(new DateTime());
+        $this->userRepository->flushEntity();
     }
 
 

@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace App\tests;
+namespace App\Tests;
 
 use PHPUnit\Framework\TestCase;
 use App\Repository\UserRepository;
@@ -29,7 +29,7 @@ class RegistrationServiceTest extends TestCase
 
         $userRepository->expects($this->once())
             ->method('isEmailAlreadyUsed')
-            ->with('tests@example.com')
+            ->with('Tests@example.com')
             ->willReturn(false);
 
         $classUnderTest = new RegistrationService(
@@ -43,11 +43,13 @@ class RegistrationServiceTest extends TestCase
 
         $errors = $classUnderTest->getValidationErrors([
             'nickname' => 'testnickname',
-            'email' => 'tests@example.com'
+            'email' => 'Tests@example.com'
         ]);
 
         $this->assertContains('Nickname with the same characters is already in use.', $errors);
 
         $this->assertNotContains('The specified email is invalid.', $errors);
     }
+
+
 }

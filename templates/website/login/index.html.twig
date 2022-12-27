@@ -14,15 +14,15 @@
             <div class="w-[384px] h-fit relative mx-auto">
                 <p class="text-black text-[16px] font-inter">Nickname</p>
                 <input class="w-[384px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none" type="text" id="username" name="_username" placeholder="Enter your nickname.." value="{{ last_username }}" required>
-                <div class="border w-[384px] border-[#2e4053] rounded"></div>
+                <div class="h-[2px] w-[384px] bg-[#2e4053] rounded"></div>
             </div>
             <div class="w-[384px] h-fit relative mx-auto top-[36px]">
                 <p class="text-black text-[16px] font-inter">Password</p>
                 <input class="w-[384px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none" type="password" id="password" name="_password" placeholder="Enter your password.." required>
-                <div class="border w-[384px] border-[#2e4053] rounded"></div>
+                <div class="h-[2px] w-[384px] bg-[#2e4053] rounded"></div>
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
             </div>
-            <div class="w-fit h-fit relative mx-auto top-[80px]">
+            <div class="w-fit h-fit relative mx-auto top-[80px] hover:shadow-xl transition">
                 <button class="text-[18px] font-inter w-[80px] h-[42px] bg-black text-white rounded" type="submit">Log In</button>
             </div>
         </form>

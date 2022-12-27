@@ -47,7 +47,7 @@ final class SecurityController extends AbstractController
             return $this->customResponse->errorResponse($request, 'grant_type required!', 406);
         }
 
-        if (!array_key_exists('client_id', $content) xor !array_key_exists('client_secret', $content)) {
+        if (!array_key_exists('client_id', $content) || !array_key_exists('client_secret', $content)) {
             return $this->customResponse->errorResponse($request, 'Client credentials required!', 406);
         }
 

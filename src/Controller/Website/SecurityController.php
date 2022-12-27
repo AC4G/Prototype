@@ -2,8 +2,7 @@
 
 namespace App\Controller\Website;
 
-use App\Entity\User;
-use App\Form\OAuth\LoginFormType;
+use App\Form\OAuth\OAuthFormType;
 use App\Repository\ClientRepository;
 use App\Repository\WebAppRepository;
 use Symfony\Component\Security\Core\Security;
@@ -49,6 +48,30 @@ final class SecurityController extends AbstractController
     }
 
     /**
+     * @Route("/loginSuccess", name="login_success", methods={"GET"})
+     */
+    public function loginSuccess(
+        Request $request
+    ): Response
+    {
+        $redirect = $request->getSession()->get('redirect');
+
+        if (!is_null($redirect)) {
+            $request->getSession()->remove('redirect');
+
+            return $this->redirect($redirect);
+        }
+
+        $previousPage = $this->getTargetPath($request->getSession(), 'main');
+
+        if (!is_null($previousPage)) {
+            return $this->redirect($previousPage);
+        }
+
+        return $this->redirectToRoute('home');
+    }
+
+    /**
      * @Route("/logout", name="logout")
      */
     public function logoutAction()
@@ -63,85 +86,34 @@ final class SecurityController extends AbstractController
         Request $request
     ): Response
     {
-        $error = '';
-        $client = null;
+        $user = $this->getUser();
 
-        $query = $request->query->all() ?? [];
+        if (is_null($user)) {
+            $session = $request->getSession();
+            $session->set('redirect', $request->getRequestUri());
 
-        if (array_key_exists('client_id', $query)) {
-            $client = $this->clientRepository->findOneBy(['clientId' => $query['client_id']]);
-
-            if (is_null($client)) {
-                $error = 'Client not found!';
-                goto end;
-            }
+            return $this->redirectToRoute('login');
         }
 
-        if (!array_key_exists('client_id', $query)) {
-            $error = 'invalid_request';
-            goto end;
-        }
+        $query = $request->query->all();
 
-        $user = new User();
-        $form = $this->createForm(LoginFormType::class, $user);
+        $errors = $this->securityService->validateQuery($query);
 
+        $form = $this->createForm(OAuthFormType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid() && $form->get('approval')->getData()) {
-            if (!array_key_exists('response_type', $query)) {
-                $error = 'invalid_request';
-                goto end;
-            }
-
-            $state = null;
-
-            if (array_key_exists('state', $query)) {
-                $state = $query['state'];
-            }
-
-            if ($query['response_type'] !== 'code') {
-                $error = 'unsupported_response_type';
-                goto end;
-            }
-
-            $user = $this->securityService->getUserByCredentials($request);
-
-            if (is_null($user)) {
-                $error = 'Email or password are false!';
-                goto end;
-            }
-
-            if ($this->securityService->hasClientAuthTokenFromUser($user, $client)) {
-                $error = 'Already authenticated!';
-                goto end;
-            }
-
-            $webApp = $this->webAppRepository->findOneBy(['client' => $client]);
-
-            if (is_null($webApp) || is_null($webApp->getRedirectUrl()) || count($webApp->getScopes()) === 0) {
-                $error = 'unauthorized_client';
-                goto end;
-            }
-
-            $authToken = $this->securityService->createAuthenticationToken($user, $client, $webApp);
-
-            $redirectUri = $webApp->getRedirectUrl() . '?code=' . $authToken->getAuthToken();
-
-            if (!is_null($state)) {
-                $redirectUri = $redirectUri . '&state=' . $state;
-            }
-
-            return $this->redirect($redirectUri);
+        if ((count($errors) === 0 && count($errors = $this->securityService->prepareParameter($query, $user)) > 0) || !$form->isSubmitted() || !$form->isValid() || count($errors) > 0) {
+            return $this->renderForm('website/oauth/index.html.twig', [
+                'user' => $user,
+                'client' => $this->securityService->getClient(),
+                'webApp' => $this->securityService->getWebApp(),
+                'scopes' => $this->securityService->getScopes(),
+                'form' => $form,
+                'errors' => $errors
+            ]);
         }
 
-        end:
-
-        return $this->renderForm('website/oauth/login.html.twig', [
-            'login_form' => $form,
-            'client_name' => is_null($client) ? '' : $client->getProject()->getProjectName(),
-            'client_logo' => is_null($client) ?  : '/files/' . $client->getProject()->getOrganisationLogo(),
-            'error' => $error
-        ]);
+        return $this->redirect($this->securityService->createAuthTokenAndBuildRedirectUri($query, $user));
     }
 
 

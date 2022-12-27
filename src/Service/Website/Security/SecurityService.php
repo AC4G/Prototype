@@ -2,40 +2,123 @@
 
 namespace App\Service\Website\Security;
 
-use App\Entity\User;
+use DateTime;
 use App\Entity\WebApp;
 use App\Entity\Client;
 use App\Entity\AuthToken;
-use App\Repository\UserRepository;
+use App\Repository\ClientRepository;
+use App\Repository\WebAppRepository;
+use App\Repository\ScopeRepository;
 use App\Repository\AuthTokenRepository;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 final class SecurityService
 {
+    private ?Client $client = null;
+    private ?WebApp $webApp = null;
+    private array $scopes = [];
+
     public function __construct(
         private AuthTokenRepository $authTokenRepository,
-        private UserRepository $userRepository
+        private ClientRepository $clientRepository,
+        private WebAppRepository $webAppRepository,
+        private ScopeRepository $scopeRepository
     )
     {
     }
 
-    public function getUserByCredentials(
-        Request $request
-    ): ?User
+    public function validateQuery(
+        array $query
+    ): array
     {
-        $data = $request->request->all('login_form');
+        $errors = [];
 
-        $user = $this->userRepository->findOneBy(['nickname' => $data['nickname']]);
-
-        if (!is_null($user) && password_verify($data['password'], $user->getPassword())) {
-            return $user;
+        if (count($query) === 0) {
+            $errors[] =  'Invalid request!';
         }
 
-        return null;
+        if (!array_key_exists('response_type', $query)) {
+            $errors[] = 'Request has not key "response_type"';
+        }
+
+        if (!array_key_exists('client_id', $query)){
+            $errors[] = 'Request has not key "client_id"';
+        }
+
+        if (array_key_exists('response_type', $query) && $query['response_type'] !== 'code') {
+            $errors[] = 'unsupported response_type';
+        }
+
+        return $errors;
     }
 
-    public function hasClientAuthTokenFromUser(
-        User $user,
+    public function prepareParameter(
+        array $query,
+        UserInterface $user
+    ): array
+    {
+        $errors = [];
+
+        $this->client = $this->clientRepository->findOneBy(['clientId' => $query['client_id']]);
+
+        if (is_null($this->client)) {
+            $errors[] = 'Client not found!';
+        }
+
+        if (!is_null($this->client) && $this->hasClientAuthTokenFromUser($user, $this->client)) {
+            $errors[] = 'Already authenticated!';
+        }
+
+        $this->webApp = $this->webAppRepository->findOneBy(['client' => $this->client]);
+
+        if (!is_null($this->client) && (is_null($this->webApp) || (is_null($this->webApp->getRedirectUrl()) || strlen($this->webApp->getRedirectUrl()) === 0) || count($this->webApp->getScopes()) === 0)) {
+            $errors[] = 'Unauthorized client!';
+        }
+
+        return $errors;
+    }
+
+    public function createAuthTokenAndBuildRedirectUri(
+        array $query,
+        UserInterface $user
+    ): string
+    {
+        $authToken = $this->createAuthenticationToken($user, $this->client, $this->webApp);
+
+        $state = '';
+
+        if (array_key_exists('state', $query)) {
+            $state = $query['state'];
+        }
+
+        return $this->webApp->getRedirectUrl() . '?code=' . $authToken->getAuthToken() . '&state=' . $state;
+    }
+
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+
+    public function getWebApp(): ?WebApp
+    {
+        return $this->webApp;
+    }
+
+    public function getScopes(): array
+    {
+        if (is_null($this->webApp)) {
+            return [];
+        }
+
+        foreach ($this->webApp->getScopes() as $scopeId) {
+            $this->scopes[] = $this->scopeRepository->findOneBy(['id' => $scopeId]);
+        }
+
+        return $this->scopes;
+    }
+
+    private function hasClientAuthTokenFromUser(
+        UserInterface $user,
         Client $client
     ): bool
     {
@@ -44,8 +127,8 @@ final class SecurityService
         return !is_null($authToken);
     }
 
-    public function createAuthenticationToken(
-        User $user,
+    private function createAuthenticationToken(
+        UserInterface $user,
         Client $client,
         WebApp $webApp
     ): AuthToken
@@ -56,6 +139,7 @@ final class SecurityService
             ->setUser($user)
             ->setProject($client->getProject())
             ->setAuthToken(bin2hex(random_bytes(64)))
+            ->setExpireDate(new DateTime('+ 7days'))
             ->setScopes($webApp->getScopes())
         ;
 

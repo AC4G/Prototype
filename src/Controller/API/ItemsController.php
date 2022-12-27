@@ -4,7 +4,6 @@ namespace App\Controller\API;
 
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
-use App\Engine\Search\ItemSearchEngine;
 use App\Service\API\Items\ItemsService;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,14 +11,11 @@ use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Service\Website\Pagination\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class ItemsController extends AbstractController
 {
     public function __construct(
-        private PaginationService $paginationService,
-        private ItemSearchEngine $itemSearchEngine,
         private SecurityService   $securityService,
         private UserRepository    $userRepository,
         private ItemRepository    $itemRepository,

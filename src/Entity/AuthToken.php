@@ -6,6 +6,7 @@ use DateTime;
 use App\Entity\User;
 use App\Entity\Project;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * AuthToken
@@ -39,14 +40,14 @@ class AuthToken
     private ?DateTime $expireDate;
 
     /**
-     * @var User
+     * @var User|UserInterface
      *
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      * })
      */
-    private User $user;
+    private User|UserInterface $user;
 
     /**
      * @var Project
@@ -94,12 +95,12 @@ class AuthToken
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): null|User|UserInterface
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(null|User|UserInterface $user): self
     {
         $this->user = $user;
 

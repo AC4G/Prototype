@@ -2,6 +2,7 @@
 
 namespace App\Controller\Website;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,12 +19,18 @@ final class HomeController extends AbstractController
     /**
      * @Route("/", name="home")
      */
-    public function showHomeTemplate(): Response
+    public function showHomeTemplate(
+        Request $request
+    ): Response
     {
         $user = [];
 
         if ($this->security->isGranted('IS_AUTHENTICATED_FULLY')) {
             $user = $this->getUser();
+        }
+
+        if (!is_null($request->getSession()->get('redirect'))) {
+            $request->getSession()->remove('redirect');
         }
 
         return $this->render('website/home/index.html.twig', [

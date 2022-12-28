@@ -94,22 +94,6 @@ select:-webkit-autofill {
     border-radius: 2px;
 }
 
-.oauth_nickname {
-    @apply w-[384px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none
-}
-
-.oauth_pwd {
-    @apply w-[384px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none
-}
-
-.oauth_approval {
-    @apply relative left-[10px]
-}
-
-.oauth_submit {
-    @apply text-[18px] font-inter w-[80px] h-[42px] bg-black text-white rounded
-}
-
 .authorize-submit {
     @apply h-[30px] w-[80px] bg-black rounded text-white hover:text-grey transition
 }

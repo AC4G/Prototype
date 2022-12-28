@@ -15,8 +15,8 @@
                 {% if user.profilePic is not null %}
                     <img src="{{ asset(user.profilePic) }}" class="mt-[2px] ml-[2.2px] object-cover w-[86px] h-[86px] rounded-full select-none">
                 {% else %}
-                    <div class="rounded-full w-fit h-fit bg-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="124" height="124" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                    <div class="rounded-full w-fit h-fit bg-white mt-[2px] ml-[2.2px]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="86" height="86" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
                             <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                             <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
                         </svg>
@@ -45,8 +45,8 @@
         </div>
         <div class="w-fit h-fit flex mx-auto mt-[4px]">
             <p class="font-inter text-[14px] select-none">Signed in as&ensp;</p>
-            <p class="font-inter text-[14px] font-bold">{{ user.getNickname|length > 10 ? user.getNickname|slice(0,10) ~ '...' : user.getNickname}}</p>
-            <a href="{{ path('home') }}">
+            <p class="font-inter text-[14px] font-bold">{{ user.getNickname|length > 10 ? user.getNickname|slice(0,10) ~ '...' : user.getNickname }}</p>
+            <a href="{{ path('logout') }}">
                 <p class="font-inter text-[14px] text-[#223dd6]">&ensp;Not you?</p>
             </a>
         </div>
@@ -54,7 +54,7 @@
         <div class="max-h-[200px] overflow-auto scrollbar-hide">
             {% if client is not null and webApp is not null %}
                 <div class="w-fit h-fit mx-auto">
-                    <p class="font-inter text-[16px] font-bold select-none">This will allow {{ client.project.projectName }} to:</p>
+                    <p class="font-inter text-[16px] font-bold select-none">This will allow {{ client.project.projectName|length > 12 ? client.project.projectName|slice(0,12) ~ '...' : client.project.projectName }} to:</p>
                 </div>
                 <div class="w-[240px] h-fit mx-auto mt-[12px]">
                     <ul class="px-4 list-disc">
@@ -70,7 +70,7 @@
             {% endif %}
         </div>
         <div class="mx-auto h-[2px] bg-[#ebebeb] w-[94%] rounded mt-[14px] mb-[20px]"></div>
-        <div class="w-[240px] h-fit mx-auto mb-[20px]">
+        <div class="w-[260px] h-fit mx-auto mb-[20px]">
             <p class="font-inter text-[12px]">By clicking Authorize, you allow this app to use and manipulate your information.</p>
         </div>
         <div class="w-[300px] h-fit flex justify-between">
@@ -90,7 +90,7 @@
             </div>
             <div class="w-fit h-fit mx-auto">
             {% if webApp is not null %}
-                <p class="font-inter text-[12px] font-bold">{{ webApp.redirectUrl }}</p>
+                <p class="font-inter text-[12px] font-bold">{{ webApp.redirectUrl|length > 40 ? webApp.redirectUrl|slice(0,40) ~ '...' : webApp.redirectUrl }}</p>
             {% endif %}
             </div>
         </div>

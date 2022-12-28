@@ -80,6 +80,24 @@ final class SecurityController extends AbstractController
     }
 
     /**
+     * @Route("/logoutSuccess", name="logout_success")
+     */
+    public function logoutSuccess(
+        Request $request
+    )
+    {
+        $redirect = $request->getSession()->get('redirect');
+
+        if (!is_null($redirect)) {
+            return $this->redirectToRoute('login');
+        }
+
+        $request->getSession()->invalidate();
+
+        return $this->redirectToRoute('home');
+    }
+
+    /**
      * @Route("/login/oauth/authorize", name="oauth_user_login", methods={"GET", "POST"})
      */
     public function oauthLoginAction(
@@ -96,8 +114,9 @@ final class SecurityController extends AbstractController
         }
 
         $query = $request->query->all();
-
         $errors = $this->securityService->validateQuery($query);
+
+        $request->getSession()->set('redirect', $request->getRequestUri());
 
         $form = $this->createForm(OAuthFormType::class);
         $form->handleRequest($request);
@@ -112,6 +131,8 @@ final class SecurityController extends AbstractController
                 'errors' => $errors
             ]);
         }
+
+        $request->getSession()->remove('redirect');
 
         return $this->redirect($this->securityService->createAuthTokenAndBuildRedirectUri($query, $user));
     }

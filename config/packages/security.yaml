@@ -24,7 +24,8 @@ security:
                 always_use_default_target_path: true
             logout:
                 path: logout
-                target: home
+                target: logout_success
+                invalidate_session: false
 
             login_throttling:
                 max_attempts: 10

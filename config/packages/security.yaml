@@ -30,6 +30,9 @@ security:
             login_throttling:
                 max_attempts: 10
                 interval: '5 minutes'
+            remember_me:
+                secret:   '%kernel.secret%'
+                always_remember_me: true
 
 
             # activate different ways to authenticate

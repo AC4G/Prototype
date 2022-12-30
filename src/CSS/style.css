@@ -97,3 +97,11 @@ select:-webkit-autofill {
 .authorize-submit {
     @apply h-[30px] w-[80px] bg-black rounded text-white hover:text-grey transition
 }
+
+#keep-me-logged-in-checkbox {
+    @apply ml-[12px] focus:outline-none
+}
+
+#keep-me-logged-in-checkbox:checked {
+    @apply accent-black;
+}

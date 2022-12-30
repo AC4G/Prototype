@@ -730,8 +730,8 @@ video {
   top: 36px;
 }
 
-.top-\[160px\] {
-  top: 160px;
+.top-\[140px\] {
+  top: 140px;
 }
 
 .top-\[120px\] {
@@ -752,6 +752,18 @@ video {
 
 .top-\[24\.5px\] {
   top: 24.5px;
+}
+
+.top-\[60px\] {
+  top: 60px;
+}
+
+.top-\[70px\] {
+  top: 70px;
+}
+
+.top-\[130px\] {
+  top: 130px;
 }
 
 .z-\[-1\] {
@@ -1936,6 +1948,19 @@ select:-webkit-autofill {
 .authorize-submit:hover {
   --tw-text-opacity: 1;
   color: rgb(136 136 136 / var(--tw-text-opacity));
+}
+
+#keep-me-logged-in-checkbox {
+  margin-left: 12px;
+}
+
+#keep-me-logged-in-checkbox:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+#keep-me-logged-in-checkbox:checked {
+  accent-color: #000;
 }
 
 .hover\:border-\[\#888888\]:hover {

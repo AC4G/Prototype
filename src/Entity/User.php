@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
@@ -15,7 +16,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  * @ORM\Table(name="user", uniqueConstraints={@ORM\UniqueConstraint(name="email_UNIQUE", columns={"email"}), @ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="nickname_UNIQUE", columns={"nickname"})})
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
 {
     public function __construct()
     {
@@ -80,6 +81,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private DateTime $creationDate;
 
+    /**
+     * @var null|string
+     *
+     * @ORM\Column(name="google_authenticator_secret", type="string", nullable=true)
+     */
+    private ?string $googleAuthenticatorSecret;
 
     /**
      * @ORM\OneToMany(targetEntity="UserRoles", mappedBy="user")
@@ -180,6 +187,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->creationDate = $creationDate;
 
         return $this;
+    }
+
+    public function isGoogleAuthenticatorEnabled(): bool
+    {
+        return null !== $this->googleAuthenticatorSecret;
+    }
+
+    public function getGoogleAuthenticatorUsername(): string
+    {
+        return $this->nickname;
+    }
+
+    public function getGoogleAuthenticatorSecret(): ?string
+    {
+        return $this->googleAuthenticatorSecret;
+    }
+
+    public function setGoogleAuthenticatorSecret(?string $googleAuthenticatorSecret): void
+    {
+        $this->googleAuthenticatorSecret = $googleAuthenticatorSecret;
     }
 
     public function getRoles(): array

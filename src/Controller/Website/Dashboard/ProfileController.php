@@ -30,6 +30,8 @@ class ProfileController extends AbstractController
         $user = $this->security->getUser();
 
         if ($request->isMethod('POST')) {
+            $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
             $this->profileService->updateProfile($user, $request);
         }
 

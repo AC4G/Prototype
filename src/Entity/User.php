@@ -196,7 +196,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function getGoogleAuthenticatorUsername(): string
     {
-        return $this->nickname;
+        return $this->getNickname();
     }
 
     public function getGoogleAuthenticatorSecret(): ?string

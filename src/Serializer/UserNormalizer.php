@@ -19,7 +19,8 @@ class UserNormalizer
             'email' => $user->getEmail(),
             'profilePic' => $user->getProfilePic(),
             'isPrivate' => $user->isPrivate(),
-            'creation' => $user->getCreationDate()
+            'creation' => $user->getCreationDate(),
+            'isGoogleAuthenticatorEnabled' => $user->isGoogleAuthenticatorEnabled()
         ];
     }
 

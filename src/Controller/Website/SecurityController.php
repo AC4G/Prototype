@@ -98,6 +98,16 @@ final class SecurityController extends AbstractController
     }
 
     /**
+     * @Route("/2-step-verification", name="two_factor_authentication")
+     */
+    public function twoFactorAuthenticationAction(
+        Request $request
+    ): Response
+    {
+        return $this->render('website/security/2fa_form.html.twig');
+    }
+
+    /**
      * @Route("/login/oauth/authorize", name="oauth_user_login", methods={"GET", "POST"})
      */
     public function oauthLoginAction(

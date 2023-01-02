@@ -2,8 +2,7 @@
 scheb_two_factor:
     google:
         enabled: true
-        server_name: Server Name
-        issuer: Issuer Name
+        issuer: STEXS
         digits: 6
         window: 1
         template: website/security/2fa_form.html.twig

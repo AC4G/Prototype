@@ -2,13 +2,17 @@
 
 namespace App\Service\Website\Dashboard;
 
+use chillerlan\QRCode\QRCode;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\Website\Account\AccountService;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
+use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
 
 final class ProfileService
 {
     public function __construct(
+        private readonly GoogleAuthenticatorInterface $googleAuthenticator,
         private readonly AccountService $accountService
     )
     {
@@ -102,6 +106,15 @@ final class ProfileService
         if ((!is_null($password1) && !is_null($password2)) && $password1 === $password2 && strlen($password2) >= 10) {
             $this->accountService->updatePassword($password2, $user);
         }
+    }
+
+    public function generateTwoStepVerificationQRCode(
+        TwoFactorInterface $user
+    ): string
+    {
+        $qrCode = new QRCode();
+
+        return $qrCode->render($this->googleAuthenticator->getQRContent($user));
     }
 
 

@@ -2,14 +2,17 @@
 
 namespace App\Service\Website\Account;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
 
 final class AccountService
 {
     public function __construct(
+        private readonly GoogleAuthenticatorInterface $googleAuthenticator,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly UserRepository $userRepository
     )
@@ -163,6 +166,26 @@ final class AccountService
         }
 
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));
+
+        $this->userRepository->flushEntity();
+    }
+
+    public function updateTwoStepSecret(
+        UserInterface $user
+    ): void
+    {
+        $secret = $this->googleAuthenticator->generateSecret();
+
+        $user->setGoogleAuthenticatorSecret($secret);
+
+        $this->userRepository->flushEntity();
+    }
+
+    public function removeTwoStepSecret(
+        User $user
+    ): void
+    {
+        $user->setGoogleAuthenticatorSecret(null);
 
         $this->userRepository->flushEntity();
     }

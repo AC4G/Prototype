@@ -20,7 +20,8 @@ class UserNormalizer
             'profilePic' => $user->getProfilePic(),
             'isPrivate' => $user->isPrivate(),
             'creation' => $user->getCreationDate(),
-            'isGoogleAuthenticatorEnabled' => $user->isGoogleAuthenticatorEnabled()
+            'isGoogleAuthenticatorEnabled' => $user->isGoogleAuthenticatorEnabled(),
+            'isTwoFaVerified' => $user->isTwoFaVerified()
         ];
     }
 

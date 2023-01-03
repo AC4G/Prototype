@@ -89,6 +89,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private ?string $googleAuthenticatorSecret;
 
     /**
+     * @var null|DateTime
+     *
+     * @ORM\Column(name="twofa_verified", type="datetime", nullable=true)
+     */
+    private ?DateTime $twofaVerified;
+
+    /**
      * @ORM\OneToMany(targetEntity="UserRoles", mappedBy="user")
      */
     private Collection $roles;
@@ -204,9 +211,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this->googleAuthenticatorSecret;
     }
 
-    public function setGoogleAuthenticatorSecret(?string $googleAuthenticatorSecret): void
+    public function setGoogleAuthenticatorSecret(?string $googleAuthenticatorSecret): self
     {
         $this->googleAuthenticatorSecret = $googleAuthenticatorSecret;
+
+        return $this;
+    }
+
+    public function getTwoFaVerified(): ?DateTime
+    {
+        return $this->twofaVerified;
+    }
+
+    public function setTwoFaVerified(
+        ?DateTime $time
+    ): self
+    {
+        $this->twofaVerified = $time;
+
+        return $this;
+    }
+
+    public function isTwoFaVerified(): bool
+    {
+        return !is_null($this->twofaVerified);
     }
 
     public function getRoles(): array

@@ -2,6 +2,7 @@
 
 namespace App\Service\Website\Account;
 
+use DateTime;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -181,13 +182,33 @@ final class AccountService
         $this->userRepository->flushEntity();
     }
 
-    public function removeTwoStepSecret(
+    public function disableTwoStepVerification(
         User $user
     ): void
     {
-        $user->setGoogleAuthenticatorSecret(null);
+        $user
+            ->setGoogleAuthenticatorSecret(null)
+            ->setTwoFaVerified(null);
+        ;
 
         $this->userRepository->flushEntity();
+    }
+
+    public function setTwofaVerified(
+        User $user
+    ): void
+    {
+        $user->setTwoFaVerified(new DateTime());
+
+        $this->userRepository->flushEntity();
+    }
+
+    public function isTwofaValid(
+        User $user,
+        string $code
+    ): bool
+    {
+        return $this->googleAuthenticator->checkCode($user, $code);
     }
 
 

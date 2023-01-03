@@ -2,6 +2,7 @@
 
 namespace App\Service\Website\Dashboard;
 
+use App\Entity\User;
 use chillerlan\QRCode\QRCode;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\Website\Account\AccountService;
@@ -115,6 +116,32 @@ final class ProfileService
         $qrCode = new QRCode();
 
         return $qrCode->render($this->googleAuthenticator->getQRContent($user));
+    }
+
+    public function isTwofaCodeValid(
+        User $user,
+        ?string $code
+    ): bool
+    {
+        if (is_null($code)) {
+            return false;
+        }
+
+        return $this->accountService->isTwofaValid($user, $code);
+    }
+
+    public function disableTwoStepVerification(
+        User $user
+    ): void
+    {
+        $this->accountService->disableTwoStepVerification($user);
+    }
+
+    public function verifyTwoStepSecret(
+        User $user
+    ): void
+    {
+        $this->accountService->setTwofaVerified($user);
     }
 
 

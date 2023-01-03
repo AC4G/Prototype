@@ -254,7 +254,7 @@
                 <div class="mt-[30px]">
                     <div class="w-fit">
                         <button id="2fa-button" class="w-[200px] h-[50px] font-inter text-[-380px] border-2 border-[#e5e7eb] rounded-lg transition-all hover:bg-green-300 hover:border-[#888888] select-none">
-                            {% if user.isGoogleAuthenticatorEnabled %} Disable {% else %} Enable {% endif %} 2-Step Verification
+                            {% if user.isTwoFaVerified %} Disable {% else %} Enable {% endif %} 2-Step Verification
                         </button>
                     </div>
                     <div class="absolute top-[-330px] opacity-0 z-[-1] transition-all left-[0px] right-[0px] ml-auto mr-auto w-fit h-fit" id="2fa-box">
@@ -272,14 +272,14 @@
                                 </div>
                             </div>
                             <div class="mt-[20px] w-fit mx-auto mb-[10px]">
-                                <p class="font-inter text-white text-[16px] text-center">Are you sure to {% if user.isGoogleAuthenticatorEnabled %} disable {% else %} enable {% endif %} 2-Step Verification?</p>
+                                <p class="font-inter text-white text-[16px] text-center">Are you sure to {% if user.isTwoFaVerified %} disable {% else %} enable {% endif %} 2-Step Verification?</p>
                             </div>
                             <div class="flex w-full justify-between h-[70px] pt-[20px]">
                                 <div class="w-fit h-fit ml-[40px] mt-[4px]">
                                     <p id="cancel-2fa-box" class="font-inter text-white text-[16px] cursor-pointer hover:text-grey transition">Cancel</p>
                                 </div>
                                 <div class="w-[40px] h-[30px] rounded mr-[40px] bg-[#06b6d4] hover:bg-[#17ddff] border-2 border-[#17ddff] pl-[4px] transition">
-                                    <a href="{{ path('dashboard_profile_two_factor_authentication') }}?action={% if user.isGoogleAuthenticatorEnabled %}disable{% else %}enable{% endif %}" class="font-inter text-[16px] text-white">Yes</a>
+                                    <a href="{{ path('dashboard_profile_two_factor_authentication') }}?action={% if user.isTwoFaVerified %}disable{% else %}enable{% endif %}" class="font-inter text-[16px] text-white">Yes</a>
                                 </div>
                             </div>
                         </div>

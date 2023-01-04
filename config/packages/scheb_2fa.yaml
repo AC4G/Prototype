@@ -6,6 +6,7 @@ scheb_two_factor:
         digits: 6
         window: 1
         template: website/security/2fa_form.html.twig
+        form_renderer: acme.custom_form_renderer
     security_tokens:
         - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
         - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken

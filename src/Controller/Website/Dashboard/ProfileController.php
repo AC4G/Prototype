@@ -84,7 +84,7 @@ class ProfileController extends AbstractController
             if (!$this->profileService->isTwofaCodeValid($user, $code)) {
                 $this->addFlash('error', 'The code is wrong!');
 
-                return $this->render('website/security/2fa_form.html.twig', [
+                return $this->render('website/security/2fa_desetup.html.twig', [
                     'action' => $this->redirectToRoute('dashboard_profile_two_factor_authentication')->getTargetUrl() . '?action=disable'
                 ]);
             }
@@ -99,7 +99,7 @@ class ProfileController extends AbstractController
             if (!$this->profileService->isTwofaCodeValid($user, $code)) {
                 $this->addFlash('error', 'The code is wrong!');
 
-                return $this->render('website/security/2fa_QR_code.html.twig', [
+                return $this->render('website/security/2fa_setup.html.twig', [
                     'code' => $user->getGoogleAuthenticatorSecret(),
                     'qrCode' => $this->profileService->generateTwoStepVerificationQRCode($user)
                 ]);
@@ -112,7 +112,7 @@ class ProfileController extends AbstractController
         }
 
         if ($query['action'] === 'disable') {
-           return $this->render('website/security/2fa_form.html.twig', [
+           return $this->render('website/security/2fa_desetup.html.twig', [
                'action' => $this->redirectToRoute('dashboard_profile_two_factor_authentication')->getTargetUrl() . '?action=disable'
            ]);
         }
@@ -121,7 +121,7 @@ class ProfileController extends AbstractController
             $this->accountService->updateTwoStepSecret($user);
         }
 
-        return $this->render('website/security/2fa_QR_code.html.twig', [
+        return $this->render('website/security/2fa_setup.html.twig', [
             'code' => $user->getGoogleAuthenticatorSecret(),
             'qrCode' => $this->profileService->generateTwoStepVerificationQRCode($user)
         ]);

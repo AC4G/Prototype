@@ -21,5 +21,16 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    acme.custom_two_factor_provider:
+        class: App\Provider\TwoFactorProvider
+        tags:
+            - { name: scheb_two_factor.provider, alias: acme_two_factor_provider }
+
+    acme.custom_form_renderer:
+        class: App\Renderer\TwoFactorRenderer
+        arguments:
+            - '@twig'
+            - '@security.firewall.map'
+            - { main: 'website/security/2fa_form.html.twig' }
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

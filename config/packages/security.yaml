@@ -22,11 +22,14 @@ security:
                 enable_csrf: true
                 default_target_path: login_success
                 always_use_default_target_path: true
+            two_factor:
+                enable_csrf: true
+                csrf_parameter: _csrf_security_token
+                csrf_token_id: a_private_string
             logout:
                 path: logout
                 target: logout_success
                 invalidate_session: false
-
             login_throttling:
                 max_attempts: 10
                 interval: '5 minutes'

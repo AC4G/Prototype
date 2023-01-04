@@ -104,7 +104,7 @@ final class SecurityController extends AbstractController
         Request $request
     ): Response
     {
-        return $this->render('website/security/2fa_form.html.twig');
+        return $this->render('2fa_desetup.html.twig');
     }
 
     /**

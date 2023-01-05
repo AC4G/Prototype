@@ -253,7 +253,7 @@
                 </div>
                 <div class="mt-[30px]">
                     <div class="w-fit">
-                        <button id="2fa-button" class="w-[200px] h-[50px] font-inter text-[-380px] border-2 border-[#e5e7eb] rounded-lg transition-all hover:bg-green-300 hover:border-[#888888] select-none">
+                        <button id="2fa-button" class="w-[200px] h-[50px] font-inter text-[-380px] border-2 border-[#e5e7eb] rounded-lg transition-all {% if user.isTwoFaVerified %} hover:bg-red-300 {% else %} hover:bg-green-300 {% endif %} hover:border-[#888888] select-none">
                             {% if user.isTwoFaVerified %} Disable {% else %} Enable {% endif %} 2-Step Verification
                         </button>
                     </div>

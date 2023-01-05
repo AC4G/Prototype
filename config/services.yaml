@@ -31,5 +31,9 @@ services:
         arguments:
             - '@twig'
             - '@security.firewall.map'
+
+    App\EventListener\LoginListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'security.interactive_login' }
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

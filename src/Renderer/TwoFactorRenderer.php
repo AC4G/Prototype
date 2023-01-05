@@ -5,22 +5,18 @@ namespace App\Renderer;
 use Twig\Environment;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\FirewallMapInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorFormRendererInterface;
 
 class TwoFactorRenderer implements TwoFactorFormRendererInterface
 {
     public function __construct(
-        private Environment $twigEnvironment,
-        private FirewallMapInterface $firewallMap,
-        private array $templates
+        private Environment $twigEnvironment
     ) {
     }
 
     public function renderForm(Request $request, array $templateVars): Response
     {
-        $firewallName = $this->firewallMap->getFirewallConfig($request)->getName();
-        $template = $this->templates[$firewallName];
+        $template = 'website/security/2fa_form.html.twig';
 
         $content = $this->twigEnvironment->render($template, $templateVars);
         $response = new Response();

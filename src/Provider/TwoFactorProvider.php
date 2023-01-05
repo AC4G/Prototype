@@ -2,6 +2,7 @@
 
 namespace App\Provider;
 
+use App\Renderer\TwoFactorRenderer;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\AuthenticationContextInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorProviderInterface;
@@ -13,7 +14,7 @@ final class TwoFactorProvider implements TwoFactorProviderInterface
 {
     public function __construct(
         private readonly GoogleAuthenticatorInterface $googleAuthenticator,
-        private readonly TwoFactorFormRendererInterface $formRenderer
+        private readonly TwoFactorRenderer $formRenderer
     )
     {
     }

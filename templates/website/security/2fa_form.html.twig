@@ -1,5 +1,31 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-Hi
+    <div class="w-fit h-fit mx-auto mt-[320px]">
+        <p class="font-inter text-[24px] text-center">2-Step Verification</p>
+    </div>
+    {% if authenticationError %}
+        <div class="mx-auto mt-[20px] border-2 bg-red-100 border-red-400 rounded w-[260px] h-[40px] pt-[6px]">
+            <p class="font-inter text-[14px] text-center break-normal opacity-[96%]">{{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}</p>
+        </div>
+    {% endif %}
+    <div class="w-fit h-fit mx-auto mt-[30px]">
+        <form action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="post">
+            <div class="w-fit h-fit">
+                 <input class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px]" id="_auth_code" type="text" name="{{ authCodeParameterName }}" autocomplete="one-time-code" placeholder="Type the verification code..." inputmode="numeric" pattern="[0-9]*" required="required" autofocus/>
+            </div>
+            <div class="h-[2px] w-[260px] bg-[#2e4053] rounded"></div>
+            {% if isCsrfProtectionEnabled %}
+                <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
+            {% endif %}
+            <div class="w-[240px] h-fit mx-auto mt-[40px] flex justify-between">
+                <div class="w-fit h-fit pt-[6px]">
+                    <a class="font-inter text-[18px] hover:text-grey transition" href="{{ logoutPath }}">{{ "cancel"|trans({}, 'SchebTwoFactorBundle') }}</a>
+                </div>
+                <div class="w-fit h-fit">
+                    <button type="submit" class="font-inter text-[18px] text-white w-[80px] h-[40px] bg-black hover:text-grey transition rounded">Login</button>
+                </div>
+            </div>
+        </form>
+    </div>
 {% endblock %}

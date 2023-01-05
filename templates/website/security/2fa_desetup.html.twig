@@ -13,9 +13,6 @@
             <div class="w-fit h-fit mx-auto max-w-[260px] mt-[30px]">
                 <p class="font-inter text-[14px] text-center">By clicking 'Continue' you will remove your 2-Step Verification</p>
             </div>
-            {% if isCsrfProtectionEnabled %}
-                <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
-            {% endif %}
             <div class="w-fit h-fit mx-auto mt-[30px]">
                 <button class="font-inter text-[18px] text-white w-[100px] h-[40px] bg-black hover:text-grey transition rounded">Continue</button>
             </div>

@@ -31,10 +31,16 @@ final class SecurityController extends AbstractController
     /**
      * @Route("/login", name="login", methods={"GET", "POST"})
      */
-    public function loginAction(): Response
+    public function loginAction(
+        Request $request
+    ): Response
     {
         if ($this->security->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->redirectToRoute('home');
+        }
+
+        if (!is_null($this->getUser()) && $this->getUser()->isTwoFaVerified()) {
+            $request->getSession()->set('redirect', $this->getTargetPath($request->getSession(), 'main'));
         }
 
         $lastUsername = $this->authenticationUtils->getLastUsername();
@@ -95,16 +101,6 @@ final class SecurityController extends AbstractController
         $request->getSession()->invalidate();
 
         return $this->redirectToRoute('home');
-    }
-
-    /**
-     * @Route("/2-step-verification", name="two_factor_authentication")
-     */
-    public function twoFactorAuthenticationAction(
-        Request $request
-    ): Response
-    {
-        return $this->render('2fa_desetup.html.twig');
     }
 
     /**

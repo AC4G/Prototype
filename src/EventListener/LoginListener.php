@@ -2,19 +2,12 @@
 
 namespace App\EventListener;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 class LoginListener
 {
     use TargetPathTrait;
-
-    public function __construct(
-        private EntityManagerInterface $entityManager
-    )
-    {
-    }
 
     public function onSecurityInteractiveLogin(
         InteractiveLoginEvent $event
@@ -26,6 +19,7 @@ class LoginListener
         if ($user->isTwoFaVerified() && !is_null($previousPage)) {
             $event->getRequest()->getSession()->set('redirect', $previousPage);
         }
+
     }
 
 

@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ProfileController extends AbstractController
 {
+
     public function __construct(
         private readonly UserNormalizer $userNormalizer,
         private readonly ProfileService $profileService,
@@ -34,8 +35,6 @@ class ProfileController extends AbstractController
         $user = $this->security->getUser();
 
         if ($request->isMethod('POST')) {
-            $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
             $this->profileService->updateProfile($user, $request);
         }
 
@@ -55,8 +54,6 @@ class ProfileController extends AbstractController
     ): Response
     {
         $query = $request->query->all();
-
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         if (!array_key_exists('action', $query)) {
             $this->addFlash('error', 'The URL was broken');

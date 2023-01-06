@@ -23,11 +23,7 @@ final class HomeController extends AbstractController
         Request $request
     ): Response
     {
-        $user = [];
-
-        if ($this->security->isGranted('IS_AUTHENTICATED_FULLY')) {
-            $user = $this->getUser();
-        }
+        $user = $this->getUser();
 
         if (!is_null($request->getSession()->get('redirect'))) {
             $request->getSession()->remove('redirect');

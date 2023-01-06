@@ -3,6 +3,7 @@
 namespace App\Controller\Website;
 
 use App\Form\OAuth\OAuthFormType;
+use App\Repository\UserRepository;
 use App\Repository\ClientRepository;
 use App\Repository\WebAppRepository;
 use Symfony\Component\Security\Core\Security;
@@ -10,9 +11,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Security\SecurityService;
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use Scheb\TwoFactorBundle\Security\Http\Authenticator\TwoFactorAuthenticator;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+
 
 final class SecurityController extends AbstractController
 {
@@ -23,6 +27,7 @@ final class SecurityController extends AbstractController
         private ClientRepository $clientRepository,
         private WebAppRepository $webAppRepository,
         private SecurityService $securityService,
+        private UserRepository $userRepository,
         private Security $security
     )
     {

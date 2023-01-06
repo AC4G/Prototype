@@ -11,14 +11,18 @@ use App\Repository\WebAppRepository;
 use App\Repository\ScopeRepository;
 use App\Repository\AuthTokenRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
+use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
 
 final class SecurityService
 {
+
     private ?Client $client = null;
     private ?WebApp $webApp = null;
     private array $scopes = [];
 
     public function __construct(
+        private GoogleAuthenticatorInterface $googleAuthenticator,
         private AuthTokenRepository $authTokenRepository,
         private ClientRepository $clientRepository,
         private WebAppRepository $webAppRepository,

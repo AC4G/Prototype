@@ -127,7 +127,7 @@
                    </div>
                </div>
                <div id="account" class="group w-fit absolute right-[5.2%] top-[16.5px]" onclick="">
-                   {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                   {% if is_granted('ROLE_USER') %}
                        <div class="w-[42px] h-[42px] rounded-full bg-[#2e4053] cursor-pointer group-hover:bg-[#c5ffef] transition">
                            {% if user.profilePic is not null %}
                                <img src="{{ asset(user.profilePic) }}" class="relative top-[2px] left-[2px] w-[38px] h-[38px] rounded-full object-cover">

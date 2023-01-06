@@ -27,6 +27,7 @@
                 <input type="text" name="code" class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px]" placeholder="Type the verification code..." required/>
             </div>
             <div class="h-[2px] w-[260px] bg-[#2e4053] rounded"></div>
+            <input type="hidden" name="token" value="{{ csrf_token('enable_2fa') }}">
             <div class="w-fit h-fit mx-auto mt-[40px]">
                 <button class="font-inter text-[18px] text-white w-[100px] h-[40px] bg-black hover:text-grey transition rounded">Continue</button>
             </div>

@@ -6,6 +6,7 @@
         <div class="flex max-w-[1000px] mx-auto h-fit pt-[40px]">
             <div class="relative w-full flex justify-evenly">
                 <form action="{{ path('dashboard_profile') }}" method="post" enctype="multipart/form-data" name="profile-pic-form" class="h-fit">
+                    <input type="hidden" name="token" value="{{ csrf_token('picture') }}" />
                     <div class="w-fit">
                         <div class="w-fit h-[30px]">
                             <p class="font-inter text-[14px] select-none">Profile picture</p>
@@ -74,6 +75,7 @@
                         </div>
                         <input class="opacity-0 z-[-1] w-[0px]" name="privacy" id="privacy" type="text" value="{% if not user.isPrivate %}1{% else %}0{% endif %}">
                     </div>
+                    <input type="hidden" name="token" value="{{ csrf_token('privacy') }}" />
                     <input name="form" type="hidden" value="privacy">
                 </form>
             </div>
@@ -123,6 +125,7 @@
                                     </svg>
                                 </div>
                             </div>
+                            <input type="hidden" name="token" value="{{ csrf_token('nickname') }}" />
                             <input type="hidden" name="form" value="nickname">
                             <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
                                 <div id="nickname-submit" class="w-fit h-fit cursor-not-allowed">
@@ -179,6 +182,7 @@
                                     </svg>
                                 </div>
                             </div>
+                            <input type="hidden" name="token" value="{{ csrf_token('email') }}" />
                             <input type="hidden" name="form" value="email">
                             <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
                                 <div id="email-submit" class="w-fit h-fit cursor-not-allowed">
@@ -241,6 +245,7 @@
                                         </svg>
                                     </div>
                                 </div>
+                                <input type="hidden" name="token" value="{{ csrf_token('password') }}" />
                                 <input type="hidden" name="form" value="password">
                                 <div class="relative w-fit mx-auto mt-[20px] h-[70px]">
                                     <div id="password-submit" class="w-fit h-fit cursor-not-allowed">

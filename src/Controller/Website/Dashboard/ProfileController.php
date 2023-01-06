@@ -34,7 +34,7 @@ class ProfileController extends AbstractController
     {
         $user = $this->security->getUser();
 
-        if ($request->isMethod('POST')) {
+        if ($request->isMethod('POST') && $this->isCsrfTokenValid($request->request->get('form'), $request->request->get('token'))) {
             $this->profileService->updateProfile($user, $request);
         }
 
@@ -77,7 +77,7 @@ class ProfileController extends AbstractController
 
         $code = $request->request->get('code');
 
-        if ($request->isMethod('POST') && $query['action'] === 'disable') {
+        if ($request->isMethod('POST') && $query['action'] === 'disable' && $this->isCsrfTokenValid('disable_2fa', $request->request->get('token'))) {
             if (!$this->profileService->isTwofaCodeValid($user, $code)) {
                 $this->addFlash('error', 'The code is wrong!');
 
@@ -92,7 +92,7 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('dashboard_profile');
         }
 
-        if ($request->isMethod('POST') && $query['action'] === 'enable') {
+        if ($request->isMethod('POST') && $query['action'] === 'enable' && $this->isCsrfTokenValid('enable_2fa', $request->request->get('token'))) {
             if (!$this->profileService->isTwofaCodeValid($user, $code)) {
                 $this->addFlash('error', 'The code is wrong!');
 

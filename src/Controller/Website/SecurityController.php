@@ -109,7 +109,7 @@ final class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/login/oauth/authorize", name="oauth_user_login", methods={"GET", "POST"})
+     * @Route("/oauth/authorize", name="oauth_authorize", methods={"GET", "POST"})
      */
     public function oauthLoginAction(
         Request $request

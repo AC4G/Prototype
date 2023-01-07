@@ -22,11 +22,11 @@
                 <div class="h-[2px] w-[384px] bg-[#2e4053] rounded"></div>
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
             </div>
-            <div class="w-fit h-fit relative mx-auto top-[70px] hover:shadow-xl transition">
+            <div class="w-fit h-fit mx-auto mt-[70px] hover:shadow-xl transition">
                 <button class="text-[18px] font-inter w-[80px] h-[42px] bg-black text-white rounded" type="submit">Log In</button>
             </div>
         </form>
-        <div class="w-[384px] h-fit relative flex justify-between top-[130px] mx-auto">
+        <div class="w-[384px] h-fit flex justify-between mt-[60px] mx-auto">
             <div>
                 <a href="{{ path('registration') }}" class="text-grey font-inter text-[14px]">
                     No account yet?

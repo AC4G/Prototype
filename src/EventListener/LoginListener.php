@@ -14,10 +14,9 @@ class LoginListener
     )
     {
         $user = $event->getAuthenticationToken()->getUser();
-        $previousPage = $this->getTargetPath($event->getRequest()->getSession(), 'main');
 
-        if ($user->isTwoFaVerified() && !is_null($previousPage)) {
-            $event->getRequest()->getSession()->set('redirect', $previousPage);
+        if ($user->isTwoFaVerified()) {
+            $event->getRequest()->getSession()->set('redirectLogin', $event->getRequest()->getRequestUri());
         }
 
     }

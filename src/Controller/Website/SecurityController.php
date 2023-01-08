@@ -11,8 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Security\SecurityService;
-use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
-use Scheb\TwoFactorBundle\Security\Http\Authenticator\TwoFactorAuthenticator;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -146,6 +144,41 @@ final class SecurityController extends AbstractController
         $request->getSession()->remove('redirect');
 
         return $this->redirect($this->securityService->createAuthTokenAndBuildRedirectUri($query, $user));
+    }
+
+    /**
+     * @Route("/passwordForgotten", name="password_forgotten", methods={"GET", "POST"})
+     */
+    public function preparePwdForgottenForVerification(
+        Request $request
+    ): Response
+    {
+        if (!is_null($this->getUser())) {
+            return $this->redirectToRoute('home');
+        }
+
+        if (!$request->isMethod('POST')) {
+            return $this->renderForm('website/security/password_forgotten.html.twig', [
+                'error' => '',
+                'form' => $form
+            ]);
+        }
+
+        return $this->redirectToRoute('password_forgotten_verify');
+    }
+
+    /**
+     * @Route("/passwordForgotten/verify", name="password_forgotten_verify", methods={"GET", "POST"})
+     */
+    public function verifyPwdForgotten(
+        Request $request
+    ): Response
+    {
+        if (!is_null($this->getUser())) {
+            return $this->redirectToRoute('home');
+        }
+
+        return new Response();
     }
 
 

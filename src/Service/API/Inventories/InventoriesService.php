@@ -28,6 +28,7 @@ final class InventoriesService
 
         if (!array_key_exists('parameter', $parameter)) {
             $this->inventoryRepository->flushEntity();
+
             return;
         }
 
@@ -35,27 +36,25 @@ final class InventoriesService
 
         $newParameters = $parameter['parameter'];
 
-        if (count($parameters) > 0) {
-            foreach ($newParameters as $parameterKey => $newValue) {
-                foreach ($parameters as $key => $oldValue) {
-                    if ($parameterKey === $key) {
-                        $parameters[$parameterKey] = is_numeric($oldValue) && is_numeric($newValue) ? $oldValue + $newValue : $newValue;
+        if (count($parameters) === 0) {
+            $parameters = $newParameters;
 
-                        continue 2;
-                    }
+            $this->setParameterAndSave($inventory, $parameters);
+        }
 
-                    $parameters[$parameterKey] = $newValue;
+        foreach ($newParameters as $parameterKey => $newValue) {
+            foreach ($parameters as $key => $oldValue) {
+                if ($parameterKey === $key) {
+                    $parameters[$parameterKey] = is_numeric($oldValue) && is_numeric($newValue) ? $oldValue + $newValue : $newValue;
+
+                    continue 2;
                 }
+
+                $parameters[$parameterKey] = $newValue;
             }
         }
 
-        if (count($parameters) === 0) {
-            $parameters = $newParameters;
-        }
-
-        $inventory->setParameter(json_encode($parameters));
-
-        $this->inventoryRepository->flushEntity();
+        $this->setParameterAndSave($inventory, $parameters);
     }
 
     public function createEntryInInventory(
@@ -94,7 +93,16 @@ final class InventoriesService
             }
         }
 
-        $inventory->setParameter(json_encode($cleanedParameter));
+        $this->setParameterAndSave($inventory, $cleanedParameter);
+    }
+
+    private function setParameterAndSave(
+        Inventory $inventory,
+        array $parameters
+    ): void
+    {
+        $inventory->setParameter(json_encode($parameters));
+
         $this->inventoryRepository->flushEntity();
     }
 

@@ -35,19 +35,15 @@ final class ItemsService
             ;
         }
 
-        if (array_key_exists('parameter', $newParameter)) {
-            if (is_array($newParameter['parameter'])) {
-                $parameters = $newParameter['parameter'];
-                $data = json_decode($normalizedItem['parameter'], true);
+        if (array_key_exists('parameter', $newParameter) && is_array($newParameter['parameter'])) {
+            $parameters = $newParameter['parameter'];
+            $data = json_decode($normalizedItem['parameter'], true);
 
-                foreach ($parameters as $key => $parameter) {
-                    $data[$key] = $parameter;
-                }
-
-                $item
-                    ->setParameter(json_encode($data))
-                ;
+            foreach ($parameters as $key => $parameter) {
+                $data[$key] = $parameter;
             }
+
+            $item->setParameter(json_encode($data));
         }
 
         $this->itemRepository->flushEntity();

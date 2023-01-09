@@ -105,3 +105,11 @@ select:-webkit-autofill {
 #keep-me-logged-in-checkbox:checked {
     @apply accent-black;
 }
+
+.r-pwd-email {
+    @apply w-[260px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none
+}
+
+.r-pwd-submit {
+    @apply h-[40px] w-[80px] bg-black rounded text-white hover:text-grey transition
+}

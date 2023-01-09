@@ -6,6 +6,7 @@ use App\Form\OAuth\OAuthFormType;
 use App\Repository\UserRepository;
 use App\Repository\ClientRepository;
 use App\Repository\WebAppRepository;
+use App\Form\ResetPassword\EmailFormType;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -157,11 +158,20 @@ final class SecurityController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
+        $form = $this->createForm(EmailFormType::class);
+
         if (!$request->isMethod('POST')) {
             return $this->renderForm('website/security/password_forgotten.html.twig', [
                 'error' => '',
                 'form' => $form
             ]);
+        }
+
+        $form->handleRequest($request);
+        $error = '';
+
+        if (!$form->isSubmitted() || !$form->isValid() || strlen($error) > 0) {
+            //
         }
 
         return $this->redirectToRoute('password_forgotten_verify');

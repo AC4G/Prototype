@@ -12,7 +12,7 @@
     <div class="w-fit h-fit mx-auto mt-[30px]">
         <form action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="post">
             <div class="w-fit h-fit">
-                 <input class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px]" id="_auth_code" type="text" name="{{ authCodeParameterName }}" autocomplete="one-time-code" placeholder="Type the verification code..." inputmode="numeric" pattern="[0-9]*" required="required" autofocus/>
+                 <input autocomplete="off" class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px]" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="Type the verification code..." inputmode="numeric" pattern="[0-9]*" required="required" autofocus/>
             </div>
             <div class="h-[2px] w-[260px] bg-[#2e4053] rounded"></div>
             {% if isCsrfProtectionEnabled %}

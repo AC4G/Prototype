@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Security\SecurityService;
+use App\Service\Website\Security\ResetPasswordService;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -22,6 +23,7 @@ final class SecurityController extends AbstractController
     use TargetPathTrait;
 
     public function __construct(
+        private ResetPasswordService $resetPasswordService,
         private AuthenticationUtils $authenticationUtils,
         private ClientRepository $clientRepository,
         private WebAppRepository $webAppRepository,
@@ -161,18 +163,23 @@ final class SecurityController extends AbstractController
         $form = $this->createForm(EmailFormType::class);
 
         if (!$request->isMethod('POST')) {
-            return $this->renderForm('website/security/password_forgotten.html.twig', [
-                'error' => '',
+            return $this->renderForm('website/security/email.html.twig', [
+                'error' => null,
                 'form' => $form
             ]);
         }
 
         $form->handleRequest($request);
-        $error = '';
+        $error = $this->resetPasswordService->validateHandedEmail($form->getData());
 
-        if (!$form->isSubmitted() || !$form->isValid() || strlen($error) > 0) {
-            //
+        if (!$form->isSubmitted() || !$form->isValid() || !is_null($error)) {
+            return $this->renderForm('website/security/email.html.twig', [
+                'error' => $error,
+                'form' => $form
+            ]);
         }
+
+        $this->resetPasswordService->prepareForReset($request);
 
         return $this->redirectToRoute('password_forgotten_verify');
     }
@@ -187,6 +194,8 @@ final class SecurityController extends AbstractController
         if (!is_null($this->getUser())) {
             return $this->redirectToRoute('home');
         }
+
+        dd($request->getSession()->get('reset_password_email'));
 
         return new Response();
     }

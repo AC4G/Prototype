@@ -44,7 +44,6 @@ final class RegistrationFormType extends AbstractType
             ])
             ->add('password',  RepeatedType::class, [
                 'type' => PasswordType::class,
-
                 'required' => true,
                 'constraints' => [
                     new NotBlank(),

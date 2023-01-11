@@ -6,24 +6,20 @@ use App\Form\OAuth\OAuthFormType;
 use App\Repository\UserRepository;
 use App\Repository\ClientRepository;
 use App\Repository\WebAppRepository;
-use App\Form\ResetPassword\EmailFormType;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Security\SecurityService;
-use App\Service\Website\Security\ResetPasswordService;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-
 
 final class SecurityController extends AbstractController
 {
     use TargetPathTrait;
 
     public function __construct(
-        private ResetPasswordService $resetPasswordService,
         private AuthenticationUtils $authenticationUtils,
         private ClientRepository $clientRepository,
         private WebAppRepository $webAppRepository,
@@ -147,57 +143,6 @@ final class SecurityController extends AbstractController
         $request->getSession()->remove('redirect');
 
         return $this->redirect($this->securityService->createAuthTokenAndBuildRedirectUri($query, $user));
-    }
-
-    /**
-     * @Route("/passwordForgotten", name="password_forgotten", methods={"GET", "POST"})
-     */
-    public function preparePwdForgottenForVerification(
-        Request $request
-    ): Response
-    {
-        if (!is_null($this->getUser())) {
-            return $this->redirectToRoute('home');
-        }
-
-        $form = $this->createForm(EmailFormType::class);
-
-        if (!$request->isMethod('POST')) {
-            return $this->renderForm('website/security/email.html.twig', [
-                'error' => null,
-                'form' => $form
-            ]);
-        }
-
-        $form->handleRequest($request);
-        $error = $this->resetPasswordService->validateHandedEmail($form->getData());
-
-        if (!$form->isSubmitted() || !$form->isValid() || !is_null($error)) {
-            return $this->renderForm('website/security/email.html.twig', [
-                'error' => $error,
-                'form' => $form
-            ]);
-        }
-
-        $this->resetPasswordService->prepareForReset($request);
-
-        return $this->redirectToRoute('password_forgotten_verify');
-    }
-
-    /**
-     * @Route("/passwordForgotten/verify", name="password_forgotten_verify", methods={"GET", "POST"})
-     */
-    public function verifyPwdForgotten(
-        Request $request
-    ): Response
-    {
-        if (!is_null($this->getUser())) {
-            return $this->redirectToRoute('home');
-        }
-
-        dd($request->getSession()->get('reset_password_email'));
-
-        return new Response();
     }
 
 

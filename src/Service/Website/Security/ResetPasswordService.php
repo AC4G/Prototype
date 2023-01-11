@@ -9,31 +9,35 @@ use App\Entity\ResetPasswordRequest;
 use App\Service\Website\Email\EmailService;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\ResetPasswordRequestRepository;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class ResetPasswordService
+final class ResetPasswordService
 {
+    private string $hash;
     private User|null $user = null;
+    private ResetPasswordRequest|null $reset = null;
 
     public function __construct(
         private readonly ResetPasswordRequestRepository $resetPasswordRequestRepository,
+        private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly UserRepository $userRepository,
         private readonly EmailService $emailService
     )
     {
     }
 
-    public function validateHandedEmail(
+    public function validateEmail(
         ?array $data
     ): ?string
     {
         if (!is_array($data) || !array_key_exists('email', $data)) {
-            return 'Invalid input';
+            return 'Invalid input.';
         }
 
         $this->user = $this->userRepository->findOneBy(['email' => $data['email']]);
 
         if (is_null($this->user)) {
-            return 'Email not found';
+            return 'The specified email cannot be used for recovering.';
         }
 
         return null;
@@ -41,7 +45,7 @@ class ResetPasswordService
 
     public function prepareForReset(
         Request $request
-    )
+    ): void
     {
         $code = $this->generateCodeAndCreateEntry();
         $this->setEmailInToSession($request);
@@ -67,14 +71,14 @@ class ResetPasswordService
 
     private function setEmailInToSession(
         Request $request
-    )
+    ): void
     {
         $request->getSession()->set('reset_password_email', $this->user->getEmail());
     }
 
     private function sendEmailWithCode(
         string $code
-    )
+    ): void
     {
         $this->emailService->createEmail(
             $this->user->getEmail(),
@@ -86,7 +90,80 @@ class ResetPasswordService
         $this->emailService->sendEmail();
     }
 
+    public function validateCode(
+        Request $request,
+        ?string $code
+    ): null|string
+    {
+        if (is_null($code)) {
+            return 'Incorrect request';
+        }
 
+        $email = $request->getSession()->get('reset_password_email');
+        $this->user = $this->userRepository->findOneBy(['email' => $email]);
+        $this->reset = $this->resetPasswordRequestRepository->findOneBy(['user' => $this->user, 'code' => $code]);
+
+        if (is_null($this->reset)) {
+            return 'Wrong code. Request new one!';
+        }
+
+        if (new DateTime() >= $this->reset->getExpiresOn()) {
+            return 'Code expired. Request new one!';
+        }
+
+        return null;
+    }
+
+    public function setSessionIsVerifiedForResetPassword(
+        Request $request
+    ): void
+    {
+        $request->getSession()->set('is_verified_for_reset_password', true);
+    }
+
+    public function removeEntry(): void
+    {
+        $this->resetPasswordRequestRepository->deleteEntry($this->reset);
+    }
+
+    public function validatePassword(
+        array $data,
+        string $email
+    ): null|string
+    {
+        if (count($data) === 0) {
+            return null;
+        }
+
+        $password = $data['password'];
+
+        if (strlen($password) < 10) {
+            return 'Password is to short.';
+        }
+
+        $this->user = $this->userRepository->findOneBy(['email' => $email]);
+        $this->hash = $this->passwordHasher->hashPassword($this->user, $data['password']);
+
+        if ($this->hash === $this->user->getPassword()) {
+            return 'Do not use your previous password.';
+        }
+
+        return null;
+    }
+
+    public function saveNewPassword(): void
+    {
+        $this->user->setPassword($this->hash);
+        $this->userRepository->flushEntity();
+    }
+
+    public function removeSessionsForResettingPassword(
+        Request $request
+    ): void
+    {
+        $request->getSession()->remove('reset_password_email');
+        $request->getSession()->remove('is_verified_for_reset_password');
+    }
 
 
 }

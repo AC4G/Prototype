@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="w-fit h-fit mx-auto mt-[300px]">
+        <div class="h-fit w-fit mx-auto">
+            <p class="text-[24px] font-inter break-normal">Reset your password</p>
+        </div>
+        {% if error is not null %}
+            <div class="mx-auto mt-[20px] border-2 bg-red-100 border-red-400 rounded w-[260px] h-[40px] pt-[6px]">
+                <p class="font-inter text-[14px] text-center break-normal opacity-[96%]">{{ error }}</p>
+            </div>
+        {% endif %}
+        <div class="w-[240px] h-fit mx-auto mt-[20px]">
+            <p class="text-[14px] font-inter break-normal text-center">Enter the code from your email.</p>
+        </div>
+        {{ form_start(form) }}
+        <div class="h-fit w-fit mx-auto mt-[10px]">
+            {{ form_row(form.code) }}
+        </div>
+        <div class="h-[2px] w-[260px] bg-[#2e4053] rounded"></div>
+        {{ form_row(form.token) }}
+        <div class="h-fit w-fit mx-auto mt-[40px]">
+            {{ form_row(form.submit) }}
+        </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

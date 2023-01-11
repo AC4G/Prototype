@@ -106,7 +106,7 @@ select:-webkit-autofill {
     @apply accent-black;
 }
 
-.r-pwd-email {
+.r-pwd-input {
     @apply w-[260px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none
 }
 

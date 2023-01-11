@@ -2,15 +2,14 @@
 
 namespace App\Form\ResetPassword;
 
-use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
-class EmailFormType extends AbstractType
+final class EmailFormType extends AbstractType
 {
     public function buildForm(
         FormBuilderInterface $builder,
@@ -24,7 +23,7 @@ class EmailFormType extends AbstractType
                 ],
                 'required' => true,
                 'attr' => [
-                    'class' => 'r-pwd-email',
+                    'class' => 'r-pwd-input',
                     'placeholder' => 'Enter your Email...'
                 ],
                 'label' => false
@@ -44,7 +43,7 @@ class EmailFormType extends AbstractType
         $resolver->setDefaults([
             'csrf_protection' => true,
             'csrf_field_name' => 'token',
-            'csrf_token_id' => 'user_item',
+            'csrf_token_id' => 'reset_password_email',
         ]);
     }
 }

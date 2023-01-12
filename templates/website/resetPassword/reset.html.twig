@@ -32,8 +32,15 @@
         </div>
         <div class="h-[2px] w-[260px] bg-[#2e4053] rounded"></div>
         {{ form_row(form.token) }}
-        <div class="h-fit w-fit mx-auto mt-[40px]">
-            {{ form_row(form.save) }}
+        <div class="w-[220px] h-fit flex mx-auto justify-between mt-[40px]">
+            <div class="h-fit w-fit pt-[6px]">
+                <a class="hover:text-grey transition inline-block align-middle" href="{{ path('login') }}">
+                    <p class="font-inter text-[16px]">Cancel</p>
+                </a>
+            </div>
+            <div class="h-fit w-fit">
+                {{ form_row(form.save) }}
+            </div>
         </div>
         {{ form_end(form) }}
     </div>

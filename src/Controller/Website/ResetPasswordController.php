@@ -26,6 +26,14 @@ final class ResetPasswordController extends AbstractController
         Request $request
     ): Response
     {
+        $email = $request->query->get('newCode');
+
+        if (!is_null($email) && str_contains($this->resetPasswordService->validateEmail(['email' => urldecode($email)]), 'Reset code already sent to this Email')) {
+            $this->resetPasswordService->updateEntrySendEmailAndSetSession($request);
+
+            return $this->redirectToRoute('password_forgotten_verify');
+        }
+
         if (!is_null($this->getUser())) {
             return $this->redirectToRoute('home');
         }
@@ -35,7 +43,8 @@ final class ResetPasswordController extends AbstractController
         if (!$request->isMethod('POST')) {
             return $this->renderForm('website/resetPassword/email.html.twig', [
                 'error' => null,
-                'form' => $form
+                'form' => $form,
+                'email' => ''
             ]);
         }
 
@@ -45,7 +54,8 @@ final class ResetPasswordController extends AbstractController
         if (!$form->isSubmitted() || !$form->isValid() || !is_null($error)) {
             return $this->renderForm('website/resetPassword/email.html.twig', [
                 'error' => $error,
-                'form' => $form
+                'form' => $form,
+                'email' => array_key_exists('email', $form->getData()) ? urlencode($form->getData()['email']) : ''
             ]);
         }
 
@@ -73,7 +83,22 @@ final class ResetPasswordController extends AbstractController
 
         $form = $this->createForm(CodeFormType::class);
 
-        if (!$request->isMethod('POST')) {
+        $newCode = (bool)$request->query->get('newCode');
+
+        if ($newCode === true && !$request->isMethod('POST')) {
+            $entryExists = $this->resetPasswordService->entryExists($email);
+
+            if ($entryExists === false) {
+                $this->addFlash('error', 'Retype your Email again!');
+
+                return $this->redirectToRoute('password_forgotten');
+            }
+
+            $this->resetPasswordService->setResetByUser();
+            $this->resetPasswordService->updateEntryAndSendEmail();
+        }
+
+        if (!$request->isMethod('POST') || $newCode === true && !$request->isMethod('POST')) {
             return $this->renderForm('website/resetPassword/code.html.twig', [
                 'form' => $form,
                 'error' => null

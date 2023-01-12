@@ -40,6 +40,12 @@ final class ResetPasswordService
             return 'The specified email cannot be used for recovering.';
         }
 
+        $reset = $this->resetPasswordRequestRepository->findOneBy(['user' => $this->user]);
+
+        if (!is_null($reset)) {
+            return 'Reset code already sent to this Email. Request new one?';
+        }
+
         return null;
     }
 
@@ -157,12 +163,50 @@ final class ResetPasswordService
         $this->userRepository->flushEntity();
     }
 
+    public function setResetByUser(): void
+    {
+        $this->reset = $this->resetPasswordRequestRepository->findOneBy(['user' => $this->user]);
+    }
+
     public function removeSessionsForResettingPassword(
         Request $request
     ): void
     {
         $request->getSession()->remove('reset_password_email');
         $request->getSession()->remove('is_verified_for_reset_password');
+    }
+
+    public function updateEntryAndSendEmail(): void
+    {
+        $code = (string)mt_rand(000000, 999999);
+
+        $this->reset
+            ->setCode($code)
+            ->setCreatedOn(new DateTime())
+            ->setExpiresOn(new DateTime('+ 5 minutes'))
+        ;
+
+        $this->resetPasswordRequestRepository->flushEntity();
+
+        $this->sendEmailWithCode($code);
+    }
+
+    public function updateEntrySendEmailAndSetSession(
+        Request $request
+    ): void
+    {
+        $this->updateEntryAndSendEmail();
+        $this->setEmailInToSession($request);
+    }
+
+    public function entryExists(
+        string $email
+    ): bool
+    {
+        $this->user = $this->userRepository->findOneBy(['email' => $email]);
+        $reset = $this->resetPasswordRequestRepository->findOneBy(['user' => $this->user]);
+
+        return !is_null($reset);
     }
 
 

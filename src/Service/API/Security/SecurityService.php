@@ -21,11 +21,11 @@ use App\Repository\RefreshTokenRepository;
 final class SecurityService
 {
     public function __construct(
-        private RefreshTokenRepository $refreshTokenRepository,
-        private AccessTokenRepository $accessTokenRepository,
-        private AuthTokenRepository $authTokenRepository,
-        private UserRolesRepository $userRolesRepository,
-        private UserRepository $userRepository
+        private readonly RefreshTokenRepository $refreshTokenRepository,
+        private readonly AccessTokenRepository $accessTokenRepository,
+        private readonly AuthTokenRepository $authTokenRepository,
+        private readonly UserRolesRepository $userRolesRepository,
+        private readonly UserRepository $userRepository
     )
     {
     }
@@ -44,6 +44,7 @@ final class SecurityService
             ->setUser($client->getProject()->getDeveloper()->getUser())
             ->setAccessToken($token)
             ->setProject($client->getProject())
+            ->setCreationDate(new DateTime())
             ->setExpireDate($expire)
             ->setScopes(['read', 'write', 'modify'])
         ;
@@ -115,6 +116,7 @@ final class SecurityService
             ->setUser($authToken->getUser())
             ->setProject($authToken->getProject())
             ->setAccessToken(bin2hex(random_bytes(64)))
+            ->setCreationDate(new DateTime())
             ->setExpireDate($expire)
             ->setScopes($authToken->getScopes())
         ;
@@ -127,6 +129,7 @@ final class SecurityService
             ->setUser($authToken->getUser())
             ->setProject($authToken->getProject())
             ->setRefreshToken(bin2hex(random_bytes(64)))
+            ->setCreationDate(new DateTime())
             ->setExpireDate(new DateTime('+15 day'))
             ->setScopes($authToken->getScopes())
         ;
@@ -159,6 +162,7 @@ final class SecurityService
             ->setUser($oldRefreshToken->getUser())
             ->setProject($oldRefreshToken->getProject())
             ->setAccessToken(bin2hex(random_bytes(64)))
+            ->setCreationDate(new DateTime())
             ->setExpireDate($expire)
             ->setScopes($oldRefreshToken->getScopes())
         ;
@@ -171,6 +175,7 @@ final class SecurityService
             ->setUser($oldRefreshToken->getUser())
             ->setProject($oldRefreshToken->getProject())
             ->setRefreshToken(bin2hex(random_bytes(64)))
+            ->setCreationDate(new DateTime())
             ->setExpireDate(new DateTime('+15 day'))
             ->setScopes($oldRefreshToken->getScopes())
         ;

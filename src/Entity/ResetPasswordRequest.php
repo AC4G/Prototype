@@ -43,29 +43,22 @@ final class ResetPasswordRequest
     /**
      * @var DateTime
      *
-     * @ORM\Column(name="created_on", type="datetime", nullable=false)
+     * @ORM\Column(name="creation_date", type="datetime", nullable=false)
      */
-    private DateTime $createdOn;
+    private DateTime $creationDate;
 
     /**
      * @var DateTime
      *
-     * @ORM\Column(name="expire_on", type="datetime", nullable=false)
+     * @ORM\Column(name="expireDate", type="datetime", nullable=false)
      */
-    private DateTime $expiresOn;
+    private DateTime $expireDate;
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     * @return ResetPasswordRequest
-     */
     public function setId(int $id): self
     {
         $this->id = $id;
@@ -73,18 +66,11 @@ final class ResetPasswordRequest
         return $this;
     }
 
-    /**
-     * @return User
-     */
     public function getUser(): User
     {
         return $this->user;
     }
 
-    /**
-     * @param User $user
-     * @return ResetPasswordRequest
-     */
     public function setUser(User $user): self
     {
         $this->user = $user;
@@ -92,18 +78,11 @@ final class ResetPasswordRequest
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @param string $code
-     * @return ResetPasswordRequest
-     */
     public function setCode(string $code): self
     {
         $this->code = $code;
@@ -111,39 +90,26 @@ final class ResetPasswordRequest
         return $this;
     }
 
-    /**
-     * @return DateTime
-     */
-    public function getCreatedOn(): DateTime
+    public function getCreationDate(): DateTime
     {
-        return $this->createdOn;
+        return $this->creationDate;
     }
 
-    /**
-     * @param DateTime $createdOn
-     * @return ResetPasswordRequest
-     */
-    public function setCreatedOn(DateTime $createdOn): self
+    public function setCreationDate(DateTime $creationDate): self
     {
-        $this->createdOn = $createdOn;
+        $this->creationDate = $creationDate;
 
         return $this;
     }
 
-    /**
-     * @return DateTime
-     */
-    public function getExpiresOn(): DateTime
+    public function getExpireDate(): DateTime
     {
-        return $this->expiresOn;
+        return $this->expireDate;
     }
 
-    /**
-     * @param DateTime $expiresOn
-     */
-    public function setExpiresOn(DateTime $expiresOn): self
+    public function setExpireDate(DateTime $expireDate): self
     {
-        $this->expiresOn = $expiresOn;
+        $this->expireDate = $expireDate;
 
         return $this;
     }

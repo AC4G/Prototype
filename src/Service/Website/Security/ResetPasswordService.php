@@ -66,8 +66,8 @@ final class ResetPasswordService
         $resetPasswordRequest
             ->setUser($this->user)
             ->setCode($code)
-            ->setCreatedOn(new DateTime())
-            ->setExpiresOn(new DateTime('+ 5 minutes'))
+            ->setCreationDate(new DateTime())
+            ->setExpireDate(new DateTime('+ 5 minutes'))
         ;
 
         $this->resetPasswordRequestRepository->persistAndFlushEntity($resetPasswordRequest);
@@ -113,7 +113,7 @@ final class ResetPasswordService
             return 'Wrong code. Request new one!';
         }
 
-        if (new DateTime() >= $this->reset->getExpiresOn()) {
+        if (new DateTime() >= $this->reset->getExpireDate()) {
             return 'Code expired. Request new one!';
         }
 
@@ -182,8 +182,8 @@ final class ResetPasswordService
 
         $this->reset
             ->setCode($code)
-            ->setCreatedOn(new DateTime())
-            ->setExpiresOn(new DateTime('+ 5 minutes'))
+            ->setCreationDate(new DateTime())
+            ->setExpireDate(new DateTime('+ 5 minutes'))
         ;
 
         $this->resetPasswordRequestRepository->flushEntity();

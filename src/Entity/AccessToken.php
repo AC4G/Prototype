@@ -39,6 +39,13 @@ class AccessToken
     private array $scopes = [];
 
     /**
+     * @var DateTime|null
+     *
+     * @ORM\Column(name="creation_date", type="datetime", nullable=true)
+     */
+    private ?DateTime $creationDate;
+
+    /**
      * @var DateTime
      *
      * @ORM\Column(name="expire_date", type="datetime", nullable=false)
@@ -70,6 +77,13 @@ class AccessToken
         return $this->id;
     }
 
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getAccessToken(): ?string
     {
         return $this->accessToken;
@@ -87,12 +101,21 @@ class AccessToken
         return array_values($this->scopes);
     }
 
-    /**
-     * @param array $scopes
-     */
     public function setScopes(array $scopes): void
     {
         $this->scopes = $scopes;
+    }
+
+    public function getCreationDate(): ?DateTime
+    {
+        return $this->creationDate;
+    }
+
+    public function setCreationDate(?DateTime $creationDate): self
+    {
+        $this->creationDate = $creationDate;
+
+        return $this;
     }
 
     public function getExpireDate(): ?DateTime

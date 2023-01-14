@@ -12,7 +12,6 @@ use App\Repository\ScopeRepository;
 use App\Repository\AuthTokenRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-
 final class SecurityService
 {
 
@@ -21,10 +20,10 @@ final class SecurityService
     private array $scopes = [];
 
     public function __construct(
-        private AuthTokenRepository $authTokenRepository,
-        private ClientRepository $clientRepository,
-        private WebAppRepository $webAppRepository,
-        private ScopeRepository $scopeRepository
+        private readonly AuthTokenRepository $authTokenRepository,
+        private readonly ClientRepository $clientRepository,
+        private readonly WebAppRepository $webAppRepository,
+        private readonly ScopeRepository $scopeRepository
     )
     {
     }
@@ -141,6 +140,7 @@ final class SecurityService
             ->setUser($user)
             ->setProject($client->getProject())
             ->setAuthToken(bin2hex(random_bytes(64)))
+            ->setCreationDate(new DateTime())
             ->setExpireDate(new DateTime('+ 7days'))
             ->setScopes($webApp->getScopes())
         ;

@@ -32,6 +32,13 @@ class RefreshToken
     private string $refreshToken;
 
     /**
+     * @var DateTime|null
+     *
+     * @ORM\Column(name="creation_date", type="datetime", nullable=true)
+     */
+    private ?DateTime $creationDate;
+
+    /**
      * @var DateTime
      *
      * @ORM\Column(name="expire_date", type="datetime", nullable=false)
@@ -70,6 +77,13 @@ class RefreshToken
         return $this->id;
     }
 
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getRefreshToken(): ?string
     {
         return $this->refreshToken;
@@ -78,6 +92,18 @@ class RefreshToken
     public function setRefreshToken(string $refreshToken): self
     {
         $this->refreshToken = $refreshToken;
+
+        return $this;
+    }
+
+    public function getCreationDate(): ?DateTime
+    {
+        return $this->creationDate;
+    }
+
+    public function setCreationDate(?DateTime $creationDate): self
+    {
+        $this->creationDate = $creationDate;
 
         return $this;
     }

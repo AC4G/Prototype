@@ -35,6 +35,13 @@ class AuthToken
     /**
      * @var DateTime|null
      *
+     * @ORM\Column(name="creation_date", type="datetime", nullable=true)
+     */
+    private ?DateTime $creationDate;
+
+    /**
+     * @var DateTime|null
+     *
      * @ORM\Column(name="expire_date", type="datetime", nullable=true)
      */
     private ?DateTime $expireDate;
@@ -79,6 +86,18 @@ class AuthToken
     public function setAuthToken(string $authToken): self
     {
         $this->authToken = $authToken;
+
+        return $this;
+    }
+
+    public function getCreationDate(): ?DateTime
+    {
+        return $this->creationDate;
+    }
+
+    public function setCreationDate(?DateTime $creationDate): self
+    {
+        $this->creationDate = $creationDate;
 
         return $this;
     }

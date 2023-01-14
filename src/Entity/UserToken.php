@@ -8,10 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Token
  *
- * @ORM\Table(name="token", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="user_id_UNIQUE", columns={"user_id"}), @ORM\UniqueConstraint(name="token_UNIQUE", columns={"token"})}, indexes={@ORM\Index(name="fk_User_Id_Token_Type", columns={"user_id", "token", "token_type"})})
+ * @ORM\Table(name="user_token", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="user_id_UNIQUE", columns={"user_id"}), @ORM\UniqueConstraint(name="token_UNIQUE", columns={"token"})}, indexes={@ORM\Index(name="fk_User_Id_User_Token_Type", columns={"user_id", "token", "token_type"})})
  * @ORM\Entity(repositoryClass="App\Repository\TokenRepository")
  */
-class Token
+class UserToken
 {
     /**
      * @var int
@@ -47,15 +47,29 @@ class Token
     private string $type;
 
     /**
-     * @var DateTime
+     * @var DateTime|null
      *
-     * @ORM\Column(name="expire_date", type="datetime", nullable=false)
+     * @ORM\Column(name="creation_date", type="datetime", nullable=true)
      */
-    private DateTime $expireDate;
+    private ?DateTime $creationDate;
+
+    /**
+     * @var null|DateTime
+     *
+     * @ORM\Column(name="expire_date", type="datetime", nullable=true)
+     */
+    private ?DateTime $expireDate = null;
 
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getUser(): ?User
@@ -94,15 +108,29 @@ class Token
         return $this;
     }
 
+    public function getCreationDate(): ?DateTime
+    {
+        return $this->creationDate;
+    }
+
+    public function setCreationDate(?DateTime $creationDate): self
+    {
+        $this->creationDate = $creationDate;
+
+        return $this;
+    }
+
     public function getExpireDate(): ?DateTime
     {
         return $this->expireDate;
     }
 
-    public function setExpireDate(DateTime $expireDate): self
+    public function setExpireDate(?DateTime $expireDate): self
     {
         $this->expireDate = $expireDate;
 
         return $this;
     }
+
+
 }

@@ -3,6 +3,10 @@
 namespace App\Command;
 
 use DateTime;
+use App\Repository\UserTokenRepository;
+use App\Repository\AuthTokenRepository;
+use App\Repository\AccessTokenRepository;
+use App\Repository\RefreshTokenRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -13,13 +17,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'app:delete-expired-tokens',
-    description: 'Deletes all reset password codes which are expired.',
+    description: 'Deletes all tokens from table which are expired.',
     hidden: false
 )]
 final class DeleteExpiredTokens extends Command
 {
     public function __construct(
-        private readonly ResetPasswordRequestRepository $resetPasswordRequestRepository
+        private readonly ResetPasswordRequestRepository $resetPasswordRequestRepository,
+        private readonly RefreshTokenRepository $refreshTokenRepository,
+        private readonly AccessTokenRepository $accessTokenRepository,
+        private readonly AuthTokenRepository $authTokenRepository,
+        private readonly UserTokenRepository $userTokenRepository
     )
     {
         parent::__construct();
@@ -48,22 +56,22 @@ final class DeleteExpiredTokens extends Command
         $pastedTable = $input->getArgument('table');
 
         if (!in_array($pastedTable, $availableTable)) {
-            $output->writeln('Entity ' . $pastedTable .' does not exists');
-            $output->writeln('Use the command | app:reset-expired-tokens --help | to find the available entities.');
+            $output->writeln('Table ' . $pastedTable .' does not exists!');
+            $output->writeln('Use the command | app:reset-expired-tokens --help | to find out the available tables.');
             return Command::FAILURE;
         }
 
-        $progressBarOutput = $output->section();
         $messageOutput = $output->section();
+        $progressBarOutput = $output->section();
 
         $progressBar = new ProgressBar($progressBarOutput, 2);
 
-        $this->createMessage($messageOutput, 'Building environment...');
+        $this->createMessage($messageOutput, 'Building environment');
 
         $repository = $this->buildRepository($pastedTable);
         $progressBar->advance();
 
-        $this->createMessage($messageOutput, 'Searching and deleting expired tokens...');
+        $this->createMessage($messageOutput, 'Searching and deleting expired tokens');
 
         $expiredTokens = $this->searchingAndDeletingExpiredTokens($repository);
         $progressBar->advance();
@@ -74,9 +82,10 @@ final class DeleteExpiredTokens extends Command
             return Command::SUCCESS;
         }
 
-        $this->createMessage($messageOutput, 'Expired tokens found: ' . $expiredTokens);
+        $this->createMessage($messageOutput, 'Done');
         $progressBar->finish();
 
+        $output->writeln('Expired tokens found: ' . $expiredTokens);
         $output->writeln('Successfully deleted all expired tokens');
         return Command::SUCCESS;
     }
@@ -111,8 +120,8 @@ final class DeleteExpiredTokens extends Command
 
         foreach($data as $token) {
             if ($token->getExpireDate() < new DateTime()) {
-                $expiredToken += 1;
                 $repository->deleteEntry($token);
+                $expiredToken += 1;
             }
         }
 

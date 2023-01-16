@@ -9,10 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * ResetPasswordRequest
  *
- * @ORM\Table(name="reset_password_request", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"})}, indexes={@ORM\Index(name="fk_ResetPassword_Request_User_idx", columns={"user_id"})})
- * @ORM\Entity(repositoryClass="App\Repository\ResetPasswordRequestRepository")
+ * @ORM\Table(name="reset_password_token", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"})}, indexes={@ORM\Index(name="fk_ResetPassword_Request_User_idx", columns={"user_id"})})
+ * @ORM\Entity(repositoryClass="ResetPasswordTokenRepository")
  */
-final class ResetPasswordRequest
+final class ResetPasswordToken
 {
     /**
      * @var int

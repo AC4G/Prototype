@@ -8,10 +8,10 @@ use App\Repository\AuthTokenRepository;
 use App\Repository\AccessTokenRepository;
 use App\Repository\RefreshTokenRepository;
 use Symfony\Component\Console\Command\Command;
+use App\Repository\ResetPasswordTokenRepository;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
-use App\Repository\ResetPasswordRequestRepository;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -23,11 +23,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class DeleteExpiredTokens extends Command
 {
     public function __construct(
-        private readonly ResetPasswordRequestRepository $resetPasswordRequestRepository,
-        private readonly RefreshTokenRepository $refreshTokenRepository,
-        private readonly AccessTokenRepository $accessTokenRepository,
-        private readonly AuthTokenRepository $authTokenRepository,
-        private readonly UserTokenRepository $userTokenRepository
+        private readonly ResetPasswordTokenRepository $resetPasswordTokenRepository,
+        private readonly RefreshTokenRepository  $refreshTokenRepository,
+        private readonly AccessTokenRepository   $accessTokenRepository,
+        private readonly AuthTokenRepository     $authTokenRepository,
+        private readonly UserTokenRepository     $userTokenRepository
     )
     {
         parent::__construct();
@@ -102,10 +102,6 @@ final class DeleteExpiredTokens extends Command
         string $pastedTable
     ): object
     {
-        if ($pastedTable === 'resetPassword') {
-            return $this->resetPasswordRequestRepository;
-        }
-
         $repositoryName = $pastedTable . 'TokenRepository';
 
         return $this->$repositoryName;

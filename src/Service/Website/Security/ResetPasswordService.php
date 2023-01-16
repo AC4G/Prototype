@@ -4,21 +4,21 @@ namespace App\Service\Website\Security;
 
 use DateTime;
 use App\Entity\User;
+use App\Entity\ResetPasswordToken;
 use App\Repository\UserRepository;
-use App\Entity\ResetPasswordRequest;
 use App\Service\Website\Email\EmailService;
 use Symfony\Component\HttpFoundation\Request;
-use App\Repository\ResetPasswordRequestRepository;
+use App\Repository\ResetPasswordTokenRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class ResetPasswordService
 {
     private string $hash;
     private User|null $user = null;
-    private ResetPasswordRequest|null $reset = null;
+    private ResetPasswordToken|null $reset = null;
 
     public function __construct(
-        private readonly ResetPasswordRequestRepository $resetPasswordRequestRepository,
+        private readonly ResetPasswordTokenRepository $resetPasswordTokenRepository,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly UserRepository $userRepository,
         private readonly EmailService $emailService
@@ -40,7 +40,7 @@ final class ResetPasswordService
             return 'The specified email cannot be used for recovering.';
         }
 
-        $reset = $this->resetPasswordRequestRepository->findOneBy(['user' => $this->user]);
+        $reset = $this->resetPasswordTokenRepository->findOneBy(['user' => $this->user]);
 
         if (!is_null($reset)) {
             return 'Reset code already sent to this Email. Request new one?';
@@ -60,17 +60,17 @@ final class ResetPasswordService
 
     private function generateCodeAndCreateEntry(): string
     {
-        $resetPasswordRequest = new ResetPasswordRequest();
+        $resetPasswordToken = new ResetPasswordToken();
         $code = (string)mt_rand(000000, 999999);
 
-        $resetPasswordRequest
+        $resetPasswordToken
             ->setUser($this->user)
             ->setCode($code)
             ->setCreationDate(new DateTime())
             ->setExpireDate(new DateTime('+ 5 minutes'))
         ;
 
-        $this->resetPasswordRequestRepository->persistAndFlushEntity($resetPasswordRequest);
+        $this->resetPasswordTokenRepository->persistAndFlushEntity($resetPasswordToken);
 
         return $code;
     }
@@ -107,13 +107,13 @@ final class ResetPasswordService
 
         $email = $request->getSession()->get('reset_password_email');
         $this->user = $this->userRepository->findOneBy(['email' => $email]);
-        $this->reset = $this->resetPasswordRequestRepository->findOneBy(['user' => $this->user, 'code' => $code]);
+        $this->reset = $this->resetPasswordTokenRepository->findOneBy(['user' => $this->user, 'code' => $code]);
 
         if (is_null($this->reset)) {
             return 'Wrong code. Request new one!';
         }
 
-        if (new DateTime() >= $this->reset->getExpireDate()) {
+        if (new DateTime() > $this->reset->getExpireDate()) {
             return 'Code expired. Request new one!';
         }
 
@@ -129,7 +129,7 @@ final class ResetPasswordService
 
     public function removeEntry(): void
     {
-        $this->resetPasswordRequestRepository->deleteEntry($this->reset);
+        $this->resetPasswordTokenRepository->deleteEntry($this->reset);
     }
 
     public function validatePassword(
@@ -165,7 +165,7 @@ final class ResetPasswordService
 
     public function setResetByUser(): void
     {
-        $this->reset = $this->resetPasswordRequestRepository->findOneBy(['user' => $this->user]);
+        $this->reset = $this->resetPasswordTokenRepository->findOneBy(['user' => $this->user]);
     }
 
     public function removeSessionsForResettingPassword(
@@ -186,7 +186,7 @@ final class ResetPasswordService
             ->setExpireDate(new DateTime('+ 5 minutes'))
         ;
 
-        $this->resetPasswordRequestRepository->flushEntity();
+        $this->resetPasswordTokenRepository->flushEntity();
 
         $this->sendEmailWithCode($code);
     }
@@ -204,10 +204,12 @@ final class ResetPasswordService
     ): bool
     {
         $this->user = $this->userRepository->findOneBy(['email' => $email]);
-        $reset = $this->resetPasswordRequestRepository->findOneBy(['user' => $this->user]);
+        $reset = $this->resetPasswordTokenRepository->findOneBy(['user' => $this->user]);
 
         return !is_null($reset);
     }
+
+
 
 
 }

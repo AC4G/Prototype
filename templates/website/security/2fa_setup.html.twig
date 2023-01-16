@@ -21,6 +21,16 @@
             <p class="font-inter text-[16px] text-center break-all">{{ code }}</p>
         </div>
     </div>
+    <div class="w-fit h-fit mx-auto mt-[8px]">
+        <div class="">
+            <p class=""></p>
+        </div>
+        {% for token in reset_tokens %}
+            <div class="w-fit h-fit mx-auto mt-[12px]">
+                <p class="font-inter text-[16px] text-center">{{ token.getToken }}</p>
+            </div>
+        {% endfor %}
+    </div>
     <div class="w-fit h-fit mx-auto mt-[30px]">
         <form action="{{ path('dashboard_profile_two_factor_authentication') }}?action=enable" method="post">
             <div class="w-fit h-fit">

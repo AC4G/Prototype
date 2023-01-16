@@ -2,8 +2,11 @@
 
 namespace App\Service\Website\Dashboard;
 
+use DateTime;
 use App\Entity\User;
+use App\Entity\UserToken;
 use chillerlan\QRCode\QRCode;
+use App\Repository\UserTokenRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\Website\Account\AccountService;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -14,6 +17,7 @@ final class ProfileService
 {
     public function __construct(
         private readonly GoogleAuthenticatorInterface $googleAuthenticator,
+        private readonly UserTokenRepository $userTokenRepository,
         private readonly AccountService $accountService
     )
     {
@@ -59,15 +63,7 @@ final class ProfileService
         Request $request
     ): void
     {
-        $privacy = $request->request->get('privacy');
-
-        if ($privacy === '1') {
-            $privacy = true;
-        }
-
-        if ($privacy === '0') {
-            $privacy = false;
-        }
+        $privacy = (bool)$request->request->get('privacy');
 
         $this->accountService->updateProfilePrivacy($privacy, $user);
     }
@@ -116,6 +112,34 @@ final class ProfileService
         $qrCode = new QRCode();
 
         return $qrCode->render($this->googleAuthenticator->getQRContent($user));
+    }
+
+    public function getOrGenerateTwoStepVerificationResetTokens(
+        User $user
+    ): array
+    {
+        $existingTokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-reset']);
+
+        if (count($existingTokens) > 0) {
+            return $existingTokens;
+        }
+
+        $tokens = [];
+
+        for ($i = 0; $i < 3; $i++) {
+            $tokens[$i] = new UserToken();
+
+            $tokens[$i]
+                ->setUser($user)
+                ->setToken(bin2hex(random_bytes(8)))
+                ->setType('2fa-recovery')
+                ->setCreationDate(new DateTime())
+            ;
+
+            $this->userTokenRepository->persistAndFlushEntity($tokens[$i]);
+        }
+
+        return $tokens;
     }
 
     public function isTwofaCodeValid(

@@ -1286,6 +1286,10 @@ video {
   width: 240px;
 }
 
+.w-\[220px\] {
+  width: 220px;
+}
+
 .w-\[100px\] {
   width: 100px;
 }
@@ -1296,10 +1300,6 @@ video {
 
 .w-\[60\%\] {
   width: 60%;
-}
-
-.w-\[220px\] {
-  width: 220px;
 }
 
 .max-w-\[1000px\] {
@@ -1665,14 +1665,6 @@ video {
 
 .pt-\[19\.5px\] {
   padding-top: 19.5px;
-}
-
-.pt-\[0px\] {
-  padding-top: 0px;
-}
-
-.pt-\[8px\] {
-  padding-top: 8px;
 }
 
 .text-center {

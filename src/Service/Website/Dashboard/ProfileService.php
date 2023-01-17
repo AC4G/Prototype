@@ -118,7 +118,7 @@ final class ProfileService
         User $user
     ): array
     {
-        $existingTokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-reset']);
+        $existingTokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-recovery']);
 
         if (count($existingTokens) > 0) {
             return $existingTokens;
@@ -126,7 +126,7 @@ final class ProfileService
 
         $tokens = [];
 
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $tokens[$i] = new UserToken();
 
             $tokens[$i]

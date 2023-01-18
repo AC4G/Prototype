@@ -24,10 +24,10 @@ final class DeleteExpiredTokens extends Command
 {
     public function __construct(
         private readonly ResetPasswordTokenRepository $resetPasswordTokenRepository,
-        private readonly RefreshTokenRepository  $refreshTokenRepository,
-        private readonly AccessTokenRepository   $accessTokenRepository,
-        private readonly AuthTokenRepository     $authTokenRepository,
-        private readonly UserTokenRepository     $userTokenRepository
+        private readonly RefreshTokenRepository $refreshTokenRepository,
+        private readonly AccessTokenRepository $accessTokenRepository,
+        private readonly AuthTokenRepository $authTokenRepository,
+        private readonly UserTokenRepository $userTokenRepository
     )
     {
         parent::__construct();

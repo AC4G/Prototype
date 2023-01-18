@@ -29,19 +29,23 @@
             <p class="font-inter text-[14px] text-center break-normal">Recovery codes are used to access your account in the event you can not receive 2-Step verification codes.</p>
         </div>
         <div class="w-full h-[2px] bg-[#e5e7eb] mt-[12px]"></div>
-        <div class="flex w-[280px] h-[260px] mx-auto mt-[30px] flex-wrap gap-x-2 gap-y-0 justify-evenly">
+        <div id="2fa-recovery-codes" class="flex w-[280px] h-[260px] mx-auto mt-[30px] flex-wrap gap-x-2 gap-y-0 justify-evenly">
             {% for token in reset_tokens %}
-                <div class="w-fit h-fit">
-                    <p class="font-inter text-[14px] text-center">{{ token.getToken }}</p>
-                </div>
+                <p class="font-inter text-[14px] text-center w-fit h-fit token">{{ token.getToken }}</p>
             {% endfor %}
+        </div>
+        <div class="w-fit h-fit mx-auto mb-[30px]">
+            <button id="copy-recovery-codes" class="h-[30px] w-[60px] rounded font-inter text-[16px] bg-[#e5e7eb] hover:bg-[#bcd7f7] shadow-md transition" type="button" onclick="copyRecoveryTokensToClipBoard()">Copy</button>
+            <div id="copied" class="select-none opacity-0 w-fit h-fit pr-[4px] pt-[2px] pl-[4px] pb-[2px] absolute inline-block mt-[2px] ml-[10px] rounded z-[10] bg-[#1a1b1c] transition">
+                <p class="font-inter text-[14px] text-white">Copied</p>
+            </div>
         </div>
         <div class="w-full h-[2px] bg-[#e5e7eb]"></div>
         <div class="w-[280px] h-fit mx-auto mt-[12px] rounded bg-[#e5e7eb] pt-[6px] pl-[4px] pr-[4px] pb-[6px]">
             <p class="font-inter text-center text-[14px] font-bold">Safe the recovery codes secure, far from third parties!</p>
         </div>
     </div>
-    <div class="w-fit h-fit mx-auto mt-[30px] mb-[100px]">
+    <div class="w-fit h-fit mx-auto mt-[50px] mb-[100px]">
         <form action="{{ path('dashboard_profile_two_factor_authentication') }}?action=enable" method="post">
             <div class="w-fit h-fit">
                 <input autocomplete="off" type="text" name="code" class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px]" placeholder="Type the verification code..." required/>

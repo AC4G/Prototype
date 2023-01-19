@@ -159,6 +159,7 @@ final class ProfileService
     ): void
     {
         $this->accountService->disableTwoStepVerification($user);
+        $this->accountService->removeTwoFaRecoveryTokens($user);
     }
 
     public function verifyTwoStepSecret(

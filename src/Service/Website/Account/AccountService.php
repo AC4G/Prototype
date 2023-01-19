@@ -5,6 +5,7 @@ namespace App\Service\Website\Account;
 use DateTime;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Repository\UserTokenRepository;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -15,6 +16,7 @@ final class AccountService
     public function __construct(
         private readonly GoogleAuthenticatorInterface $googleAuthenticator,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly UserTokenRepository $userTokenRepository,
         private readonly UserRepository $userRepository
     )
     {
@@ -192,6 +194,17 @@ final class AccountService
         ;
 
         $this->userRepository->flushEntity();
+    }
+
+    public function removeTwoFaRecoveryTokens(
+        User $user
+    ): void
+    {
+        $tokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-recovery']);
+
+        foreach ($tokens as $token) {
+            $this->userTokenRepository->deleteEntry($token);
+        }
     }
 
     public function setTwofaVerified(

@@ -11,23 +11,19 @@ cannotScanQRCodeButton.addEventListener('click', function () {
 async function copyRecoveryTokensToClipBoard() {
     if (window.isSecureContext && navigator.clipboard) {
         let tokens = '';
-        let counter = 0;
 
-        for (const token of twoFaRecoveryTokens) {
-            counter++;
-
+        twoFaRecoveryTokens.forEach((token, index) => {
             tokens += token.textContent;
 
-            if ((counter % 2) === 0) {
+            if ((index + 1) % 2 === 0) {
                 tokens += '\n';
-                continue;
             }
 
             tokens += ' ';
-        }
+        });
 
         await navigator.clipboard.writeText(tokens);
-        showCopiedNotification();
+        await showCopiedNotification();
     }
 }
 

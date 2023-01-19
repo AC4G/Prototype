@@ -184,7 +184,7 @@ final class AccountService
         $this->userRepository->flushEntity();
     }
 
-    public function disableTwoStepVerification(
+    public function unsetTwoStepVerification(
         User $user
     ): void
     {
@@ -196,7 +196,7 @@ final class AccountService
         $this->userRepository->flushEntity();
     }
 
-    public function removeTwoFaRecoveryTokens(
+    public function removeTwofaRecoveryTokens(
         User $user
     ): void
     {

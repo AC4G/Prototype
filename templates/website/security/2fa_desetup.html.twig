@@ -5,7 +5,7 @@
         <p class="font-inter text-[20px] text-center">2-Step Verification de Set Up</p>
     </div>
     <div class="w-fit h-fit mx-auto mt-[40px]">
-        <form action="{{ action }}" method="POST">
+        <form action="{{ path('dashboard_profile_two_factor_authentication') }}?action=disable" method="POST">
             <div class="w-fit h-fit">
                 <input autocomplete="off" type="text" name="code" class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px]" placeholder="Type the verification code..." required/>
             </div>

@@ -69,8 +69,20 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('dashboard_profile');
         }
 
-        if ($user->isTwoFaVerified() && $query['action'] === 'enable') {
+        if ($query['action'] === 'cancel' && !$user->isTwoFaVerified()) {
+            $this->profileService->removeTokensAndUnsetTwofa($user);
+
+            return $this->redirectToRoute('dashboard_profile');
+        }
+
+        if ($query['action'] === 'enable' && $user->isTwoFaVerified()) {
             $this->addFlash('error', '2-Step Verification already enabled!');
+
+            return $this->redirectToRoute('dashboard_profile');
+        }
+
+        if ($query['action'] === 'disable' && !$user->isTwoFaVerified()) {
+            $this->addFlash('error', '2-Step Verification already disabled!');
 
             return $this->redirectToRoute('dashboard_profile');
         }
@@ -86,7 +98,7 @@ class ProfileController extends AbstractController
                 ]);
             }
 
-            $this->profileService->disableTwoStepVerification($user);
+            $this->profileService->removeTokensAndUnsetTwofa($user);
             $this->addFlash('success', '2-Step Verification successfully disabled!');
 
             return $this->redirectToRoute('dashboard_profile');
@@ -109,9 +121,7 @@ class ProfileController extends AbstractController
         }
 
         if ($query['action'] === 'disable') {
-           return $this->render('website/security/2fa_desetup.html.twig', [
-               'action' => $this->redirectToRoute('dashboard_profile_two_factor_authentication')->getTargetUrl() . '?action=disable'
-           ]);
+           return $this->render('website/security/2fa_desetup.html.twig');
         }
 
         if (!$user->isGoogleAuthenticatorEnabled()) {

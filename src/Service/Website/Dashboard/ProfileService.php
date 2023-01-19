@@ -154,19 +154,19 @@ final class ProfileService
         return $this->accountService->isTwofaValid($user, $code);
     }
 
-    public function disableTwoStepVerification(
-        User $user
-    ): void
-    {
-        $this->accountService->disableTwoStepVerification($user);
-        $this->accountService->removeTwoFaRecoveryTokens($user);
-    }
-
     public function verifyTwoStepSecret(
         User $user
     ): void
     {
         $this->accountService->setTwofaVerified($user);
+    }
+
+    public function removeTokensAndUnsetTwofa(
+        User $user
+    ): void
+    {
+        $this->accountService->unsetTwoStepVerification($user);
+        $this->accountService->removeTwofaRecoveryTokens($user);
     }
 
 

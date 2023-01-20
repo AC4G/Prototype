@@ -72,7 +72,7 @@ final class SecurityController extends AbstractController
                 return $this->customResponse->errorResponse($request, 'Rejected!', 403);
             }
 
-            $payload = $this->securityService->createPayloadWithAccessAndRefreshTokenFromAuthToken($authToken);
+            $payload = $this->securityService->buildPayloadWithAccessAndRefreshToken($authToken, 'authorization_code');
 
             return new JsonResponse(
                 $payload,
@@ -105,7 +105,7 @@ final class SecurityController extends AbstractController
                 return $this->customResponse->errorResponse($request, 'Rejected!', 403);
             }
 
-            $payload = $this->securityService->createPayloadWithAccessAndRefreshTokenFromRefreshToken($refreshToken, $accessToken);
+            $payload = $this->securityService->buildPayloadWithAccessAndRefreshToken($refreshToken, 'refresh_token',$accessToken);
 
             return new JsonResponse(
                 $payload,

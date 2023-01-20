@@ -34,15 +34,13 @@ final class SecurityService
         Client $client
     ): array
     {
-        $token = bin2hex(random_bytes(64));
-
         $accessToken = new AccessToken();
 
         $expire = new DateTime('+1 day');
 
         $accessToken
             ->setUser($client->getProject()->getDeveloper()->getUser())
-            ->setAccessToken($token)
+            ->setAccessToken(bin2hex(random_bytes(64)))
             ->setProject($client->getProject())
             ->setCreationDate(new DateTime())
             ->setExpireDate($expire)
@@ -55,7 +53,7 @@ final class SecurityService
         $seconds = $diff->s + ($diff->m * 60) + ($diff->h * 3600);
 
         return [
-            'access_token' => $this->generateJWT($token),
+            'access_token' => $this->generateJWT($accessToken->getAccessToken()),
             'token_type' => 'bearer',
             'expires_in' => $seconds
         ];
@@ -104,8 +102,10 @@ final class SecurityService
         return get_object_vars($payload)['token'];
     }
 
-    public function createPayloadWithAccessAndRefreshTokenFromAuthToken(
-        AuthToken $authToken
+    public function buildPayloadWithAccessAndRefreshToken(
+        AuthToken|RefreshToken $token,
+        string $grantType,
+        AccessToken $oldAccessToken = null
     ): array
     {
         $accessToken = new AccessToken();
@@ -113,12 +113,12 @@ final class SecurityService
         $expire = new DateTime('+10 day');
 
         $accessToken
-            ->setUser($authToken->getUser())
-            ->setProject($authToken->getProject())
+            ->setUser($token->getUser())
+            ->setProject($token->getProject())
             ->setAccessToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
             ->setExpireDate($expire)
-            ->setScopes($authToken->getScopes())
+            ->setScopes($token->getScopes())
         ;
 
         $this->accessTokenRepository->persistAndFlushEntity($accessToken);
@@ -126,64 +126,21 @@ final class SecurityService
         $refreshToken = new RefreshToken();
 
         $refreshToken
-            ->setUser($authToken->getUser())
-            ->setProject($authToken->getProject())
+            ->setUser($token->getUser())
+            ->setProject($token->getProject())
             ->setRefreshToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
             ->setExpireDate(new DateTime('+15 day'))
-            ->setScopes($authToken->getScopes())
+            ->setScopes($token->getScopes())
         ;
 
         $this->refreshTokenRepository->persistAndFlushEntity($refreshToken);
 
-        $this->authTokenRepository->deleteEntry($authToken);
+        $this->authTokenRepository->deleteEntry($token);
 
-        $diff = $expire->diff(new DateTime());
-        $expireInSeconds = $diff->s + ($diff->m * 60) + ($diff->h * 3600) + ($diff->d * 3600 * 24);
-
-        return [
-            'access_token' => $this->generateJWT($accessToken->getAccessToken()),
-            'token_type' => 'bearer',
-            'expires_in' => $expireInSeconds,
-            'refresh_token' => $this->generateJWT($refreshToken->getRefreshToken())
-        ];
-    }
-
-    public function createPayloadWithAccessAndRefreshTokenFromRefreshToken(
-        RefreshToken $oldRefreshToken,
-        AccessToken $oldAccessToken
-    ): array
-    {
-        $accessToken = new AccessToken();
-
-        $expire = new DateTime('+10 day');
-
-        $accessToken
-            ->setUser($oldRefreshToken->getUser())
-            ->setProject($oldRefreshToken->getProject())
-            ->setAccessToken(bin2hex(random_bytes(64)))
-            ->setCreationDate(new DateTime())
-            ->setExpireDate($expire)
-            ->setScopes($oldRefreshToken->getScopes())
-        ;
-
-        $this->accessTokenRepository->persistAndFlushEntity($accessToken);
-
-        $refreshToken = new RefreshToken();
-
-        $refreshToken
-            ->setUser($oldRefreshToken->getUser())
-            ->setProject($oldRefreshToken->getProject())
-            ->setRefreshToken(bin2hex(random_bytes(64)))
-            ->setCreationDate(new DateTime())
-            ->setExpireDate(new DateTime('+15 day'))
-            ->setScopes($oldRefreshToken->getScopes())
-        ;
-
-        $this->refreshTokenRepository->persistAndFlushEntity($refreshToken);
-
-        $this->accessTokenRepository->deleteEntry($oldAccessToken);
-        $this->refreshTokenRepository->deleteEntry($oldRefreshToken);
+        if ($grantType === 'refresh_token' && $oldAccessToken instanceof AccessToken) {
+            $this->accessTokenRepository->deleteEntry($oldAccessToken);
+        }
 
         $diff = $expire->diff(new DateTime());
         $expireInSeconds = $diff->s + ($diff->m * 60) + ($diff->h * 3600) + ($diff->d * 3600 * 24);

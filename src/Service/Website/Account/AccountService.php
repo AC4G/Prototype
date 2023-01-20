@@ -185,7 +185,7 @@ final class AccountService
     }
 
     public function unsetTwoStepVerification(
-        User $user
+        User|UserInterface $user
     ): void
     {
         $user
@@ -197,7 +197,7 @@ final class AccountService
     }
 
     public function removeTwofaRecoveryTokens(
-        User $user
+        User|UserInterface $user
     ): void
     {
         $tokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-recovery']);

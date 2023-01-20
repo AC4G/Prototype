@@ -105,6 +105,8 @@ final class ProfileService
         }
     }
 
+    //##//
+
     public function generateTwoStepVerificationQRCode(
         TwoFactorInterface $user
     ): string

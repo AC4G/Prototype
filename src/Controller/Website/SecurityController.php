@@ -20,12 +20,12 @@ final class SecurityController extends AbstractController
     use TargetPathTrait;
 
     public function __construct(
-        private AuthenticationUtils $authenticationUtils,
-        private ClientRepository $clientRepository,
-        private WebAppRepository $webAppRepository,
-        private SecurityService $securityService,
-        private UserRepository $userRepository,
-        private Security $security
+        private readonly AuthenticationUtils $authenticationUtils,
+        private readonly ClientRepository $clientRepository,
+        private readonly WebAppRepository $webAppRepository,
+        private readonly SecurityService $securityService,
+        private readonly UserRepository $userRepository,
+        private readonly Security $security
     )
     {
     }

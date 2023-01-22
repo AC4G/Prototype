@@ -2,7 +2,7 @@
 
 namespace App\Engine\Search;
 
-use App\Service\API\Items\ItemsService;
+use App\Service\API\Items\ItemService;
 use App\Service\API\Project\ProjectService;
 use App\Service\API\Inventories\InventoriesService;
 
@@ -11,7 +11,7 @@ abstract class AbstractSearchEngine
     private array $amountOfOccurrence = [];
 
     public function __construct(
-        private readonly ItemsService
+        private readonly ItemService
         |InventoriesService
         |ProjectService $service
     )

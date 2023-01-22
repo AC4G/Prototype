@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\API\Items;
+namespace App\Service\API\Item;
 
 use App\Entity\Item;
 use App\Serializer\ItemNormalizer;
 use App\Repository\ItemRepository;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-final class ItemsService
+final class ItemService
 {
     public function __construct(
         private NormalizerInterface $normalizer,

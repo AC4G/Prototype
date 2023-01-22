@@ -174,14 +174,10 @@ final class SecurityService
     }
 
     public function isClientAllowedForAdjustmentOnItem(
-        ?string $jwt,
+        string $jwt,
         Item $item
     ): bool
     {
-        if (is_null($jwt)) {
-            return false;
-        }
-
         $token = $this->decodeJWTAndReturnToken($jwt);
 
         if (is_null($token)) {

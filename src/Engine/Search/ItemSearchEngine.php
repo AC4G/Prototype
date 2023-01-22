@@ -4,14 +4,14 @@ namespace App\Engine\Search;
 
 use Doctrine\ORM\Query;
 use App\Repository\ItemRepository;
-use App\Service\API\Items\ItemsService;
+use App\Service\API\Item\ItemService;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 final class ItemSearchEngine extends AbstractSearchEngine
 {
     public function __construct(
         private readonly ItemRepository $itemRepository,
-        private readonly ItemsService $itemsService
+        private readonly ItemService $itemsService
     )
     {
         parent::__construct(

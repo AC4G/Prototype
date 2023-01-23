@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
 use App\Service\API\Item\ItemService;
+use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +19,8 @@ final class ItemController extends AbstractController
         private readonly UserRepository $userRepository,
         private readonly ItemRepository $itemRepository,
         private readonly CustomResponse $customResponse,
-        private readonly ItemService $itemsService
+        private readonly ItemService $itemsService,
+        private readonly CacheInterface $cache
     )
     {
     }
@@ -49,13 +51,13 @@ final class ItemController extends AbstractController
         string $property
     ): ?Response
     {
-        $item = '';
-
-        if (is_numeric($property)) {
-            $item = $this->itemRepository->findOneBy(['id' => (int)$property]);
-        }
-
         if ($request->isMethod('PATCH')) {
+            $item = $this->cache->get('item_' . $property, function () {});
+
+            if (is_null($item)) {
+                return  $this->customResponse->errorResponse($request, 'Internal error, retry again!', 500);
+            }
+
             $newParameter = json_decode($request->getContent(), true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -65,6 +67,12 @@ final class ItemController extends AbstractController
             $this->itemsService->updateItem($item, $newParameter);
 
             return $this->customResponse->notificationResponse($request, 'Parameter successfully added or updated!', 202);
+        }
+
+        $item = '';
+
+        if (is_numeric($property)) {
+            $item = $this->itemRepository->findOneBy(['id' => (int)$property]);
         }
 
         if (!is_numeric($property)) {
@@ -100,9 +108,13 @@ final class ItemController extends AbstractController
         int $id
     ): Response
     {
-        $item = $this->itemRepository->findOneBy(['id' => $id]);
-
         if ($request->isMethod('DELETE')) {
+            $item = $this->cache->get('item_' . $id, function () {});
+
+            if (is_null($item)) {
+                return  $this->customResponse->errorResponse($request, 'Internal error, retry again!', 500);
+            }
+
             $parameters = json_decode($request->getContent(), true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -117,6 +129,8 @@ final class ItemController extends AbstractController
 
             return $this->customResponse->notificationResponse($request, sprintf('Parameter successfully removed from item with id: %s', $id));
         }
+
+        $item = $this->itemRepository->findOneBy(['id' => $id]);
 
         if (is_null($item)) {
             return $this->customResponse->errorResponse($request, 'Item not found', 404);

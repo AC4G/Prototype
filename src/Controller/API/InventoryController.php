@@ -5,6 +5,7 @@ namespace App\Controller\API;
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
 use App\Repository\InventoryRepository;
+use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,12 +18,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class InventoryController extends AbstractController
 {
     public function __construct(
-        private InventoryRepository $inventoryRepository,
-        private InventoriesService $inventoriesService,
-        private SecurityService $securityService,
-        private UserRepository $userRepository,
-        private ItemRepository $itemRepository,
-        private CustomResponse $customResponse
+        private readonly InventoryRepository $inventoryRepository,
+        private readonly InventoriesService $inventoriesService,
+        private readonly SecurityService $securityService,
+        private readonly UserRepository $userRepository,
+        private readonly ItemRepository $itemRepository,
+        private readonly CustomResponse $customResponse,
+        private readonly CacheInterface $cache
     )
     {
     }

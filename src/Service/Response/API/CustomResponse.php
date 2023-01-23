@@ -20,6 +20,7 @@ final class CustomResponse
                 'source' => [
                     'pointer' => $request->getUri()
                 ],
+                'method' => $request->getMethod(),
                 'message' => $message
             ]
         ];
@@ -43,6 +44,7 @@ final class CustomResponse
                 'source' => [
                     'pointer' => $request->getUri()
                 ],
+                'method' => $request->getMethod(),
                 'message' => $message
             ]
         ];

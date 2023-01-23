@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use App\Repository\ItemRepository;
+use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -18,7 +19,8 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
     public function __construct(
         private readonly SecurityService $securityService,
         private readonly CustomResponse $customResponse,
-        private readonly ItemRepository $itemRepository
+        private readonly ItemRepository $itemRepository,
+        private readonly CacheInterface $cache
     )
     {
     }
@@ -57,11 +59,7 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
 
         if (str_contains($route, 'inventory') || str_contains($route, 'inventories')) {
             $this->validateJWTForInventoryController($event, $jwt, $params);
-
-            return;
         }
-
-        //
     }
 
     private function validateJWTForItemController(
@@ -82,7 +80,13 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
 
         if (!$this->securityService->isClientAllowedForAdjustmentOnItem($jwt, $item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Rejected!', 403));
+
+            return;
         }
+
+        $this->cache->get('item_' . $item->getId(), function () use ($item) {
+            return $item;
+        });
     }
 
     private function validateJWTForInventoryController(
@@ -91,13 +95,13 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
         array $params
     ): void
     {
-
+        //
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            RequestEvent::class => ['onKernelRequest', 10],
+            RequestEvent::class => ['onKernelRequest', 9],
         ];
     }
 

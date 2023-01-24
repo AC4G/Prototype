@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class APIClientAuthorizationListener implements EventSubscriberInterface
 {
     private array $securedRoutes = [
-        'api_items_by_identifier' => 'PATCH',
+        'api_item_by_id' => 'PATCH',
         'api_item_by_id_process_parameters' => 'DELETE',
     ];
 
@@ -91,7 +91,7 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
         array $params
     ): void
     {
-        //
+
     }
 
     public static function getSubscribedEvents(): array

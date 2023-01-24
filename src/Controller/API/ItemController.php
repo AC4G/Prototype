@@ -44,15 +44,17 @@ final class ItemController extends AbstractController
     }
 
     /**
-     * @Route("/api/items/{property}", name="api_items_by_identifier", methods={"GET", "PATCH"})
+     * @Route("/api/items/{id}", name="api_item_by_id", methods={"GET", "PATCH"}, requirements={"id" = "\d+"})
      */
-    public function processItem(
+    public function processItemById(
         Request $request,
-        string $property
+        int $id
     ): ?Response
     {
         if ($request->isMethod('PATCH')) {
-            $item = $this->cache->get('item_' . $property, function () {});
+            $item = $this->cache->get('item_' . $id, function () {
+                return null;
+            });
 
             if (is_null($item)) {
                 return  $this->customResponse->errorResponse($request, 'Internal error, retry again!', 500);
@@ -69,34 +71,39 @@ final class ItemController extends AbstractController
             return $this->customResponse->notificationResponse($request, 'Parameter successfully added or updated!', 202);
         }
 
-        $item = '';
-
-        if (is_numeric($property)) {
-            $item = $this->itemRepository->findOneBy(['id' => (int)$property]);
-        }
-
-        if (!is_numeric($property)) {
-            $user = $this->userRepository->findOneBy(['nickname' => $property]);
-
-            if (is_null($user)) {
-                return $this->customResponse->errorResponse($request, 'User doesn\'t exists!', 404);
-            }
-
-            $item = $this->itemRepository->findBy(['user' => $user]);
-        }
+        $item = $this->itemRepository->findOneBy(['id' => $id]);
 
         if (is_null($item)) {
             return $this->customResponse->errorResponse($request,'Item not found', 404);
         }
 
-        if (is_array($item)) {
-            if (count($item) === 0) {
-                return $this->customResponse->errorResponse($request, 'User hasn\'t created an item yet!', 400);
-            }
+        return new JsonResponse(
+            $this->itemsService->prepareData($item)
+        );
+    }
+
+    /**
+     * @Route("/api/items/user/{nickname}", name="api_items_by_nickname", methods={"GET"})
+     */
+    public function getItemsByNickname(
+        Request $request,
+        string $nickname
+    ): Response
+    {
+        $user = $this->userRepository->findOneBy(['nickname' => $nickname]);
+
+        if (is_null($user)) {
+            return $this->customResponse->errorResponse($request, 'User doesn\'t exists!', 404);
+        }
+
+        $items = $this->itemRepository->findBy(['user' => $user]);
+
+        if (count($items) === 0) {
+            return $this->customResponse->errorResponse($request, 'User hasn\'t created an item yet!', 400);
         }
 
         return new JsonResponse(
-            $this->itemsService->prepareData($item)
+            $this->itemsService->prepareData($items)
         );
     }
 

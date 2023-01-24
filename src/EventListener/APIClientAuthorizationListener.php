@@ -70,7 +70,9 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
     {
         $id = array_key_exists('property', $params) ? (int)$params['property'] : $params['id'];
 
-        $item = $this->itemRepository->findOneBy(['id' => $id]);
+        $item = $this->cache->get('item_' . $id, function () use ($id) {
+            return $this->itemRepository->findOneBy(['id' => $id]);
+        });
 
         if (is_null($item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Item not found', 404));
@@ -80,13 +82,7 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
 
         if (!$this->securityService->isClientAllowedForAdjustmentOnItem($jwt, $item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Rejected!', 403));
-
-            return;
         }
-
-        $this->cache->get('item_' . $item->getId(), function () use ($item) {
-            return $item;
-        });
     }
 
     private function validateJWTForInventoryController(

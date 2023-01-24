@@ -11,8 +11,8 @@ use App\Repository\InventoryRepository;
 final class InventoriesService
 {
     public function __construct(
-        private InventoryRepository $inventoryRepository,
-        private InventoryNormalizer $inventoryNormalizer
+        private readonly InventoryRepository $inventoryRepository,
+        private readonly InventoryNormalizer $inventoryNormalizer
     )
     {
     }
@@ -61,7 +61,7 @@ final class InventoriesService
         array $parameter,
         User $user,
         Item $item
-    )
+    ): void
     {
         $inventory = new Inventory();
 
@@ -79,7 +79,7 @@ final class InventoriesService
     public function deleteParameter(
         Inventory $inventory,
         array $parameters
-    )
+    ): void
     {
         $allParameters = json_decode($inventory->getParameter(), true);
 

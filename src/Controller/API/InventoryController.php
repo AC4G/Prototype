@@ -32,16 +32,10 @@ final class InventoryController extends AbstractController
     /**
      * @Route("/api/inventories", name="api_inventories", methods={"GET"})
      */
-    public function showInventories(
+    public function getInventories(
         Request $request
     ): Response
     {
-        $jwt = $request->headers->get('Authorization');
-
-        if (!$this->securityService->isClientAdmin($jwt)) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
-        }
-
         $inventory = $this->inventoryRepository->findAll();
 
         if (count($inventory) !== 0) {
@@ -54,23 +48,19 @@ final class InventoryController extends AbstractController
     }
 
     /**
-     * @Route("/api/inventories/{property}", name="api_inventory_by_property", methods={"GET"})
+     * @Route("/api/inventories/{userId}", name="api_inventory_by_userId", methods={"GET"}, requirements={"userId" = "\d+"})
      */
-    public function getInventoryByProperty(
+    public function getInventoryByUserId(
         Request $request,
-        string $property
+        string $userId
     ): Response
     {
-        $user = $this->userRepository->getUserByProperty($property);
+        $user = $this->cache->get('user_' . $userId, function () {
+            return null;
+        });
 
         if (is_null($user)) {
-            return $this->customResponse->errorResponse($request, is_numeric($property) ? sprintf('User with id %s don\'t exists!', $property) : sprintf('User %s don\'t exists!', $property), 404);
-        }
-
-        $jwt = $request->headers->get('Authorization');
-
-        if ($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user)) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+            return  $this->customResponse->errorResponse($request, 'Internal error, retry again!', 500);
         }
 
         $inventory = $this->inventoryRepository->findBy(['user' => $user]);
@@ -85,24 +75,20 @@ final class InventoryController extends AbstractController
     }
 
     /**
-     * @Route("/api/inventories/{property}/{itemId}", name="api_inventory_by_property_and_item_id", methods={"GET", "POST", "PATCH", "DELETE"}, requirements={"itemId" = "\d+"})
+     * @Route("/api/inventories/{userId}/{itemId}", name="api_inventory_by_userId_and_itemId", methods={"GET", "POST", "PATCH", "DELETE"}, requirements={"userId" = "\d+", "itemId" = "\d+"})
      */
     public function processInventoryByItem(
         Request $request,
-        string $property,
+        string $userId,
         int $itemId
     ): Response
     {
-        $user = $this->userRepository->getUserByProperty($property);
+        $user = $this->cache->get('user_' . $userId, function () {
+            return null;
+        });
 
         if (is_null($user)) {
-            return $this->customResponse->errorResponse($request, is_numeric($property) ? sprintf('User with id %s don\'t exists!', $property) : sprintf('User %s don\'t exists!', $property), 404);
-        }
-
-        $jwt = $request->headers->get('Authorization');
-
-        if ($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user) || !$user->isPrivate() && !$request->isMethod('GET') && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user)) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+            return  $this->customResponse->errorResponse($request, 'Internal error, retry again!', 500);
         }
 
         $item = $this->itemRepository->findOneBy(['id' => $itemId]);
@@ -131,20 +117,12 @@ final class InventoryController extends AbstractController
             return $this->customResponse->errorResponse($request, 'User does not has this item in inventory!', 406);
         }
 
-        /*
-         * Update Inventory
-         *  - PATCH
-         */
         if ($request->isMethod('PATCH')) {
             $this->inventoriesService->updateInventory($parameter, $inventory);
 
             return $this->customResponse->notificationResponse($request, 'Inventory updated');
         }
 
-        /*
-         * Put Item in users inventory (create entry)
-         *  - POST
-         */
         if ($request->isMethod('POST')) {
             if (!array_key_exists('amount', $parameter)) {
                 return $this->customResponse->errorResponse($request, 'Amount is required with POST method!', 406);
@@ -155,44 +133,32 @@ final class InventoryController extends AbstractController
             return $this->customResponse->notificationResponse($request, 'Item successfully added to inventory', 201);
         }
 
-        /*
-         * Get all entries from inventory
-         *  - GET
-         */
         if ($request->isMethod('GET')) {
             return new JsonResponse(
               $this->inventoriesService->prepareData($inventory)
             );
         }
 
-        /*
-         * Delete one entry from inventory
-         *  - DELETE
-         */
         $this->inventoryRepository->deleteEntry($inventory);
 
         return $this->customResponse->notificationResponse($request, 'Item successfully removed from inventory');
     }
 
     /**
-     * @Route("/api/inventories/{property}/{itemId}/parameters", name="api_inventories_item_by_id_remove_parameters", methods={"DELETE", "GET"}, requirements={"itemId" = "\d+"})
+     * @Route("/api/inventories/{userId}/{itemId}/parameters", name="api_inventory_by_userId_and_itemId_parameters", methods={"DELETE", "GET"}, requirements={"userId" = "\d+", "itemId" = "\d+"})
      */
-    public function deleteOrGetParameterFromItemInInventory(
+    public function processParameterFromItemInInventory(
         Request $request,
-        string $property,
+        string $userId,
         int $itemId
     ): Response
     {
-        $user = $this->userRepository->getUserByProperty($property);
+        $user = $this->cache->get('user_' . $userId, function () {
+            return null;
+        });
 
         if (is_null($user)) {
-            return $this->customResponse->errorResponse($request, is_numeric($property) ? sprintf('User with id %s don\'t exists', $property) : sprintf('User %s don\'t exists', $property), 404);
-        }
-
-        $jwt = $request->headers->get('Authorization');
-
-        if (($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user) || !$user->isPrivate() && !$request->isMethod('GET') && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user))) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+            return  $this->customResponse->errorResponse($request, 'Internal error, retry again!', 500);
         }
 
         $item = $this->itemRepository->findOneBy(['id' => $itemId]);

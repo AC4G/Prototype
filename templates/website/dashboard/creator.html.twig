@@ -54,8 +54,10 @@
             <div id="item-content-box" class="flex flex-wrap gap-4 justify-evenly mt-[20px] mb-[60px]">
                 {% for item in items %}
                 <div class="relative w-[244px] h-[244px] bg-[#e5e7eb] item-box group">
-                    <div class="absolute w-full h-full">
-                        <img class="object-cover w-[244px] h-[244px] h-full w-full" src="{% if item.path is not null %}{{ asset('files/profile/%userNickname%/items/%itemName%/pictures/%itemPicture%'|replace({'%userNickname%': user.nickname, '%itemName%': item.name, '%itemPicture%': item.path.pictures.1})) }}{% endif %}">
+                    <div class="absolute w-[244px] h-[244px]">
+                        {% if (item.path is not null) and (item.path.pictures is not null) and (item.path.pictures.1 is not null) %}
+                            <img class="object-cover w-full h-full w-full" src="{{ asset('files/profile/%userNickname%/items/%itemName%/pictures/%itemPicture%'|replace({'%userNickname%': user.nickname, '%itemName%': item.name, '%itemPicture%': item.path.pictures.1})) }}">
+                        {% endif %}
                     </div>
                     <div class="absolute w-full h-full z-[10] transition-all opacity-0 bg-black group-hover:opacity-[0.4] rounded-t-sm"></div>
                     <div class="absolute bottom-[0px] w-full h-fit z-[11] opacity-0 group-hover:opacity-100 transition-all">

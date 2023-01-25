@@ -14,9 +14,15 @@
                 <p class="font-inter text-[14px] text-center">By clicking 'Continue' you will remove your 2-Step Verification</p>
             </div>
             <input type="hidden" name="token" value="{{ csrf_token('disable_2fa') }}">
-            <div class="w-fit h-fit mx-auto mt-[30px]">
-                <button class="font-inter text-[18px] text-white w-[100px] h-[40px] bg-black hover:text-grey transition rounded">Continue</button>
-            </div>
+            <div class="w-[220px] h-fit mx-auto mt-[40px] flex justify-between">
+                <div class="w-fit h-fit mt-[8px]">
+                    <a href="{{ path('dashboard_profile') }}">
+                        <p class="font-inter text-[18px] hover:text-grey transition">Cancel</p>
+                    </a>
+                </div>
+                <div class="w-fit h-fit">
+                    <button class="font-inter text-[18px] text-white w-[90px] h-[40px] bg-black hover:text-grey transition rounded">Continue</button>
+                </div>
         </form>
     </div>
 {% endblock %}

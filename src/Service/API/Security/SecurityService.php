@@ -64,7 +64,7 @@ final class SecurityService
     ): string
     {
         $passphrase = '6913abde502dffb25b96af7c5a2e322304d48c89381d852edab6a4e98f343d618e1e8196858ea9193b869a4b50e43d2c65178260dd7a50d89d71cd9394bdcdef';
-        $privateKeyFile = '../private.pem';
+        $privateKeyFile = '../rsaKeys/private.pem';
 
         $privateKey = openssl_get_privatekey(
             file_get_contents($privateKeyFile),
@@ -81,7 +81,7 @@ final class SecurityService
     ): ?string
     {
         $passphrase = '6913abde502dffb25b96af7c5a2e322304d48c89381d852edab6a4e98f343d618e1e8196858ea9193b869a4b50e43d2c65178260dd7a50d89d71cd9394bdcdef';
-        $privateKeyFile = '../private.pem';
+        $privateKeyFile = '../rsaKeys/private.pem';
 
         $privateKey = openssl_get_privatekey(
             file_get_contents($privateKeyFile),

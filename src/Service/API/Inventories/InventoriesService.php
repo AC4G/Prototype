@@ -20,7 +20,7 @@ final class InventoriesService
     public function updateInventory(
         array $parameter,
         Inventory $inventory
-    )
+    ): void
     {
         if (array_key_exists('amount', $parameter)) {
             $inventory->setAmount($inventory->getAmount() + $parameter['amount']);

@@ -124,7 +124,9 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
         }
 
         $userId = $params['userId'];
-        $user = $this->cache->get('user_'. $userId, function ($userId) {
+
+
+        $user = $this->cache->get('user_'. $userId, function () use ($userId) {
             return $this->userRepository->findOneBy(['id' => $userId]);
         });
 
@@ -133,7 +135,6 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
 
             return;
         }
-
         if (($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user) || !$user->isPrivate() && !$event->getRequest()->isMethod('GET') && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user))) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Rejected!', 403));
         }

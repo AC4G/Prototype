@@ -2,7 +2,7 @@
 
 namespace App\Engine\Search;
 
-use App\Service\API\Items\ItemService;
+use App\Service\API\Item\ItemService;
 use App\Service\API\Project\ProjectService;
 use App\Service\API\Inventories\InventoriesService;
 

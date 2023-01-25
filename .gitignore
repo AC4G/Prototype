@@ -40,6 +40,9 @@ private.pem
 /.ddev
 ##< ddev ##
 
+.env
+.env.test
+
 ###> phpunit/phpunit ###
 /phpunit.xml
 .phpunit.result.cache

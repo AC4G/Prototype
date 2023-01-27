@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-
+    app.passphrase: '%env(APP_PASSPHRASE)%'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -19,6 +19,16 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    Redis:
+        class: Redis
+        calls:
+            - connect:
+                  - '%env(REDIS_HOST)%'
+                  - '%env(int:REDIS_PORT)%'
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+        arguments:
+            - '@Redis'
 
     acme.custom_two_factor_provider:
         class: App\Provider\TwoFactorProvider

@@ -17,6 +17,7 @@ use App\Repository\AuthTokenRepository;
 use App\Repository\UserRolesRepository;
 use App\Repository\AccessTokenRepository;
 use App\Repository\RefreshTokenRepository;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 final class SecurityService
 {
@@ -25,7 +26,8 @@ final class SecurityService
         private readonly AccessTokenRepository $accessTokenRepository,
         private readonly AuthTokenRepository $authTokenRepository,
         private readonly UserRolesRepository $userRolesRepository,
-        private readonly UserRepository $userRepository
+        private readonly UserRepository $userRepository,
+        private readonly ContainerBagInterface $params
     )
     {
     }
@@ -63,7 +65,7 @@ final class SecurityService
         string $token
     ): string
     {
-        $passphrase = '6913abde502dffb25b96af7c5a2e322304d48c89381d852edab6a4e98f343d618e1e8196858ea9193b869a4b50e43d2c65178260dd7a50d89d71cd9394bdcdef';
+        $passphrase = $this->params->get('app.passphrase');
         $privateKeyFile = '../rsaKeys/private.pem';
 
         $privateKey = openssl_get_privatekey(
@@ -80,7 +82,7 @@ final class SecurityService
         ?string $jwt
     ): ?string
     {
-        $passphrase = '6913abde502dffb25b96af7c5a2e322304d48c89381d852edab6a4e98f343d618e1e8196858ea9193b869a4b50e43d2c65178260dd7a50d89d71cd9394bdcdef';
+        $passphrase = $this->params->get('app.passphrase');
         $privateKeyFile = '../rsaKeys/private.pem';
 
         $privateKey = openssl_get_privatekey(

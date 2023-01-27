@@ -11,14 +11,13 @@ class LoginListener
 
     public function onSecurityInteractiveLogin(
         InteractiveLoginEvent $event
-    )
+    ): void
     {
         $user = $event->getAuthenticationToken()->getUser();
 
         if ($user->isTwoFaVerified()) {
             $event->getRequest()->getSession()->set('redirectLogin', $event->getRequest()->getRequestUri());
         }
-
     }
 
 

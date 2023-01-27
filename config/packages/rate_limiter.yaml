@@ -1,0 +1,6 @@
+framework:
+  rate_limiter:
+    login_throttling:
+        policy: 'token_bucket'
+        limit: 5
+        rate: { interval: '15 minutes', amount: 5 }

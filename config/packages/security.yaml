@@ -31,7 +31,7 @@ security:
                 target: logout_success
                 invalidate_session: false
             login_throttling:
-                max_attempts: 10
+                max_attempts: 5
                 interval: '5 minutes'
             remember_me:
                 secret:   '%kernel.secret%'

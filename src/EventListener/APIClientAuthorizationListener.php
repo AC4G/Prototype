@@ -103,7 +103,7 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
         }
 
         if (!$this->securityService->isClientAllowedForAdjustmentOnItem($jwt, $item)) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Rejected!', 403));
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
     }
 
@@ -118,7 +118,7 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
         }
 
         if ((count($params) === 0) && !$this->securityService->isClientAdmin($jwt)) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Rejected!', 403));
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
 
             return;
         }
@@ -136,7 +136,7 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
             return;
         }
         if (($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user) || !$user->isPrivate() && !$event->getRequest()->isMethod('GET') && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user))) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Rejected!', 403));
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
     }
 

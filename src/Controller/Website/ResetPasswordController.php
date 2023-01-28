@@ -6,15 +6,18 @@ use App\Form\ResetPassword\CodeFormType;
 use App\Form\ResetPassword\EmailFormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Form\ResetPassword\ResetPasswordFormType;
 use App\Service\Website\Security\ResetPasswordService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use function Symfony\Component\Translation\t;
 
 final class ResetPasswordController extends AbstractController
 {
     public function __construct(
-        private readonly ResetPasswordService $resetPasswordService
+        private readonly ResetPasswordService $resetPasswordService,
+        private readonly RateLimiterFactory $securityThrottlingLimiter
     )
     {
     }
@@ -34,7 +37,7 @@ final class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('password_forgotten_verify');
         }
 
-        if (!is_null($this->getUser())) {
+        if (!is_null($this->getUser()) && $this->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->redirectToRoute('home');
         }
 
@@ -71,7 +74,7 @@ final class ResetPasswordController extends AbstractController
         Request $request
     ): Response
     {
-        if (!is_null($this->getUser())) {
+        if (!is_null($this->getUser()) && $this->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->redirectToRoute('home');
         }
 
@@ -108,6 +111,7 @@ final class ResetPasswordController extends AbstractController
         $form->handleRequest($request);
         $code = array_key_exists('code', $form->getData()) ? $form->getData()['code'] : null;
         $error = $this->resetPasswordService->validateCode($request, $code);
+        $limiter = $this->securityThrottlingLimiter->create($request->getClientIp());
 
         if (!$form->isSubmitted() || !$form->isValid() || !is_null($error)) {
             return $this->renderForm('website/resetPassword/code.html.twig', [
@@ -129,7 +133,7 @@ final class ResetPasswordController extends AbstractController
         Request $request
     ): Response
     {
-        if (!is_null($this->getUser())) {
+        if (!is_null($this->getUser()) && $this->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->redirectToRoute('home');
         }
 

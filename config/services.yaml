@@ -29,6 +29,7 @@ services:
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
         arguments:
             - '@Redis'
+            - { 'ttl': 600 }
 
     acme.custom_two_factor_provider:
         class: App\Provider\TwoFactorProvider
@@ -44,5 +45,12 @@ services:
     App\EventListener\LoginListener:
         tags:
             - { name: 'kernel.event_listener', event: 'security.interactive_login' }
+
+    app.login_throttling:
+        class: Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter
+        arguments:
+            $globalFactory: '@limiter.security_throttling'
+            $localFactory: '@limiter.login_throttling'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

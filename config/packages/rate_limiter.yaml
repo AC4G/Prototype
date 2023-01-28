@@ -1,6 +1,16 @@
 framework:
   rate_limiter:
+    security_throttling:
+      policy: 'token_bucket'
+      limit: 10
+      rate: { interval: '15 minutes', amount: 5 }
+
     login_throttling:
         policy: 'token_bucket'
         limit: 5
-        rate: { interval: '15 minutes', amount: 5 }
+        rate: { interval: '5 minutes', amount: 5 }
+
+    form:
+        policy: 'token_bucket'
+        limit: 10
+        rate: { interval: '5 minutes', amount: 10 }

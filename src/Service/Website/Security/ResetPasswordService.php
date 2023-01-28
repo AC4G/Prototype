@@ -40,9 +40,9 @@ final class ResetPasswordService
             return 'The specified email cannot be used for recovering.';
         }
 
-        $reset = $this->resetPasswordTokenRepository->findOneBy(['user' => $this->user]);
+        $this->reset = $this->resetPasswordTokenRepository->findOneBy(['user' => $this->user]);
 
-        if (!is_null($reset)) {
+        if (!is_null($this->reset)) {
             return 'Reset code already sent to this Email. Request new one?';
         }
 

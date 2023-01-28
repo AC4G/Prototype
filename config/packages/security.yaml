@@ -31,8 +31,7 @@ security:
                 target: logout_success
                 invalidate_session: false
             login_throttling:
-                max_attempts: 5
-                interval: '5 minutes'
+                limiter: app.login_throttling
             remember_me:
                 secret:   '%kernel.secret%'
                 always_remember_me: true

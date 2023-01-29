@@ -18,10 +18,10 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 final class RegistrationController extends AbstractController
 {
     public function __construct(
-        private VerifyEmailHelperInterface $verifyEmailHelper,
-        private RegistrationService $registrationService,
-        private UserRepository $userRepository,
-        private Security $security
+        private readonly VerifyEmailHelperInterface $verifyEmailHelper,
+        private readonly RegistrationService $registrationService,
+        private readonly UserRepository $userRepository,
+        private readonly Security $security
     )
     {
     }
@@ -100,4 +100,6 @@ final class RegistrationController extends AbstractController
 
         return $this->redirectToRoute('login');
     }
+
+
 }

@@ -11,8 +11,8 @@ use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorFormRendererInter
 class TwoFactorRenderer implements TwoFactorFormRendererInterface
 {
     public function __construct(
-        private Environment $twigEnvironment,
-        private FirewallMapInterface $firewallMap
+        private readonly Environment $twigEnvironment,
+        private readonly FirewallMapInterface $firewallMap
     ) {
     }
 

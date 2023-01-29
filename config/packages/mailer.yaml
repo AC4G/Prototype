@@ -2,6 +2,6 @@ framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'
         envelope:
-            sender: 'metaverse@service.com'
+            sender: 'stexs@service.com'
         headers:
-            From: 'Metaverse <metaverse@service.com>'
+            From: 'STEXS <metaverse@service.com>'

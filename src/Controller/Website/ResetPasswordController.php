@@ -2,22 +2,23 @@
 
 namespace App\Controller\Website;
 
+use DateTime;
 use App\Form\ResetPassword\CodeFormType;
 use App\Form\ResetPassword\EmailFormType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Form\ResetPassword\ResetPasswordFormType;
 use App\Service\Website\Security\ResetPasswordService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use function Symfony\Component\Translation\t;
+
+use App\Service\BruteForceService;
 
 final class ResetPasswordController extends AbstractController
 {
     public function __construct(
         private readonly ResetPasswordService $resetPasswordService,
-        private readonly RateLimiterFactory $securityThrottlingLimiter
+        private readonly BruteForceService $bruteForceService
     )
     {
     }
@@ -111,7 +112,27 @@ final class ResetPasswordController extends AbstractController
         $form->handleRequest($request);
         $code = array_key_exists('code', $form->getData()) ? $form->getData()['code'] : null;
         $error = $this->resetPasswordService->validateCode($request, $code);
-        $limiter = $this->securityThrottlingLimiter->create($request->getClientIp());
+        $bruteForce = $this->bruteForceService->setup(
+            $request->getClientIp(),
+            10,
+            600
+        );
+
+
+        if (!is_null($error)) {
+            if ($bruteForce->hasClientAttemptsLeft()) {
+                $bruteForce->increaseCounter();
+            }
+
+            if (!$bruteForce->hasClientAttemptsLeft()) {
+                $timeStamp = $bruteForce->getTimeToWait();
+
+                $minutes = str_pad((string)(intval(($timeStamp - (new DateTime())->getTimestamp()) / 60)), 2, '0', STR_PAD_LEFT);
+                $seconds = str_pad((string)(($timeStamp - (new DateTime())->getTimestamp()) % 60), 2, '0', STR_PAD_LEFT);
+
+                $error = 'Too many attempts, retry in ' . $minutes . ':' . $seconds . ' minutes.';
+            }
+        }
 
         if (!$form->isSubmitted() || !$form->isValid() || !is_null($error)) {
             return $this->renderForm('website/resetPassword/code.html.twig', [
@@ -119,6 +140,8 @@ final class ResetPasswordController extends AbstractController
                 'error' => $error
             ]);
         }
+
+        $bruteForce->remove();
 
         $this->resetPasswordService->setSessionIsVerifiedForResetPassword($request);
         $this->resetPasswordService->removeEntry();

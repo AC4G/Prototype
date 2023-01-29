@@ -3,6 +3,7 @@
 namespace App\Controller\Website;
 
 use DateTime;
+use App\Service\ThrottlingService;
 use App\Form\ResetPassword\CodeFormType;
 use App\Form\ResetPassword\EmailFormType;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,13 +13,11 @@ use App\Form\ResetPassword\ResetPasswordFormType;
 use App\Service\Website\Security\ResetPasswordService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-use App\Service\BruteForceService;
-
 final class ResetPasswordController extends AbstractController
 {
     public function __construct(
         private readonly ResetPasswordService $resetPasswordService,
-        private readonly BruteForceService $bruteForceService
+        private readonly ThrottlingService $throttlingService
     )
     {
     }
@@ -112,7 +111,7 @@ final class ResetPasswordController extends AbstractController
         $form->handleRequest($request);
         $code = array_key_exists('code', $form->getData()) ? $form->getData()['code'] : null;
         $error = $this->resetPasswordService->validateCode($request, $code);
-        $bruteForce = $this->bruteForceService->setup(
+        $throttling = $this->throttlingService->setup(
             $request->getClientIp(),
             10,
             600
@@ -120,17 +119,16 @@ final class ResetPasswordController extends AbstractController
 
 
         if (!is_null($error)) {
-            if ($bruteForce->hasClientAttemptsLeft()) {
-                $bruteForce->increaseCounter();
+            if ($throttling->hasClientAttemptsLeft()) {
+                $throttling->increaseCounter();
             }
 
-            if (!$bruteForce->hasClientAttemptsLeft()) {
-                $timeStamp = $bruteForce->getTimeToWait();
+            if (!$throttling->hasClientAttemptsLeft()) {
+                $timeStamp = $throttling->getTimeToWait();
 
-                $minutes = str_pad((string)(intval(($timeStamp - (new DateTime())->getTimestamp()) / 60)), 2, '0', STR_PAD_LEFT);
-                $seconds = str_pad((string)(($timeStamp - (new DateTime())->getTimestamp()) % 60), 2, '0', STR_PAD_LEFT);
+                $timer = date('i:s', $timeStamp - (new DateTime())->getTimestamp());
 
-                $error = 'Too many attempts, retry in ' . $minutes . ':' . $seconds . ' minutes.';
+                $error = 'Too many attempts, retry in ' . $timer . ' minutes.';
             }
         }
 
@@ -141,7 +139,7 @@ final class ResetPasswordController extends AbstractController
             ]);
         }
 
-        $bruteForce->remove();
+        $throttling->remove();
 
         $this->resetPasswordService->setSessionIsVerifiedForResetPassword($request);
         $this->resetPasswordService->removeEntry();

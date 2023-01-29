@@ -10,10 +10,13 @@ use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorFormRendererInter
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Exception\TwoFactorProviderLogicException;
 
+use App\Repository\UserTokenRepository;
+
 final class TwoFactorProvider implements TwoFactorProviderInterface
 {
     public function __construct(
         private readonly GoogleAuthenticatorInterface $googleAuthenticator,
+        private readonly UserTokenRepository $userTokenRepository,
         private readonly TwoFactorRenderer $formRenderer
     )
     {
@@ -53,7 +56,19 @@ final class TwoFactorProvider implements TwoFactorProviderInterface
             return false;
         }
 
-        return $this->googleAuthenticator->checkCode($user, $authenticationCode);
+        if (strlen($authenticationCode) !== 16) {
+            return $this->googleAuthenticator->checkCode($user, $authenticationCode);
+        }
+
+        $token = $this->userTokenRepository->findOneBy(['user' => $user, 'type' => '2fa-recovery', 'token' => $authenticationCode]);
+
+        if (is_null($token)) {
+            return false;
+        }
+
+        $this->userTokenRepository->deleteEntry($token);
+
+        return true;
     }
 
     public function getFormRenderer(): TwoFactorFormRendererInterface

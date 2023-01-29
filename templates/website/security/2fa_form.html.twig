@@ -5,14 +5,14 @@
         <p class="font-inter text-[24px] text-center">2-Step Verification</p>
     </div>
     {% if authenticationError %}
-        <div class="mx-auto mt-[20px] border-2 bg-red-100 border-red-400 rounded w-[260px] h-[40px] pt-[6px]">
+        <div class="mx-auto mt-[20px] border-2 bg-red-100 border-red-400 rounded w-[260px] h-fit pt-[6px] pb-[6px] pl-[4px] pr-[4px]">
             <p class="font-inter text-[14px] text-center break-normal opacity-[96%]">{{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}</p>
         </div>
     {% endif %}
     <div class="w-fit h-fit mx-auto mt-[30px]">
         <form action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="post">
             <div class="w-fit h-fit">
-                 <input autocomplete="off" class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px]" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="Type the verification code..." inputmode="numeric" pattern="[0-9]*" required="required" autofocus/>
+                 <input autocomplete="off" class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px]" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="Type the verification code..." required="required" autofocus/>
             </div>
             <div class="h-[2px] w-[260px] bg-[#2e4053] rounded"></div>
             {% if isCsrfProtectionEnabled %}

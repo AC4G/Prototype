@@ -9,8 +9,3 @@ framework:
         policy: 'token_bucket'
         limit: 5
         rate: { interval: '5 minutes', amount: 5 }
-
-    form:
-        policy: 'token_bucket'
-        limit: 10
-        rate: { interval: '5 minutes', amount: 10 }

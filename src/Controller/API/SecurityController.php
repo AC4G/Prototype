@@ -7,6 +7,8 @@ use App\Repository\ClientRepository;
 use App\Repository\AuthTokenRepository;
 use App\Repository\AccessTokenRepository;
 use App\Repository\RefreshTokenRepository;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\API\Security\SecurityService;
@@ -23,7 +25,8 @@ final class SecurityController extends AbstractController
         private readonly AuthTokenRepository $authTokenRepository,
         private readonly ClientRepository $clientRepository,
         private readonly SecurityService $securityService,
-        private readonly CustomResponse $customResponse
+        private readonly CustomResponse $customResponse,
+        private readonly CacheInterface $cache
     )
     {
     }
@@ -37,12 +40,6 @@ final class SecurityController extends AbstractController
     {
         $content = $request->request->all();
 
-        /*
-         * grant_type
-         *  - Client Credentials Grant -> client_credentials
-         *  - Authorization Code Grant -> authorization_code
-         *  - Refresh Token Grant -> refresh_token
-         */
         if (!array_key_exists('grant_type', $content)) {
             return $this->customResponse->errorResponse($request, 'grant_type required!', 406);
         }
@@ -51,24 +48,28 @@ final class SecurityController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Client credentials required!', 406);
         }
 
-        $client = $this->clientRepository->findOneBy(['clientId' => $content['client_id'], 'clientSecret' => $content['client_secret']]);
+        $client = $this->cache->get('client_' . $content['client_id'], function (ItemInterface $item) use ($content) {
+            $item->expiresAfter(86400);
 
-        if (is_null($client)) {
+            return $this->clientRepository->findOneBy(['clientId' => $content['client_id']]);
+        });
+
+        if (is_null($client) || $client->getClientSecret() !== $content['client_secret']) {
             return $this->customResponse->errorResponse($request, 'Rejected!', 403);
         }
 
         if ($content['grant_type'] === 'authorization_code') {
-            /*  Start of 'Authorization Code Grant'
-            *  - access token for client resources
-            */
-
             if (!array_key_exists('code', $content)) {
                 return $this->customResponse->errorResponse($request, 'code required!', 406);
             }
 
-            $authToken = $this->authTokenRepository->findOneBy(['authToken' => $content['code'], 'project' => $client->getProject()]);
+            $authToken = $this->cache->getItem('authToken_' . $content['code'])->get();
 
-            if (is_null($authToken)) {
+            if (!$authToken->isHit()) {
+                $authToken = $this->authTokenRepository->findOneBy(['authToken' => $content['code']]);
+            }
+
+            if (is_null($authToken) || $authToken->getClient()->getId() !== $client->getId()) {
                 return $this->customResponse->errorResponse($request, 'Rejected!', 403);
             }
 
@@ -86,20 +87,17 @@ final class SecurityController extends AbstractController
         }
 
         if ($content['grant_type'] === 'refresh_token') {
-            /*  Start Refresh Token Grant
-             *  - access token for client resources
-             */
             if (!array_key_exists('refresh_token', $content)) {
                 return $this->customResponse->errorResponse($request, 'refresh_token required!', 406);
             }
 
-            $refreshToken = $this->refreshTokenRepository->findOneBy(['refreshToken' => $content['refresh_token'], 'project' => $client->getProject()]);
+            $refreshToken = $this->refreshTokenRepository->findOneBy(['refreshToken' => $content['refresh_token'], 'client' => $client]);
 
             if (is_null($refreshToken)) {
                 return $this->customResponse->errorResponse($request, 'Rejected!', 403);
             }
 
-            $accessToken = $this->accessTokenRepository->findOneBy(['project' => $client->getProject(), 'user' => $refreshToken->getUser()]);
+            $accessToken = $this->accessTokenRepository->findOneBy(['client' => $client, 'user' => $refreshToken->getUser()]);
 
             if (is_null($accessToken) || new DateTime() > $accessToken->getExpireDate()) {
                 return $this->customResponse->errorResponse($request, 'Rejected!', 403);
@@ -117,10 +115,6 @@ final class SecurityController extends AbstractController
                 ]
             );
         }
-
-        /*  Start of 'Client Credentials Grant'
-         *  - access token only for client resources
-         */
 
         if ($content['grant_type'] !== 'client_credentials') {
             return $this->customResponse->errorResponse($request, 'Invalid grant_type!', 406);

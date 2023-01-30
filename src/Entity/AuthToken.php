@@ -67,6 +67,16 @@ class AuthToken
     private Project $project;
 
     /**
+     * @var Client
+     *
+     * @ORM\ManyToOne(targetEntity="Client")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="client_id", referencedColumnName="id")
+     * })
+     */
+    private Client $client;
+
+    /**
      * @var array
      *
      * @ORM\Column(name="scopes", type="array", nullable=false)
@@ -122,6 +132,18 @@ class AuthToken
     public function setUser(null|User|UserInterface $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getClient(): Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(Client $client): self
+    {
+        $this->client = $client;
 
         return $this;
     }

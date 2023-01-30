@@ -6,10 +6,12 @@ use DateTime;
 use App\Entity\WebApp;
 use App\Entity\Client;
 use App\Entity\AuthToken;
+use App\Repository\ScopeRepository;
 use App\Repository\ClientRepository;
 use App\Repository\WebAppRepository;
-use App\Repository\ScopeRepository;
 use App\Repository\AuthTokenRepository;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 final class SecurityService
@@ -23,7 +25,8 @@ final class SecurityService
         private readonly AuthTokenRepository $authTokenRepository,
         private readonly ClientRepository $clientRepository,
         private readonly WebAppRepository $webAppRepository,
-        private readonly ScopeRepository $scopeRepository
+        private readonly ScopeRepository $scopeRepository,
+        private readonly CacheInterface $cache
     )
     {
     }
@@ -60,7 +63,11 @@ final class SecurityService
     {
         $errors = [];
 
-        $this->client = $this->clientRepository->findOneBy(['clientId' => $query['client_id']]);
+        $this->client = $this->cache->get('client_'. $query['client_id'], function (ItemInterface $item) use ($query) {
+            $item->expiresAfter(86400);
+
+            return $this->clientRepository->findOneBy(['clientId' => $query['client_id']]);
+        });
 
         if (is_null($this->client)) {
             $errors[] = 'Client not found!';
@@ -70,7 +77,11 @@ final class SecurityService
             $errors[] = 'Already authenticated!';
         }
 
-        $this->webApp = $this->webAppRepository->findOneBy(['client' => $this->client]);
+        $this->webApp = $this->cache->get('webApp_client_'. $query['client_id'], function (ItemInterface $item) use ($query) {
+            $item->expiresAfter(86400);
+
+            return $this->webAppRepository->findOneBy(['client' => $this->client]);
+        });
 
         if (!is_null($this->client) && (is_null($this->webApp) || (is_null($this->webApp->getRedirectUrl()) || strlen($this->webApp->getRedirectUrl()) === 0) || count($this->webApp->getScopes()) === 0)) {
             $errors[] = 'Unauthorized client!';
@@ -79,7 +90,7 @@ final class SecurityService
         return $errors;
     }
 
-    public function createAuthTokenAndBuildRedirectUri(
+    public function createAuthTokenAndBuildRedirectURI(
         array $query,
         UserInterface $user
     ): string
@@ -123,9 +134,7 @@ final class SecurityService
         Client $client
     ): bool
     {
-        $authToken = $this->authTokenRepository->findOneBy(['user' => $user, 'project' => $client->getProject()]);
-
-        return !is_null($authToken);
+        return !is_null($this->authTokenRepository->findOneBy(['user' => $user, 'client' => $client]));
     }
 
     private function createAuthenticationToken(
@@ -136,16 +145,31 @@ final class SecurityService
     {
         $authToken = new AuthToken();
 
+        $expire = new DateTime('+ 7days');
+
         $authToken
             ->setUser($user)
+            ->setClient($client)
             ->setProject($client->getProject())
             ->setAuthToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
-            ->setExpireDate(new DateTime('+ 7days'))
+            ->setExpireDate($expire)
             ->setScopes($webApp->getScopes())
         ;
 
         $this->authTokenRepository->persistAndFlushEntity($authToken);
+
+        $diff = $expire->diff(new DateTime());
+        $seconds = $diff->s + ($diff->m * 60) + ($diff->h * 3600) + ($diff->d * 3600 * 24);
+
+        $authTokenCache = $this->cache->getItem('authToken_' . $authToken->getAuthToken());
+
+        $authTokenCache
+            ->set($authToken)
+            ->expiresAfter($seconds)
+        ;
+
+        $this->cache->save($authTokenCache);
 
         return $authToken;
     }

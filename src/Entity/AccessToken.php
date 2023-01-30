@@ -72,6 +72,16 @@ class AccessToken
      */
     private Project $project;
 
+    /**
+     * @var Client
+     *
+     * @ORM\ManyToOne(targetEntity="Client")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="client_id", referencedColumnName="id")
+     * })
+     */
+    private Client $client;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -138,6 +148,18 @@ class AccessToken
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getClient(): Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(Client $client): self
+    {
+        $this->client = $client;
 
         return $this;
     }

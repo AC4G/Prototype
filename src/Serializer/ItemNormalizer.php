@@ -8,7 +8,7 @@ use App\Serializer\ProjectNormalizer;
 class ItemNormalizer
 {
     public function __construct(
-        private ProjectNormalizer $projectNormalizer
+        private readonly ProjectNormalizer $projectNormalizer
     )
     {
     }

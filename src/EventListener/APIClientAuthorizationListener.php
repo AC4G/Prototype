@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use App\Repository\UserRepository;
 use App\Repository\ItemRepository;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
@@ -12,22 +13,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class APIClientAuthorizationListener implements EventSubscriberInterface
 {
-    private array $securedRoutes = [
-        'api_item_by_id' => 'PATCH',
-        'api_item_by_id_process_parameters' => 'DELETE',
-        'api_inventories' => 'GET',
-        'api_inventory_by_userId' => 'GET',
-        'api_inventory_by_userId_and_itemId' => [
-            'GET',
-            'POST',
-            'PATCH',
-            'DELETE',
-        ],
-        'api_inventory_by_userId_and_itemId_parameter' => [
-            'GET',
-            'DELETE',
-        ],
-    ];
 
     public function __construct(
         private readonly SecurityService $securityService,
@@ -50,12 +35,6 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
             return;
         }
 
-        $method = $request->getMethod();
-
-        if (!$this->isRouteSecured($route, $method)) {
-            return;
-        }
-
         $jwt = $request->headers->get('Authorization');
         $params = $request->attributes->get('_route_params');
 
@@ -65,34 +44,44 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
             return;
         }
 
+        $payload = $this->securityService->decodeJWTAndReturnPayload($jwt);
+
+        if (is_null($payload)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
+
+            return;
+        }
+
+        $accessToken = json_decode($payload, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Corrupted access token, retry again or create a new one!', 500));
+
+            return;
+        }
+
         if (str_contains($route, 'item')) {
-            $this->validateJWTForItemController($event, $jwt, $params);
+            $this->validateJWTForItemController($event, $accessToken, $params);
 
             return;
         }
 
         if (str_contains($route, 'inventory') || str_contains($route, 'inventories')) {
-            $this->validateJWTForInventoryController($event, $jwt, $params);
+            $this->validateJWTForInventoryController($event, $accessToken, $params);
         }
-    }
-
-    private function isRouteSecured(
-        string $route,
-        string $method
-    ): bool
-    {
-        return array_key_exists($route, $this->securedRoutes) && ($this->securedRoutes[$route] === $method || (is_array($this->securedRoutes[$route]) && in_array($method, $this->securedRoutes[$route])));
     }
 
     private function validateJWTForItemController(
         RequestEvent $event,
-        string $jwt,
+        array $accessToken,
         array $params
     ): void
     {
         $id = $params['id'];
 
-        $item = $this->cache->get('item_' . $id, function () use ($id) {
+        $item = $this->cache->get('item_' . $id, function (ItemInterface $item) use ($id) {
+            $item->expiresAfter(86400);
+
             return $this->itemRepository->findOneBy(['id' => $id]);
         });
 
@@ -102,22 +91,22 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$this->securityService->isClientAllowedForAdjustmentOnItem($jwt, $item)) {
+        if (!$this->securityService->isClientAllowedForAdjustmentOnItem($accessToken, $item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
     }
 
     private function validateJWTForInventoryController(
         RequestEvent $event,
-        string $jwt,
+        array $accessToken,
         array $params
     ): void
     {
-        if (count($params) === 0 && $this->securityService->isClientAdmin($jwt)) {
+        if (count($params) === 0 && $this->securityService->isClientAdmin($accessToken)) {
             return;
         }
 
-        if ((count($params) === 0) && !$this->securityService->isClientAdmin($jwt)) {
+        if ((count($params) === 0) && !$this->securityService->isClientAdmin($accessToken)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
 
             return;
@@ -126,7 +115,9 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
         $userId = $params['userId'];
 
 
-        $user = $this->cache->get('user_'. $userId, function () use ($userId) {
+        $user = $this->cache->get('user_'. $userId, function (ItemInterface $item) use ($userId) {
+            $item->expiresAfter(86400);
+
             return $this->userRepository->findOneBy(['id' => $userId]);
         });
 
@@ -135,7 +126,20 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
 
             return;
         }
-        if (($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user) || !$user->isPrivate() && !$event->getRequest()->isMethod('GET') && !$this->securityService->isClientAllowedForAdjustmentOnUserContent($jwt, $user))) {
+
+        $item = array_key_exists('itemId', $params) ? $this->cache->get('item_' . $params['itemId'], function (ItemInterface $item) use ($params) {
+            $item->expiresAfter(86400);
+
+            return $this->itemRepository->findOneBy(['id' => $params['itemId']]);
+        }) : null;
+
+        if (array_key_exists('itemId', $params) && is_null($item)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Item not found', 404));
+
+            return;
+        }
+
+        if (($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserInventory($accessToken, $user, $item) || !$user->isPrivate() && !$event->getRequest()->isMethod('GET') && !$this->securityService->isClientAllowedForAdjustmentOnUserInventory($accessToken, $user, $item))) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
     }

@@ -29,7 +29,7 @@ services:
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
         arguments:
             - '@Redis'
-            - { 'ttl': 600 }
+            - { 'ttl': 1800 }
 
     acme.custom_two_factor_provider:
         class: App\Provider\TwoFactorProvider

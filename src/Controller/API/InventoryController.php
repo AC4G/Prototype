@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Repository\ItemRepository;
 use App\Repository\InventoryRepository;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,22 +52,24 @@ final class InventoryController extends AbstractController
         string $userId
     ): Response
     {
-        $user = $this->cache->get('user_' . $userId, function () {
-            return null;
-        });
+        $user = $this->cache->getItem('user_' . $userId)->get();
 
         if (is_null($user)) {
             return  $this->customResponse->errorResponse($request, 'Internal error, retry again!', 500);
         }
 
-        $inventory = $this->inventoryRepository->findBy(['user' => $user]);
+        $inventory = $this->cache->get('inventory_' . $userId . '_GET', function (ItemInterface $item) use ($user) {
+            $item->expiresAfter(604800);
+
+            return json_encode($this->inventoriesService->prepareData($this->inventoryRepository->findBy(['user' => $user])));
+        });
 
         if (count($inventory) === 0) {
             return $this->customResponse->errorResponse($request, 'User has not an item in inventory yet!', 400);
         }
 
         return new JsonResponse(
-            $this->inventoriesService->prepareData($inventory)
+            $inventory
         );
     }
 
@@ -130,6 +133,8 @@ final class InventoryController extends AbstractController
         }
 
         if ($request->isMethod('GET')) {
+
+
             return new JsonResponse(
               $this->inventoriesService->prepareData($inventory)
             );

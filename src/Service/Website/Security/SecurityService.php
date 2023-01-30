@@ -14,6 +14,8 @@ use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+use App\Repository\ProjectRepository;
+
 final class SecurityService
 {
 
@@ -26,7 +28,9 @@ final class SecurityService
         private readonly ClientRepository $clientRepository,
         private readonly WebAppRepository $webAppRepository,
         private readonly ScopeRepository $scopeRepository,
-        private readonly CacheInterface $cache
+        private readonly CacheInterface $cache,
+
+        private readonly ProjectRepository $projectRepository
     )
     {
     }
@@ -147,9 +151,11 @@ final class SecurityService
 
         $expire = new DateTime('+ 7days');
 
+        $project = $this->projectRepository->findOneBy(['id' => $client->getProject()->getId()]);
+
         $authToken
             ->setUser($user)
-            ->setProject($client->getProject())
+            ->setProject($project)
             ->setAuthToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
             ->setExpireDate($expire)

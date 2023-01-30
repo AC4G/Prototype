@@ -65,7 +65,7 @@ final class SecurityController extends AbstractController
 
             $authToken = $this->cache->getItem('authToken_' . $content['code'])->get();
 
-            if (!$authToken->isHit()) {
+            if (is_null($authToken)) {
                 $authToken = $this->authTokenRepository->findOneBy(['authToken' => $content['code']]);
             }
 

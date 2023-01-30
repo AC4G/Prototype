@@ -13,6 +13,7 @@ use App\Entity\AuthToken;
 use App\Entity\AccessToken;
 use App\Entity\RefreshToken;
 use App\Repository\UserRepository;
+use App\Repository\ProjectRepository;
 use App\Repository\AuthTokenRepository;
 use App\Serializer\AccessTokenNormalizer;
 use App\Repository\AccessTokenRepository;
@@ -28,6 +29,7 @@ final class SecurityService
         private readonly AccessTokenNormalizer $accessTokenNormalizer,
         private readonly AccessTokenRepository $accessTokenRepository,
         private readonly AuthTokenRepository $authTokenRepository,
+        private readonly ProjectRepository $projectRepository,
         private readonly UserRepository $userRepository,
         private readonly ContainerBagInterface $params
     )
@@ -116,9 +118,12 @@ final class SecurityService
 
         $expire = new DateTime('+10 day');
 
+        $user = $this->userRepository->findOneBy(['id' => $token->getUser()->getId()]);
+        $project = $this->projectRepository->findOneBy(['id' => $token->getProject()->getId()]);
+
         $accessToken
-            ->setUser($token->getUser())
-            ->setProject($token->getProject())
+            ->setUser($user)
+            ->setProject($project)
             ->setAccessToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
             ->setExpireDate($expire)
@@ -130,8 +135,8 @@ final class SecurityService
         $refreshToken = new RefreshToken();
 
         $refreshToken
-            ->setUser($token->getUser())
-            ->setProject($token->getProject())
+            ->setUser($user)
+            ->setProject($project)
             ->setRefreshToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
             ->setExpireDate(new DateTime('+15 day'))
@@ -140,7 +145,7 @@ final class SecurityService
 
         $this->refreshTokenRepository->persistAndFlushEntity($refreshToken);
 
-        $this->authTokenRepository->deleteEntry($token);
+        //$this->authTokenRepository->merge($token);
 
         if ($grantType === 'refresh_token' && $oldAccessToken instanceof AccessToken) {
             $this->accessTokenRepository->deleteEntry($oldAccessToken);

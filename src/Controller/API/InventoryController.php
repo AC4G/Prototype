@@ -4,7 +4,6 @@ namespace App\Controller\API;
 
 use App\Repository\ItemRepository;
 use App\Repository\InventoryRepository;
-use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,24 +51,15 @@ final class InventoryController extends AbstractController
         string $userId
     ): Response
     {
-        $user = $this->cache->getItem('user_' . $userId)->get();
 
-        if (is_null($user)) {
-            return  $this->customResponse->errorResponse($request, 'Internal error, retry again!', 500);
-        }
+        $inventory = $this->cache->getItem('inventory_' . $userId)->get();
 
-        $inventory = $this->cache->get('inventory_' . $userId . '_GET', function (ItemInterface $item) use ($user) {
-            $item->expiresAfter(604800);
-
-            return json_encode($this->inventoriesService->prepareData($this->inventoryRepository->findBy(['user' => $user])));
-        });
-
-        if (count($inventory) === 0) {
+        if (is_null($inventory)) {
             return $this->customResponse->errorResponse($request, 'User has not an item in inventory yet!', 400);
         }
 
         return new JsonResponse(
-            $inventory
+            $this->inventoriesService->prepareData($inventory)
         );
     }
 
@@ -82,27 +72,16 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
-        $user = $this->cache->get('user_' . $userId, function () {
-            return null;
-        });
-
-        if (is_null($user)) {
-            return  $this->customResponse->errorResponse($request, 'Internal error, retry again!', 500);
-        }
-
-        $item = $this->itemRepository->findOneBy(['id' => $itemId]);
-
-        if (is_null($item)) {
-            return $this->customResponse->errorResponse($request, 'Item not found', 404);
-        }
-
-        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+        $user = $this->cache->getItem('user_' . $userId)->get();
 
         $parameter = json_decode($request->getContent(), true);
 
         if (($request->isMethod('POST') || $request->isMethod('PATCH')) && json_last_error() !== JSON_ERROR_NONE) {
             return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
         }
+
+        $item = $this->cache->getItem('item_' . $itemId)->get();
+        $inventory = $this->cache->getItem('inventory_' . $userId . '_item_' . $itemId)->get();
 
         if (is_null($inventory) && $request->isMethod('PATCH')) {
             return $this->customResponse->errorResponse($request, 'User does not has this item in inventory. Please use POST method to add item!', 406);
@@ -133,8 +112,6 @@ final class InventoryController extends AbstractController
         }
 
         if ($request->isMethod('GET')) {
-
-
             return new JsonResponse(
               $this->inventoriesService->prepareData($inventory)
             );
@@ -175,7 +152,12 @@ final class InventoryController extends AbstractController
         }
 
         if ($request->isMethod('GET')) {
-            return new JsonResponse(json_decode($inventory->getParameter(), true));
+            return new JsonResponse(
+                json_decode(
+                    $inventory->getParameter(),
+                    true
+                )
+            );
         }
 
         $parameters = json_decode($request->getContent(), true);

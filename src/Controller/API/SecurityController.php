@@ -69,7 +69,7 @@ final class SecurityController extends AbstractController
                 $authToken = $this->authTokenRepository->findOneBy(['authToken' => $content['code']]);
             }
 
-            if (is_null($authToken) || $authToken->getClient()->getId() !== $client->getId()) {
+            if (is_null($authToken) || $authToken->getProject()->getId() !== $client->getProject()->getId()) {
                 return $this->customResponse->errorResponse($request, 'Rejected!', 403);
             }
 
@@ -91,13 +91,13 @@ final class SecurityController extends AbstractController
                 return $this->customResponse->errorResponse($request, 'refresh_token required!', 406);
             }
 
-            $refreshToken = $this->refreshTokenRepository->findOneBy(['refreshToken' => $content['refresh_token'], 'client' => $client]);
+            $refreshToken = $this->refreshTokenRepository->findOneBy(['refreshToken' => $content['refresh_token'], 'project' => $client->getProject()]);
 
             if (is_null($refreshToken)) {
                 return $this->customResponse->errorResponse($request, 'Rejected!', 403);
             }
 
-            $accessToken = $this->accessTokenRepository->findOneBy(['client' => $client, 'user' => $refreshToken->getUser()]);
+            $accessToken = $this->accessTokenRepository->findOneBy(['project' => $client->getProject(), 'user' => $refreshToken->getUser()]);
 
             if (is_null($accessToken) || new DateTime() > $accessToken->getExpireDate()) {
                 return $this->customResponse->errorResponse($request, 'Rejected!', 403);

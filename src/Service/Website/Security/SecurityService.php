@@ -134,7 +134,7 @@ final class SecurityService
         Client $client
     ): bool
     {
-        return !is_null($this->authTokenRepository->findOneBy(['user' => $user, 'client' => $client]));
+        return !is_null($this->authTokenRepository->findOneBy(['user' => $user, 'project' => $client->getProject()]));
     }
 
     private function createAuthenticationToken(
@@ -149,7 +149,6 @@ final class SecurityService
 
         $authToken
             ->setUser($user)
-            ->setClient($client)
             ->setProject($client->getProject())
             ->setAuthToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())

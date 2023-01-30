@@ -44,7 +44,6 @@ final class SecurityService
 
         $accessToken
             ->setUser($client->getProject()->getDeveloper()->getUser())
-            ->setClient($client)
             ->setAccessToken(bin2hex(random_bytes(64)))
             ->setProject($client->getProject())
             ->setCreationDate(new DateTime())
@@ -119,7 +118,6 @@ final class SecurityService
 
         $accessToken
             ->setUser($token->getUser())
-            ->setClient($token->getClient())
             ->setProject($token->getProject())
             ->setAccessToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
@@ -133,7 +131,6 @@ final class SecurityService
 
         $refreshToken
             ->setUser($token->getUser())
-            ->setClient($token->getClient())
             ->setProject($token->getProject())
             ->setRefreshToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())

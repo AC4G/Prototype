@@ -142,7 +142,7 @@ final class SecurityController extends AbstractController
 
         $request->getSession()->remove('redirect');
 
-        return $this->redirect($this->securityService->createAuthTokenAndBuildRedirectUri($query, $user));
+        return $this->redirect($this->securityService->createAuthTokenAndBuildRedirectURI($query, $user));
     }
 
 

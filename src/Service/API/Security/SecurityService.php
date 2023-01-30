@@ -14,8 +14,9 @@ use App\Entity\AccessToken;
 use App\Entity\RefreshToken;
 use App\Repository\UserRepository;
 use App\Repository\AuthTokenRepository;
-use App\Repository\UserRolesRepository;
+use App\Serializer\AccessTokenNormalizer;
 use App\Repository\AccessTokenRepository;
+use App\Serializer\RefreshTokenNormalizer;
 use App\Repository\RefreshTokenRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
@@ -23,9 +24,10 @@ final class SecurityService
 {
     public function __construct(
         private readonly RefreshTokenRepository $refreshTokenRepository,
+        private readonly RefreshTokenNormalizer $refreshTokenNormalizer,
+        private readonly AccessTokenNormalizer $accessTokenNormalizer,
         private readonly AccessTokenRepository $accessTokenRepository,
         private readonly AuthTokenRepository $authTokenRepository,
-        private readonly UserRolesRepository $userRolesRepository,
         private readonly UserRepository $userRepository,
         private readonly ContainerBagInterface $params
     )
@@ -42,6 +44,7 @@ final class SecurityService
 
         $accessToken
             ->setUser($client->getProject()->getDeveloper()->getUser())
+            ->setClient($client)
             ->setAccessToken(bin2hex(random_bytes(64)))
             ->setProject($client->getProject())
             ->setCreationDate(new DateTime())
@@ -55,13 +58,13 @@ final class SecurityService
         $seconds = $diff->s + ($diff->m * 60) + ($diff->h * 3600);
 
         return [
-            'access_token' => $this->generateJWT($accessToken->getAccessToken()),
+            'access_token' => $this->encodePayloadToJWT(json_encode($this->accessTokenNormalizer->normalize($accessToken))),
             'token_type' => 'bearer',
             'expires_in' => $seconds
         ];
     }
 
-    protected function generateJWT(
+    private function encodePayloadToJWT(
         string $token
     ): string
     {
@@ -78,8 +81,8 @@ final class SecurityService
         ], $privateKey, 'RS256');
     }
 
-    protected function decodeJWTAndReturnToken(
-        ?string $jwt
+    public function decodeJWTAndReturnPayload(
+        string $jwt
     ): ?string
     {
         $passphrase = $this->params->get('app.passphrase');
@@ -116,6 +119,7 @@ final class SecurityService
 
         $accessToken
             ->setUser($token->getUser())
+            ->setClient($token->getClient())
             ->setProject($token->getProject())
             ->setAccessToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
@@ -129,6 +133,7 @@ final class SecurityService
 
         $refreshToken
             ->setUser($token->getUser())
+            ->setClient($token->getClient())
             ->setProject($token->getProject())
             ->setRefreshToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
@@ -145,81 +150,42 @@ final class SecurityService
         }
 
         $diff = $expire->diff(new DateTime());
-        $expireInSeconds = $diff->s + ($diff->m * 60) + ($diff->h * 3600) + ($diff->d * 3600 * 24);
+        $seconds = $diff->s + ($diff->m * 60) + ($diff->h * 3600) + ($diff->d * 3600 * 24);
 
         return [
-            'access_token' => $this->generateJWT($accessToken->getAccessToken()),
+            'access_token' => $this->encodePayloadToJWT(json_encode($this->accessTokenNormalizer->normalize($accessToken))),
             'token_type' => 'bearer',
-            'expires_in' => $expireInSeconds,
-            'refresh_token' => $this->generateJWT($refreshToken->getRefreshToken())
+            'expires_in' => $seconds,
+            'refresh_token' => $this->encodePayloadToJWT(json_encode($this->refreshTokenNormalizer->normalize($refreshToken)))
         ];
     }
 
-    public function isClientAllowedForAdjustmentOnUserContent(
-        ?string $jwt,
-        User $user
+    public function isClientAllowedForAdjustmentOnUserInventory(
+        array $accessToken,
+        User $user,
+        ?Item $item
     ): bool
     {
-        if (is_null($jwt)) {
-            return false;
+        if (is_null($item)) {
+            return $accessToken['user']['id'] === $user->getId();
         }
 
-        $token = $this->decodeJWTAndReturnToken($jwt);
-
-        if (is_null($token)) {
-            return false;
-        }
-
-        $accessToken = $this->accessTokenRepository->findOneBy(['user' => $user, 'accessToken' => $token]);
-
-        return !is_null($accessToken) && new DateTime() < $accessToken->getExpireDate();
+        return $accessToken['user']['id'] === $user->getId() && $item->getProject()->getId() === $accessToken['project']['id'];
     }
 
     public function isClientAllowedForAdjustmentOnItem(
-        string $jwt,
+        array $accessToken,
         Item $item
     ): bool
     {
-        $token = $this->decodeJWTAndReturnToken($jwt);
-
-        if (is_null($token)) {
-            return false;
-        }
-
-        $accessTokenData = $this->accessTokenRepository->findOneBy(['accessToken' => $token]);
-
-        return !is_null($accessTokenData) && $item->getUser()->getId() === $accessTokenData->getUser()->getId() && $item->getUser()->getId() === $accessTokenData->getUser()->getId();
+        return $item->getProject()->getId() === $accessToken['project']['id'];
     }
 
     public function isClientAdmin(
-        $jwt
+        array $accessToken
     ): bool
     {
-        if (is_null($jwt)) {
-            return false;
-        }
-
-        $token = $this->decodeJWTAndReturnToken($jwt);
-
-        if (is_null($token)) {
-            return false;
-        }
-
-        $accessToken = $this->accessTokenRepository->findOneBy(['accessToken' => $token]);
-
-        if (is_null($accessToken)) {
-            return false;
-        }
-
-        $userRoles = $this->userRolesRepository->findBy(['user' => $accessToken->getProject()->getDeveloper()->getUser()]);
-
-        foreach ($userRoles as $role) {
-            if ($role->getRoleIdent()->getRoleName() === 'ROLE_ADMIN') {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array('ROLE_ADMIN', $accessToken['user']['roles']);
     }
 
     public function nicknameExists(

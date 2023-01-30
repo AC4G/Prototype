@@ -22,7 +22,7 @@ class InventoryNormalizer
             'item' => [
                 'id' => $inventory->getItem()->getId(),
                 'name' => $inventory->getItem()->getName(),
-                'gameName' => $inventory->getItem()->getGameName()
+                'projectName' => $inventory->getItem()->getProject()->getProjectName()
             ]
         ];
     }

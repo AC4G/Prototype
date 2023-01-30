@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use DateTime;
-use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 
 final class ThrottlingService
@@ -11,8 +10,6 @@ final class ThrottlingService
     private int $limit;
     private int $interval;
     private string $client;
-
-    private DateTime $expireTime;
 
     public function __construct(
         private readonly CacheInterface $cache
@@ -37,63 +34,90 @@ final class ThrottlingService
 
     private function addClientToList(): void
     {
-        $this->cache->get('throttling_count_' . $this->client, function (ItemInterface $item) {
-           $item->expiresAfter($this->interval);
+        $count = $this->cache->getItem('throttling_count_' . $this->client);
 
-           return 0;
-        });
+        if ($count->isHit()) {
+            return;
+        }
+
+        $count
+            ->set(0)
+            ->expiresAfter($this->interval)
+        ;
+
+        $this->cache->save($count);
     }
 
     public function increaseCounter(
         int $count = 1
     ): bool
     {
-        $currentStatus = $this->cache->get('throttling_count_' . $this->client, function () {});
+        $currentStatus = $this->cache->getItem('throttling_count_' . $this->client);
 
-        if ($currentStatus > $this->limit || ($currentStatus + $count) > $this->limit) {
+        $status = $currentStatus->get();
+
+        if ($status > $this->limit || ($status + $count) > $this->limit) {
             return false;
         }
 
-        $this->cache->delete('throttling_count_' . $this->client);
+        $newStatus = $status + $count;
 
-        $this->cache->get('throttling_count_' . $this->client, function (ItemInterface $item) use ($currentStatus, $count) {
-            $item->expiresAfter($this->interval);
+        $currentStatus
+            ->set($newStatus)
+            ->expiresAfter($this->interval)
+        ;
 
-            $newStatus = $currentStatus + $count;
+        $this->cache->save($currentStatus);
 
-            if ($newStatus === $this->limit) {
-                $this->cache->delete('throttling_time_' . $this->client);
+        if ($newStatus === $this->limit) {
+            $timer = $this->cache->getItem('throttling_time_' . $this->client);
 
-                $this->cache->get('throttling_time_' . $this->client, function (ItemInterface $item) {
-                    $item->expiresAfter($this->interval);
+            $timer
+                ->set([
+                    'created' => new DateTime(),
+                    'expires' => new DateTime('+' . $this->interval . ' seconds')
+                ])
+                ->expiresAfter($this->interval)
+            ;
 
-                    return $this->expireTime = new DateTime('+' . $this->interval . ' seconds');
-                });
-            }
-
-            return $newStatus;
-        });
+            $this->cache->save($timer);
+        }
 
         return true;
     }
 
     public function hasClientAttemptsLeft(): bool
     {
-        $status = $this->cache->get('throttling_count_' . $this->client, function () {});
+        $status = $this->cache->getItem('throttling_count_' . $this->client);
 
-        return $status !== $this->limit;
+        return $status->get() !== $this->limit;
     }
 
     public function getCurrentStatus(): int
     {
-        return $this->cache->get('throttling_count_' . $this->client, function () {});
+        return $this->cache->getItem('throttling_count_' . $this->client)->get();
     }
 
-    public function getTimeToWait(): int
+    public function getTimerList(): array
     {
-        $this->expireTime = $this->cache->get('throttling_time_' . $this->client, function () {});
+        return $this->cache->getItem('throttling_time_' . $this->client)->get();
+    }
 
-        return $this->expireTime->getTimestamp();
+    public function getStaticWaitTime(): int
+    {
+        $timer = $this->cache->getItem('throttling_time_' . $this->client)->get();
+
+        $created = $timer['created'];
+        $expires = $timer['expires'];
+
+        return ($expires->getTimestamp() - $created->getTimestamp()) / 60;
+    }
+
+    public function getTimeToLive(): int
+    {
+        $timer = $this->cache->getItem('throttling_time_' . $this->client)->get();
+
+        return ($timer['expires']->getTimestamp() - (new DateTime())->getTimestamp()) % 60;
     }
 
     public function remove(): void

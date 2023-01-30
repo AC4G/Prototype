@@ -18,12 +18,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class SecurityController extends AbstractController
 {
     public function __construct(
-        private RefreshTokenRepository $refreshTokenRepository,
-        private AccessTokenRepository $accessTokenRepository,
-        private AuthTokenRepository $authTokenRepository,
-        private ClientRepository $clientRepository,
-        private SecurityService $securityService,
-        private CustomResponse $customResponse
+        private readonly RefreshTokenRepository $refreshTokenRepository,
+        private readonly AccessTokenRepository $accessTokenRepository,
+        private readonly AuthTokenRepository $authTokenRepository,
+        private readonly ClientRepository $clientRepository,
+        private readonly SecurityService $securityService,
+        private readonly CustomResponse $customResponse
     )
     {
     }

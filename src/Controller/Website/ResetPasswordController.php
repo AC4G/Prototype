@@ -124,11 +124,7 @@ final class ResetPasswordController extends AbstractController
             }
 
             if (!$throttling->hasClientAttemptsLeft()) {
-                $timeStamp = $throttling->getTimeToWait();
-
-                $timer = date('i:s', $timeStamp - (new DateTime())->getTimestamp());
-
-                $error = 'Too many attempts, retry in ' . $timer . ' minutes.';
+                $error = 'Too many attempts, retry in ' . $throttling->getStaticWaitTime() . ' minutes.';
             }
         }
 

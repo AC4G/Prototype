@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use App\Repository\UserRepository;
 use App\Repository\ItemRepository;
+use App\Repository\InventoryRepository;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
@@ -15,6 +16,7 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
 {
 
     public function __construct(
+        private readonly InventoryRepository $inventoryRepository,
         private readonly SecurityService $securityService,
         private readonly CustomResponse $customResponse,
         private readonly ItemRepository $itemRepository,
@@ -60,13 +62,13 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
             return;
         }
 
-        if (str_contains($route, 'item')) {
+        if (str_starts_with($route, 'api_item')) {
             $this->validateJWTForItemController($event, $accessToken, $params);
 
             return;
         }
 
-        if (str_contains($route, 'inventory') || str_contains($route, 'inventories')) {
+        if (str_starts_with($route, 'api_inventory') || str_starts_with($route, 'api_inventories')) {
             $this->validateJWTForInventoryController($event, $accessToken, $params);
         }
     }
@@ -141,6 +143,45 @@ final class APIClientAuthorizationListener implements EventSubscriberInterface
 
         if (($user->isPrivate() && !$this->securityService->isClientAllowedForAdjustmentOnUserInventory($accessToken, $user, $item) || !$user->isPrivate() && !$event->getRequest()->isMethod('GET') && !$this->securityService->isClientAllowedForAdjustmentOnUserInventory($accessToken, $user, $item))) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
+        }
+
+        if (!array_key_exists('itemId', $params)) {
+            $inventory = $this->cache->get('inventory_' . $userId, function (ItemInterface $item) use ($user) {
+                $item->expiresAfter(86400);
+
+                return $this->inventoryRepository->findOneBy(['user' => $user->getId()]);
+            });
+
+            if (is_null($inventory)) {
+                $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'User has not an item in inventory yet!', 404));
+            }
+
+            return;
+        }
+
+        $itemId = $params['itemId'];
+        $item = $this->cache->get('item_' . $itemId, function (ItemInterface $item) use ($itemId) {
+            $item->expiresAfter(86400);
+
+            return $this->itemRepository->findOneBy(['id' => $itemId]);
+        });
+
+        if (is_null($item)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Item not found', 404));
+
+            return;
+        }
+
+        $item = $item->get();
+
+        $inventory = $this->cache->get('inventory_' . $userId . '_item_' . $itemId, function (ItemInterface $itemInterface) use ($user, $item) {
+            $itemInterface->expiresAfter(86400);
+
+            return $this->inventoryRepository->findOneBy(['user' => $user->getId(), 'item' => $item]);
+        });
+
+        if (is_null($inventory)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'User has not an item in inventory yet!', 404));
         }
     }
 

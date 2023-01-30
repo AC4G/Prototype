@@ -68,7 +68,7 @@ class Project
     /**
      * @var Developer
      *
-     * @ORM\ManyToOne(targetEntity="Developer")
+     * @ORM\ManyToOne(targetEntity="Developer", fetch="EAGER")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="developer_id", referencedColumnName="id")
      * })

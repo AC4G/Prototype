@@ -40,7 +40,7 @@ class Inventory
     /**
      * @var User
      *
-     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\ManyToOne(targetEntity="User", fetch="EAGER")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
      * })
@@ -50,7 +50,7 @@ class Inventory
     /**
      * @var Item
      *
-     * @ORM\ManyToOne(targetEntity="Item")
+     * @ORM\ManyToOne(targetEntity="Item", fetch="EAGER")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="item_id", referencedColumnName="id", onDelete="CASCADE")
      * })

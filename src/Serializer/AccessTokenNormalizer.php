@@ -13,7 +13,6 @@ class AccessTokenNormalizer
     ): array
     {
         $user = $accessToken->getUser();
-        $client = $accessToken->getClient();
         $project = $accessToken->getProject();
 
         return [
@@ -22,10 +21,6 @@ class AccessTokenNormalizer
             'scopes' => $accessToken->getScopes(),
             'project' => [
                 'id' => $project->getId(),
-            ],
-            'client' => [
-                'id' => $client->getId(),
-                'clientId' => $client->getClientId(),
             ],
             'user' => [
                 'id' => $user->getId(),

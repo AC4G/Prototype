@@ -18,7 +18,7 @@ final class CustomResponse
             'error' => [
                 'status' => $status,
                 'source' => [
-                    'pointer' => $request->getUri()
+                    'pointer' => $request->getRequestUri()
                 ],
                 'method' => $request->getMethod(),
                 'message' => $message
@@ -42,7 +42,7 @@ final class CustomResponse
             'notification' => [
                 'status' => $status,
                 'source' => [
-                    'pointer' => $request->getUri()
+                    'pointer' => $request->getRequestUri()
                 ],
                 'method' => $request->getMethod(),
                 'message' => $message

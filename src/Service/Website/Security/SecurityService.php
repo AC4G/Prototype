@@ -9,12 +9,13 @@ use App\Entity\AuthToken;
 use App\Repository\ScopeRepository;
 use App\Repository\ClientRepository;
 use App\Repository\WebAppRepository;
+use App\Repository\ProjectRepository;
 use App\Repository\AuthTokenRepository;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use App\Repository\ProjectRepository;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class SecurityService
 {
@@ -30,7 +31,8 @@ final class SecurityService
         private readonly ScopeRepository $scopeRepository,
         private readonly CacheInterface $cache,
 
-        private readonly ProjectRepository $projectRepository
+        private readonly ProjectRepository $projectRepository,
+        private readonly NormalizerInterface $normalizer
     )
     {
     }
@@ -81,7 +83,7 @@ final class SecurityService
             $errors[] = 'Already authenticated!';
         }
 
-        $this->webApp = $this->cache->get('webApp_client_'. $query['client_id'], function (ItemInterface $item) use ($query) {
+        $this->webApp = $this->cache->get('webApp_'. $query['client_id'], function (ItemInterface $item) use ($query) {
             $item->expiresAfter(86400);
 
             return $this->webAppRepository->findOneBy(['client' => $this->client]);
@@ -101,13 +103,13 @@ final class SecurityService
     {
         $authToken = $this->createAuthenticationToken($user, $this->client, $this->webApp);
 
-        $state = '';
+        $redirectURI = $this->webApp->getRedirectUrl() . '?code=' . $authToken->getAuthToken();
 
-        if (array_key_exists('state', $query)) {
-            $state = $query['state'];
+        if (!array_key_exists('state', $query)) {
+            return $redirectURI;
         }
 
-        return $this->webApp->getRedirectUrl() . '?code=' . $authToken->getAuthToken() . '&state=' . $state;
+        return $redirectURI . '&state=' . $query['state'];
     }
 
     public function getClient(): ?Client
@@ -151,7 +153,11 @@ final class SecurityService
 
         $expire = new DateTime('+ 7days');
 
-        $project = $this->projectRepository->findOneBy(['id' => $client->getProject()->getId()]);
+        $project = $this->cache->get('project_' . $client->getProject()->getId(), function (ItemInterface $item) use ($client) {
+            $item->expiresAfter(86400);
+
+            return $this->projectRepository->findOneBy(['id' => $client->getProject()->getId()]);
+        });
 
         $authToken
             ->setUser($user)

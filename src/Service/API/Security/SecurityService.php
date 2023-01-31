@@ -14,7 +14,6 @@ use App\Entity\AccessToken;
 use App\Entity\RefreshToken;
 use App\Repository\UserRepository;
 use App\Repository\ProjectRepository;
-use App\Repository\AuthTokenRepository;
 use App\Serializer\AccessTokenNormalizer;
 use App\Repository\AccessTokenRepository;
 use App\Serializer\RefreshTokenNormalizer;
@@ -28,7 +27,6 @@ final class SecurityService
         private readonly RefreshTokenNormalizer $refreshTokenNormalizer,
         private readonly AccessTokenNormalizer $accessTokenNormalizer,
         private readonly AccessTokenRepository $accessTokenRepository,
-        private readonly AuthTokenRepository $authTokenRepository,
         private readonly ProjectRepository $projectRepository,
         private readonly UserRepository $userRepository,
         private readonly ContainerBagInterface $params
@@ -145,8 +143,6 @@ final class SecurityService
 
         $this->refreshTokenRepository->persistAndFlushEntity($refreshToken);
 
-        //$this->authTokenRepository->merge($token);
-
         if ($grantType === 'refresh_token' && $oldAccessToken instanceof AccessToken) {
             $this->accessTokenRepository->deleteEntry($oldAccessToken);
         }
@@ -162,7 +158,15 @@ final class SecurityService
         ];
     }
 
-    public function isClientAllowedForAdjustmentOnUserInventory(
+    public function hasClientPermissionForAccessingInventory(
+        array $accessToken,
+        User $user
+    ): bool
+    {
+        return $accessToken['user']['id'] === $user->getId();
+    }
+
+    public function hasClientPermissionForAdjustmentOnUserInventory(
         array $accessToken,
         User $user,
         ?Item $item
@@ -175,7 +179,7 @@ final class SecurityService
         return $accessToken['user']['id'] === $user->getId() && $item->getProject()->getId() === $accessToken['project']['id'];
     }
 
-    public function isClientAllowedForAdjustmentOnItem(
+    public function hasClientPermissionForAdjustmentOnItem(
         array $accessToken,
         Item $item
     ): bool

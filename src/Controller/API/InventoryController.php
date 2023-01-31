@@ -51,7 +51,6 @@ final class InventoryController extends AbstractController
         string $userId
     ): Response
     {
-
         $inventory = $this->cache->getItem('inventory_' . $userId)->get();
 
         if (is_null($inventory)) {

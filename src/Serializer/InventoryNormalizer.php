@@ -12,6 +12,8 @@ class InventoryNormalizer
         array $context = []
     ): array
     {
+        $project = $inventory->getItem()->getProject();
+
         return [
             'amount' => $inventory->getAmount(),
             'parameter' => json_decode($inventory->getParameter(), true),
@@ -22,7 +24,7 @@ class InventoryNormalizer
             'item' => [
                 'id' => $inventory->getItem()->getId(),
                 'name' => $inventory->getItem()->getName(),
-                'projectName' => $inventory->getItem()->getProject()->getProjectName()
+                'projectName' => is_null($project) ? null : $project->getProjectName()
             ]
         ];
     }

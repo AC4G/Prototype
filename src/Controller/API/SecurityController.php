@@ -63,11 +63,11 @@ final class SecurityController extends AbstractController
                 return $this->customResponse->errorResponse($request, 'code required!', 406);
             }
 
-            $authToken = $this->cache->getItem('authToken_' . $content['code'])->get();
+            $authToken = $this->cache->get('authToken_' . $content['code'], function (ItemInterface $item) use ($content) {
+                $item->expiresAfter(86400);
 
-            if (is_null($authToken)) {
-                $authToken = $this->authTokenRepository->findOneBy(['authToken' => $content['code']]);
-            }
+                $this->authTokenRepository->findOneBy(['authToken' => $content['code']]);
+            });
 
             if (is_null($authToken) || $authToken->getProject()->getId() !== $client->getProject()->getId()) {
                 return $this->customResponse->errorResponse($request, 'Rejected!', 403);

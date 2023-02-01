@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use DateTime;
 use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -51,6 +52,12 @@ final class APIAuthorizationListener implements EventSubscriberInterface
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Corrupted access token, retry again or create a new one!', 500));
+
+            return;
+        }
+
+        if ((new DateTime($accessToken['expireDate']['date']) < new DateTime())) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Access token is expired!', 400));
 
             return;
         }

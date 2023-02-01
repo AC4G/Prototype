@@ -43,7 +43,7 @@ final class SecurityService
         $expire = new DateTime('+1 day');
 
         $accessToken
-            ->setUser($client->getProject()->getDeveloper()->getUser())
+            ->setUser(null)
             ->setAccessToken(bin2hex(random_bytes(64)))
             ->setProject($client->getProject())
             ->setCreationDate(new DateTime())
@@ -107,7 +107,7 @@ final class SecurityService
     }
 
     public function buildPayloadWithAccessAndRefreshToken(
-        AuthToken|RefreshToken $token,
+        AuthToken|array $token,
         string $grantType,
         AccessToken $oldAccessToken = null
     ): array
@@ -116,8 +116,8 @@ final class SecurityService
 
         $expire = new DateTime('+10 day');
 
-        $user = $this->userRepository->findOneBy(['id' => $token->getUser()->getId()]);
-        $project = $this->projectRepository->findOneBy(['id' => $token->getProject()->getId()]);
+        $user = $this->userRepository->findOneBy(['id' => is_array($token) ? $token['user']['id'] : $token->getUser()->getId()]);
+        $project = $this->projectRepository->findOneBy(['id' => is_array($token) ? $token['project']['id'] : $token->getProject()->getId()]);
 
         $accessToken
             ->setUser($user)
@@ -125,7 +125,7 @@ final class SecurityService
             ->setAccessToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
             ->setExpireDate($expire)
-            ->setScopes($token->getScopes())
+            ->setScopes(is_array($token) ? $token['scopes'] : $token->getScopes())
         ;
 
         $this->accessTokenRepository->persistAndFlushEntity($accessToken);
@@ -138,7 +138,7 @@ final class SecurityService
             ->setRefreshToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
             ->setExpireDate(new DateTime('+15 day'))
-            ->setScopes($token->getScopes())
+            ->setScopes(is_array($token) ? $token['scopes'] : $token->getScopes())
         ;
 
         $this->refreshTokenRepository->persistAndFlushEntity($refreshToken);

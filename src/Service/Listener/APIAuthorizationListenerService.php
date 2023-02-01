@@ -3,9 +3,9 @@
 namespace App\Service\Listener;
 
 use App\Entity\User;
-use App\Repository\InventoryRepository;
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
+use App\Repository\InventoryRepository;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
@@ -84,7 +84,7 @@ final class APIAuthorizationListenerService
             return $this->itemRepository->findOneBy(['id' => $params['itemId']]);
         });
 
-        if ((is_null($item)) && (($user->isPrivate() && !$this->securityService->hasClientPermissionForAdjustmentOnUserInventory($accessToken, $user, $item) || !$user->isPrivate() && !$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAdjustmentOnUserInventory($accessToken, $user, $item)))) {
+        if (($user->isPrivate() && !$this->securityService->hasClientPermissionForAdjustmentOnUserInventory($accessToken, $user, $item) || !$user->isPrivate() && !$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAdjustmentOnUserInventory($accessToken, $user, $item))) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
 
             return;
@@ -103,7 +103,7 @@ final class APIAuthorizationListenerService
         });
 
         if (is_null($inventory)) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'User has not an item in inventory yet!', 404));
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet!', $params['itemId']), 404));
         }
     }
 

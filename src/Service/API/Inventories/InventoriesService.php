@@ -46,7 +46,6 @@ final class InventoriesService
             foreach ($parameters as $key => $oldValue) {
                 if ($parameterKey === $key) {
                     $parameters[$parameterKey] = is_numeric($oldValue) && is_numeric($newValue) ? $oldValue + $newValue : $newValue;
-
                     continue 2;
                 }
 

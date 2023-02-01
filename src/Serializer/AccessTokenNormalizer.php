@@ -23,9 +23,9 @@ class AccessTokenNormalizer
                 'id' => $project->getId(),
             ],
             'user' => [
-                'id' => $user->getId(),
-                'nickname' => $user->getNickname(),
-                'roles' => $user->getRoles()
+                'id' => is_null($user) ? null : $user->getId(),
+                'nickname' => is_null($user) ? null : $user->getNickname(),
+                'roles' => is_null($user) ? null : $user->getRoles()
             ],
             'creationDate' => $accessToken->getCreationDate(),
             'expireDate' => $accessToken->getExpireDate()

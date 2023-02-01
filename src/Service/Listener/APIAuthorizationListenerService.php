@@ -152,7 +152,7 @@ final class APIAuthorizationListenerService
             return $this->inventoryRepository->findBy(['user' => $user->getId()]);
         });
 
-        if (is_null($inventory)) {
+        if (count($inventory) === 0) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'User has not an item in inventory yet!', 404));
         }
 

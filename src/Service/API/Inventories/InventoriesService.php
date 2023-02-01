@@ -7,6 +7,7 @@ use App\Entity\Item;
 use App\Entity\Inventory;
 use App\Serializer\InventoryNormalizer;
 use App\Repository\InventoryRepository;
+use Symfony\Component\HttpFoundation\Request;
 
 final class InventoriesService
 {
@@ -105,18 +106,35 @@ final class InventoriesService
         $this->inventoryRepository->flushEntity();
     }
 
+    public function getFormat(
+        Request $request,
+    ): null|string
+    {
+        $header = $request->headers->all();
+
+        $format = null;
+
+        if (array_key_exists('format', $header) && $header['format'][0] === 'jsonld') {
+            $format = $header['format'][0];
+        }
+
+        return $format;
+    }
+
     public function prepareData(
-        array|Inventory $inventories
+        array|Inventory $inventories,
+        ?string $format = null,
+        array $context = []
     ): array
     {
         if (is_object($inventories)) {
-            return $this->inventoryNormalizer->normalize($inventories);
+            return $this->inventoryNormalizer->normalize($inventories, $format, $context);
         }
 
         $inventoryList = [];
 
         foreach ($inventories as $inventory) {
-            $inventoryList[] = $this->inventoryNormalizer->normalize($inventory);
+            $inventoryList[] = $this->inventoryNormalizer->normalize($inventory, $format, $context);
         }
 
         return $inventoryList;

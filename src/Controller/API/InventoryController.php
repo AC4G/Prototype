@@ -32,13 +32,15 @@ final class InventoryController extends AbstractController
     {
         $inventory = $this->inventoryRepository->findAll();
 
-        if (count($inventory) !== 0) {
-            return new JsonResponse(
-                $this->inventoriesService->prepareData($inventory)
-            );
+        if (count($inventory) === 0) {
+            return $this->customResponse->errorResponse($request, 'No inventories here, maybe next time...');
         }
 
-        return $this->customResponse->errorResponse($request, 'No inventories here, maybe next time...');
+        $format = $this->inventoriesService->getFormat($request);
+
+        return new JsonResponse(
+            $this->inventoriesService->prepareData($inventory, $format)
+        );
     }
 
     /**
@@ -51,12 +53,10 @@ final class InventoryController extends AbstractController
     {
         $inventory = $this->cache->getItem('inventory_' . $userId)->get();
 
-        if (is_null($inventory)) {
-            return $this->customResponse->errorResponse($request, 'User has not an item in inventory yet!', 400);
-        }
+        $format = $this->inventoriesService->getFormat($request);
 
         return new JsonResponse(
-            $this->inventoriesService->prepareData($inventory)
+            $this->inventoriesService->prepareData($inventory, $format)
         );
     }
 
@@ -101,8 +101,10 @@ final class InventoryController extends AbstractController
         }
 
         if ($request->isMethod('GET')) {
+            $format = $this->inventoriesService->getFormat($request);
+
             return new JsonResponse(
-                $this->inventoriesService->prepareData($inventory)
+                $this->inventoriesService->prepareData($inventory, $format)
             );
         }
 

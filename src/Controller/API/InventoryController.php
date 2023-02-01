@@ -2,7 +2,6 @@
 
 namespace App\Controller\API;
 
-use App\Repository\ItemRepository;
 use App\Repository\InventoryRepository;
 use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
@@ -18,7 +17,6 @@ final class InventoryController extends AbstractController
     public function __construct(
         private readonly InventoryRepository $inventoryRepository,
         private readonly InventoriesService $inventoriesService,
-        private readonly ItemRepository $itemRepository,
         private readonly CustomResponse $customResponse,
         private readonly CacheInterface $cache
     )
@@ -141,24 +139,18 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
-        $user = $this->cache->get('user_' . $userId, function () {
-            return null;
-        });
+        $user = $this->cache->getItem('user_' . $userId)->get();
 
-        if (is_null($user)) {
-            return  $this->customResponse->errorResponse($request, 'Internal error, retry again!', 500);
+        $item = $this->cache->getItem('item_' . $itemId)->get();
+
+        $inventory = '';
+
+        if ($request->isMethod('GET')) {
+            $inventory = $this->cache->getItem('inventory_' . $user->getId() . '_item_' . $item->getId())->get();
         }
 
-        $item = $this->itemRepository->findOneBy(['id' => $itemId]);
-
-        if (is_null($item)) {
-            return $this->customResponse->errorResponse($request, sprintf('Item with id %s don\'t exists!', $itemId), 404);
-        }
-
-        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
-
-        if (is_null($inventory)) {
-            return $this->customResponse->errorResponse($request, sprintf('User don\'t has item with id %s in inventory', $itemId), 404);
+        if (!$request->isMethod('GET')) {
+            $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
         }
 
         if ($request->isMethod('GET')) {
@@ -181,6 +173,7 @@ final class InventoryController extends AbstractController
         }
 
         $this->inventoriesService->deleteParameter($inventory, $parameters);
+        $this->cache->delete('inventory_' . $user->getId() . '_item_' . $item->getId());
 
         return $this->customResponse->notificationResponse($request, sprintf('Inventory parameter from user %s and item %d successfully removed', $itemId, $itemId));
     }

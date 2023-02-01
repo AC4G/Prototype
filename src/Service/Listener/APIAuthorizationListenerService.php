@@ -96,14 +96,16 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        $inventory = $this->cache->get('inventory_' . $userId . '_item_' . $params['itemId'], function (ItemInterface $itemInterface) use ($user, $item) {
-            $itemInterface->expiresAfter(86400);
+        if ($event->getRequest()->isMethod('GET')) {
+            $inventory = $this->cache->get('inventory_' . $userId . '_item_' . $params['itemId'], function (ItemInterface $itemInterface) use ($user, $item) {
+                $itemInterface->expiresAfter(86400);
 
-            return $this->inventoryRepository->findOneBy(['user' => $user->getId(), 'item' => $item]);
-        });
+                return $this->inventoryRepository->findOneBy(['user' => $user->getId(), 'item' => $item]);
+            });
 
-        if (is_null($inventory)) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet!', $params['itemId']), 404));
+            if (is_null($inventory)) {
+                $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet!', $params['itemId']), 404));
+            }
         }
     }
 

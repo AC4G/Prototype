@@ -39,7 +39,7 @@ class WebApp
     /**
      * @var Client
      *
-     * @ORM\ManyToOne(targetEntity="Client")
+     * @ORM\ManyToOne(targetEntity="Client", fetch="EAGER")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="oauth_client_id", referencedColumnName="id")
      * })

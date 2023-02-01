@@ -22,5 +22,4 @@ class ClientRepository extends AbstractRepository
         );
     }
 
-
 }

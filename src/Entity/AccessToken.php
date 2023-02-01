@@ -53,14 +53,14 @@ class AccessToken
     private DateTime $expireDate;
 
     /**
-     * @var User
+     * @var null|User
      *
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true)
      * })
      */
-    private User $user;
+    private ?User $user;
 
     /**
      * @var Project

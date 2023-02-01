@@ -80,24 +80,32 @@ final class InventoryController extends AbstractController
         }
 
         $item = $this->cache->getItem('item_' . $itemId)->get();
-        $inventory = $this->cache->getItem('inventory_' . $userId . '_item_' . $itemId)->get();
+        $inventory = '';
+
+        if ($request->isMethod('GET')) {
+            $inventory = $this->cache->getItem('inventory_' . $userId . '_item_' . $itemId)->get();
+        }
+
+        if (!$request->isMethod('GET')) {
+            $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+        }
 
         if (is_null($inventory) && $request->isMethod('PATCH')) {
             return $this->customResponse->errorResponse($request, 'User does not has this item in inventory. Please use POST method to add item!', 406);
         }
 
         if (is_null($inventory) && $request->isMethod('POST')) {
-            return $this->customResponse->errorResponse($request, sprintf('User already has that item with id %s. For update use PATCH method', $itemId), 406);
+            return $this->customResponse->errorResponse($request, sprintf('User already has item with id %s. For update use PATCH method', $itemId), 406);
         }
 
         if (is_null($inventory) && ($request->isMethod('GET') || $request->isMethod('DELETE'))) {
             return $this->customResponse->errorResponse($request, 'User does not has this item in inventory!', 406);
         }
 
-        if ($request->isMethod('PATCH')) {
-            $this->inventoriesService->updateInventory($parameter, $inventory);
-
-            return $this->customResponse->notificationResponse($request, 'Inventory updated');
+        if ($request->isMethod('GET')) {
+            return new JsonResponse(
+                $this->inventoriesService->prepareData($inventory)
+            );
         }
 
         if ($request->isMethod('POST')) {
@@ -106,17 +114,20 @@ final class InventoryController extends AbstractController
             }
 
             $this->inventoriesService->createEntryInInventory($parameter, $user, $item);
+            $this->cache->delete('inventory_' . $userId . '_item_' . $itemId);
 
             return $this->customResponse->notificationResponse($request, 'Item successfully added to inventory', 201);
         }
 
-        if ($request->isMethod('GET')) {
-            return new JsonResponse(
-              $this->inventoriesService->prepareData($inventory)
-            );
+        $this->cache->delete('inventory_' . $userId . '_item_' . $itemId);
+
+        if ($request->isMethod('PATCH')) {
+            $this->inventoriesService->updateInventory($parameter, $inventory);
+
+            return $this->customResponse->notificationResponse($request, 'Inventory updated');
         }
 
-        $this->inventoryRepository->deleteEntry($inventory);
+        $this->inventoryRepository->deleteEntry($this->inventoryRepository->findOneBy(['id' => $inventory->getId()]));
 
         return $this->customResponse->notificationResponse($request, 'Item successfully removed from inventory');
     }
@@ -171,7 +182,7 @@ final class InventoryController extends AbstractController
 
         $this->inventoriesService->deleteParameter($inventory, $parameters);
 
-        return $this->customResponse->notificationResponse($request, sprintf('Inventory parameter from user %s and item %d successfully removed', $property, $itemId));
+        return $this->customResponse->notificationResponse($request, sprintf('Inventory parameter from user %s and item %d successfully removed', $itemId, $itemId));
     }
 
 

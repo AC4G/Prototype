@@ -15,8 +15,6 @@ use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-
 final class SecurityService
 {
 
@@ -26,13 +24,11 @@ final class SecurityService
 
     public function __construct(
         private readonly AuthTokenRepository $authTokenRepository,
+        private readonly ProjectRepository $projectRepository,
         private readonly ClientRepository $clientRepository,
         private readonly WebAppRepository $webAppRepository,
         private readonly ScopeRepository $scopeRepository,
         private readonly CacheInterface $cache,
-
-        private readonly ProjectRepository $projectRepository,
-        private readonly NormalizerInterface $normalizer
     )
     {
     }

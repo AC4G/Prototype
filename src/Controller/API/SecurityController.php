@@ -6,7 +6,6 @@ use DateTime;
 use App\Repository\ClientRepository;
 use App\Repository\AuthTokenRepository;
 use App\Repository\AccessTokenRepository;
-use App\Repository\RefreshTokenRepository;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
@@ -20,7 +19,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class SecurityController extends AbstractController
 {
     public function __construct(
-        private readonly RefreshTokenRepository $refreshTokenRepository,
         private readonly AccessTokenRepository $accessTokenRepository,
         private readonly AuthTokenRepository $authTokenRepository,
         private readonly ClientRepository $clientRepository,
@@ -55,7 +53,7 @@ final class SecurityController extends AbstractController
         });
 
         if (is_null($client) || $client->getClientSecret() !== $content['client_secret']) {
-            return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+            return $this->customResponse->errorResponse($request, 'Permission denied!', 403);
         }
 
         if ($content['grant_type'] === 'authorization_code') {
@@ -70,7 +68,11 @@ final class SecurityController extends AbstractController
             });
 
             if (is_null($authToken) || $authToken->getProject()->getId() !== $client->getProject()->getId()) {
-                return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+                return $this->customResponse->errorResponse($request, 'Permission denied!', 403);
+            }
+
+            if (new DateTime() > $authToken->getExpireDate()) {
+                return $this->customResponse->errorResponse($request, 'Auth token is expired!', 403);
             }
 
             $payload = $this->securityService->buildPayloadWithAccessAndRefreshToken($authToken, 'authorization_code');
@@ -91,16 +93,26 @@ final class SecurityController extends AbstractController
                 return $this->customResponse->errorResponse($request, 'refresh_token required!', 406);
             }
 
-            $refreshToken = $this->refreshTokenRepository->findOneBy(['refreshToken' => $content['refresh_token'], 'project' => $client->getProject()]);
+            $payload = $this->securityService->decodeJWTAndReturnPayload($content['refresh_token']);
 
-            if (is_null($refreshToken)) {
-                return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+            if (is_null($payload)) {
+                return $this->customResponse->errorResponse($request, 'Permission denied!', 403);
             }
 
-            $accessToken = $this->accessTokenRepository->findOneBy(['project' => $client->getProject(), 'user' => $refreshToken->getUser()]);
+            $refreshToken = json_decode($payload, true);
 
-            if (is_null($accessToken) || new DateTime() > $accessToken->getExpireDate()) {
-                return $this->customResponse->errorResponse($request, 'Rejected!', 403);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return $this->customResponse->errorResponse($request, 'Corrupted refresh token, retry again or create a new one!', 500);
+            }
+
+            $accessToken = $this->accessTokenRepository->findOneBy(['project' => $client->getProject(), 'user' => is_array($refreshToken['user']) ? $refreshToken['user']['id'] : null]);
+
+            if (is_null($accessToken)) {
+                return $this->customResponse->errorResponse($request, 'No relatable access token found!', 403);
+            }
+
+            if (new DateTime() < $accessToken->getExpireDate()) {
+                return $this->customResponse->errorResponse($request, 'Access token is not yet expired!', 403);
             }
 
             $payload = $this->securityService->buildPayloadWithAccessAndRefreshToken($refreshToken, 'refresh_token',$accessToken);

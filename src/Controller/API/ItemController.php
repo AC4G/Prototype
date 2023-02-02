@@ -54,13 +54,13 @@ final class ItemController extends AbstractController
     ): ?Response
     {
         if ($request->isMethod('PATCH')) {
-            $item = $this->itemRepository->findOneBy(['id' => $id]);
-
             $newParameter = json_decode($request->getContent(), true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
                 return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
             }
+
+            $item = $this->itemRepository->findOneBy(['id' => $id]);
 
             $this->itemsService->updateItem($item, $newParameter);
             $this->cache->delete('item_' . $id);
@@ -70,13 +70,15 @@ final class ItemController extends AbstractController
 
         $item = $this->cache->getItem('item_' . $id)->get();
 
+        $format = $this->itemsService->getFormat($request);
+
         return new JsonResponse(
-            $this->itemsService->prepareData($item)
+            $this->itemsService->prepareData($item, $format)
         );
     }
 
     /**
-     * @Route("/api/items/user/{userId}", name="api_items_by_nickname", methods={"GET"})
+     * @Route("/api/items/user/{userId}", name="api_items_by_nickname", methods={"GET"}, requirements={"userId" = "\d+"})
      */
     public function getItemsByNickname(
         Request $request,
@@ -95,8 +97,10 @@ final class ItemController extends AbstractController
             return $this->customResponse->errorResponse($request, 'User hasn\'t created an item yet!', 400);
         }
 
+        $format = $this->itemsService->getFormat($request);
+
         return new JsonResponse(
-            $this->itemsService->prepareData($items)
+            $this->itemsService->prepareData($items, $format)
         );
     }
 
@@ -108,43 +112,37 @@ final class ItemController extends AbstractController
         int $id
     ): Response
     {
-        if ($request->isMethod('DELETE')) {
-            $item = $this->cache->get('item_' . $id, function () {});
+        if ($request->isMethod('GET')) {
+            $item = $this->cache->getItem('item_' . $id)->get();
 
-            if (is_null($item)) {
-                return  $this->customResponse->errorResponse($request, 'Internal error, retry again!', 500);
-            }
+            $itemParameter = json_decode($item->getParameter(), true);
 
-            $parameters = json_decode($request->getContent(), true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
-            }
-
-            if (count($parameters) === 0) {
-                return  $this->customResponse->errorResponse($request, 'Not even passed a parameter for deletion. Nothing changed!', 406);
-            }
-
-            $this->itemsService->deleteParameter($parameters, $item);
-
-            return $this->customResponse->notificationResponse($request, sprintf('Parameter successfully removed from item with id: %s', $id));
+            return new JsonResponse(
+                $itemParameter
+            );
         }
 
         $item = $this->itemRepository->findOneBy(['id' => $id]);
-
-        if (is_null($item)) {
-            return $this->customResponse->errorResponse($request, 'Item not found', 404);
-        }
-
         $itemParameter = json_decode($item->getParameter(), true);
 
+        $parameters = json_decode($request->getContent(), true);
+
         if (count($itemParameter) === 0) {
-            return $this->customResponse->notificationResponse($request, sprintf('Item with id %s doesn\'t has parameter yet!', $id));
+            return $this->customResponse->notificationResponse($request, sprintf('Item with id %s doesn\'t has parameter yet. Nothing deleted!', $id));
         }
 
-        return new JsonResponse(
-            $itemParameter
-        );
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
+        }
+
+        if (count($parameters) === 0) {
+            return  $this->customResponse->errorResponse($request, 'Not even passed a parameter for deletion. Nothing changed!', 406);
+        }
+
+        $this->itemsService->deleteParameter($parameters, $item);
+        $this->cache->delete('item_' . $id);
+
+        return $this->customResponse->notificationResponse($request, sprintf('Parameter successfully removed from item with id: %s', $id));
     }
 
 

@@ -41,9 +41,7 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        if (array_key_exists('nickname', $params)) {
-            //
-            $n = '';
+        if (array_key_exists('userId', $params)) {
             return;
         }
 

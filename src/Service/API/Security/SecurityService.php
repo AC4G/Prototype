@@ -13,6 +13,7 @@ use App\Entity\AuthToken;
 use App\Entity\AccessToken;
 use App\Entity\RefreshToken;
 use App\Repository\UserRepository;
+use App\Repository\ClientRepository;
 use App\Repository\ProjectRepository;
 use App\Serializer\AccessTokenNormalizer;
 use App\Repository\AccessTokenRepository;
@@ -28,6 +29,7 @@ final class SecurityService
         private readonly AccessTokenNormalizer $accessTokenNormalizer,
         private readonly AccessTokenRepository $accessTokenRepository,
         private readonly ProjectRepository $projectRepository,
+        private readonly ClientRepository $clientRepository,
         private readonly UserRepository $userRepository,
         private readonly ContainerBagInterface $params
     )
@@ -41,6 +43,8 @@ final class SecurityService
         $accessToken = new AccessToken();
 
         $expire = new DateTime('+1 day');
+
+        $client = $this->clientRepository->findOneBy(['id' => $client->getId()]);
 
         $accessToken
             ->setUser(null)
@@ -181,9 +185,13 @@ final class SecurityService
 
     public function hasClientPermissionForAdjustmentOnItem(
         array $accessToken,
-        Item $item
+        ?Item $item
     ): bool
     {
+        if (is_null($item) || is_null($item->getProject())) {
+            return false;
+        }
+
         return $item->getProject()->getId() === $accessToken['project']['id'];
     }
 

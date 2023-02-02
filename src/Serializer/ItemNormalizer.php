@@ -19,6 +19,23 @@ class ItemNormalizer
         array $context = []
     ): array
     {
+        if ($format === 'jsonld') {
+            return array_merge([
+                '@id' => '/api/items/' . $item->getId(),
+                '@type' => 'Item'
+            ],
+                $this->getBasicSchema($item, $context)
+            );
+        }
+
+        return $this->getBasicSchema($item, $context);
+    }
+
+    private function getBasicSchema(
+        Item $item,
+        array $context
+    ): array
+    {
         return [
             'id' => $item->getId(),
             'name' => $item->getName(),

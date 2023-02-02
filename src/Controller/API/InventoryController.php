@@ -104,7 +104,7 @@ final class InventoryController extends AbstractController
             $format = $this->inventoriesService->getFormat($request);
 
             return new JsonResponse(
-                $this->inventoriesService->prepareData($inventory, $format)
+                $this->inventoriesService->prepareData($inventory, $format),
             );
         }
 

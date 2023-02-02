@@ -31,6 +31,22 @@ final class APIAuthorizationListenerService
         array $params
     ): void
     {
+        if (!is_null($accessToken['user']['id'])) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Access token is not based on client credentials grant!'. 400));
+
+            return;
+        }
+
+        if ($this->isRouteItems($params)) {
+            return;
+        }
+
+        if (array_key_exists('nickname', $params)) {
+            //
+            $n = '';
+            return;
+        }
+
         $id = $params['id'];
 
         $item = $this->cache->get('item_' . $id, function (ItemInterface $item) use ($id) {
@@ -45,9 +61,16 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        if (!$this->securityService->hasClientPermissionForAdjustmentOnItem($accessToken, $item)) {
+        if (!$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAdjustmentOnItem($accessToken, $item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
+    }
+
+    private function isRouteItems(
+        array $params
+    ): bool
+    {
+        return count($params) === 0;
     }
 
     public function validateJWTForInventoryController(

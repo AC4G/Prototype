@@ -5,6 +5,8 @@ namespace App\Service\API\Inventories;
 use App\Entity\User;
 use App\Entity\Item;
 use App\Entity\Inventory;
+use App\Repository\UserRepository;
+use App\Repository\ItemRepository;
 use App\Serializer\InventoryNormalizer;
 use App\Repository\InventoryRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +15,9 @@ final class InventoriesService
 {
     public function __construct(
         private readonly InventoryRepository $inventoryRepository,
-        private readonly InventoryNormalizer $inventoryNormalizer
+        private readonly InventoryNormalizer $inventoryNormalizer,
+        private readonly UserRepository $userRepository,
+        private readonly ItemRepository $itemRepository,
     )
     {
     }
@@ -64,12 +68,14 @@ final class InventoriesService
     ): void
     {
         $inventory = new Inventory();
+        $user = $this->userRepository->findOneBy(['id' => $user->getId()]);
+        $item = $this->itemRepository->findOneBy(['id' => $item->getId()]);
 
         $inventory
             ->setUser($user)
             ->setItem($item)
             ->setAmount($parameter['amount'])
-            ->setParameter((array_key_exists('parameter', $parameter) ? $parameter['parameter'] : '{}'))
+            ->setParameter((array_key_exists('parameter', $parameter) ? json_encode($parameter['parameter']) : '{}'))
         ;
 
         $this->inventoryRepository->persistEntity($inventory);

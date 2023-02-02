@@ -5,14 +5,15 @@ namespace App\Service\API\Item;
 use App\Entity\Item;
 use App\Serializer\ItemNormalizer;
 use App\Repository\ItemRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class ItemService
 {
     public function __construct(
-        private NormalizerInterface $normalizer,
-        private ItemRepository $itemRepository,
-        private ItemNormalizer $itemNormalizer
+        private readonly NormalizerInterface $normalizer,
+        private readonly ItemRepository $itemRepository,
+        private readonly ItemNormalizer $itemNormalizer
     )
     {
     }
@@ -25,7 +26,7 @@ final class ItemService
     public function updateItem(
         Item $item,
         array $newParameter
-    )
+    ): void
     {
         $normalizedItem = $this->normalizer->normalize($item);
 
@@ -70,19 +71,35 @@ final class ItemService
         $this->itemRepository->flushEntity();
     }
 
+    public function getFormat(
+        Request $request,
+    ): null|string
+    {
+        $header = $request->headers->all();
+
+        $format = null;
+
+        if (array_key_exists('format', $header) && $header['format'][0] === 'jsonld') {
+            $format = $header['format'][0];
+        }
+
+        return $format;
+    }
+
     public function prepareData(
         array|Item $items,
+        string $format = null,
         array $context = []
     ): array
     {
         if (is_object($items)) {
-            return $this->itemNormalizer->normalize($items, null, $context);
+            return $this->itemNormalizer->normalize($items, $format, $context);
         }
 
         $itemsList = [];
 
         foreach ($items as $item) {
-            $itemsList[] = $this->itemNormalizer->normalize($item, null, $context);
+            $itemsList[] = $this->itemNormalizer->normalize($item, $format, $context);
         }
 
         return $itemsList;

@@ -2,9 +2,8 @@
 
 namespace App\Serializer;
 
-use App\Entity\Inventory;
-use App\Entity\Project;
 use App\Entity\User;
+use App\Entity\Inventory;
 
 class InventoryNormalizer
 {
@@ -31,7 +30,7 @@ class InventoryNormalizer
     private function getBasicSchema(
         Inventory $inventory,
         User $user
-    )
+    ): array
     {
         return [
             'amount' => $inventory->getAmount(),

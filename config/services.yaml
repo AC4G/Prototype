@@ -21,7 +21,9 @@ services:
             - '../src/Kernel.php'
 
     Redis:
-        class: Redis
+        class: Predis\Client
+        arguments:
+            - 'redis://%env(REDIS_HOST)%:%env(REDIS_PORT)%'
         calls:
             - connect:
                   - '%env(REDIS_HOST)%'
@@ -29,7 +31,7 @@ services:
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
         arguments:
             - '@Redis'
-            - { 'ttl': 1800 }
+            - { 'ttl': 1800 }:
 
     acme.custom_two_factor_provider:
         class: App\Provider\TwoFactorProvider

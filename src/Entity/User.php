@@ -54,6 +54,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private string $password;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="uuid", type="text", length=0, nullable=false)
+     */
+    private string $uuid;
+
+    /**
      * @var null|string
      *
      * @ORM\Column(name="profile_pic", type="text", length=0, nullable=true)
@@ -144,6 +151,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): self
+    {
+        $this->uuid = $uuid;
 
         return $this;
     }

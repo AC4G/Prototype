@@ -28,7 +28,7 @@ when@test:
 when@prod:
     doctrine:
         orm:
-            auto_generate_proxy_classes: false
+            auto_generate_proxy_classes: true
             query_cache_driver:
                 type: pool
                 pool: doctrine.system_cache_pool

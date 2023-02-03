@@ -88,18 +88,6 @@ final class InventoryController extends AbstractController
             $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
         }
 
-        if (is_null($inventory) && $request->isMethod('PATCH')) {
-            return $this->customResponse->errorResponse($request, 'User does not has this item in inventory. Please use POST method to add item!', 406);
-        }
-
-        if (!is_null($inventory) && $request->isMethod('POST')) {
-            return $this->customResponse->errorResponse($request, sprintf('User already has item with id %s. For update use PATCH method', $itemId), 406);
-        }
-
-        if (is_null($inventory) && ($request->isMethod('GET') || $request->isMethod('DELETE'))) {
-            return $this->customResponse->errorResponse($request, 'User does not has this item in inventory!', 406);
-        }
-
         if ($request->isMethod('GET')) {
             $format = $this->inventoriesService->getFormat($request);
 

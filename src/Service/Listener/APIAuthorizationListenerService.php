@@ -117,16 +117,26 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        if ($event->getRequest()->isMethod('GET')) {
-            $inventory = $this->cache->get('inventory_' . $userId . '_item_' . $params['itemId'], function (ItemInterface $itemInterface) use ($user, $item) {
-                $itemInterface->expiresAfter(86400);
+        $inventory = $this->cache->get('inventory_' . $userId . '_item_' . $params['itemId'], function (ItemInterface $itemInterface) use ($user, $item) {
+            $itemInterface->expiresAfter(86400);
 
-                return $this->inventoryRepository->findOneBy(['user' => $user->getId(), 'item' => $item]);
-            });
+            return $this->inventoryRepository->findOneBy(['user' => $user->getId(), 'item' => $item]);
+        });
 
-            if (is_null($inventory)) {
-                $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet!', $params['itemId']), 404));
-            }
+        if (is_null($inventory) && $event->getRequest()->isMethod('PATCH')) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet! Please use POST method to add item!', $params['itemId']), 406));
+
+            return;
+        }
+
+        if (!is_null($inventory) && $event->getRequest()->isMethod('POST')) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User already has item with id %s in inventory. For update use PATCH method', $params['itemId']), 406));
+
+            return;
+        }
+
+        if (is_null($inventory)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet!', $params['itemId']), 406));
         }
     }
 

@@ -3,8 +3,8 @@
 namespace App\Service\Website\Registration;
 
 use DateTime;
-use Exception;
 use App\Entity\User;
+use Ramsey\Uuid\Uuid;
 use App\Entity\UserRoles;
 use App\Entity\RoleIdent;
 use App\Repository\UserRepository;
@@ -17,12 +17,12 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 final class RegistrationService
 {
     public function __construct(
-        private VerifyEmailHelperInterface $verifyEmailHelper,
-        private UserPasswordHasherInterface $passwordHasher,
-        private RoleIdentRepository $roleIdentRepository,
-        private UserRolesRepository $userRolesRepository,
-        private UserRepository $userRepository,
-        private EmailService $emailService
+        private readonly VerifyEmailHelperInterface $verifyEmailHelper,
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly RoleIdentRepository $roleIdentRepository,
+        private readonly UserRolesRepository $userRolesRepository,
+        private readonly UserRepository $userRepository,
+        private readonly EmailService $emailService
     )
     {
     }
@@ -78,6 +78,7 @@ final class RegistrationService
     ): User
     {
         $user
+            ->setUuid(Uuid::uuid4()->toString())
             ->setNickName($data['nickname'])
             ->setEmail($data['email'])
             ->setPassword($hashedPassword)

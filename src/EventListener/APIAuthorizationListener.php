@@ -62,6 +62,8 @@ final class APIAuthorizationListener implements EventSubscriberInterface
             return;
         }
 
+        $event->getRequest()->getSession()->set('accessToken', $accessToken);
+
         if (str_starts_with($route, 'api_item')) {
             $this->authorizationListenerService->validateJWTForItemController($event, $accessToken, $params);
 

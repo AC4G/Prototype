@@ -12,6 +12,8 @@ use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
+use App\Serializer\ItemNormalizer;
+
 final class APIAuthorizationListenerService
 {
     public function __construct(
@@ -20,6 +22,7 @@ final class APIAuthorizationListenerService
         private readonly CustomResponse $customResponse,
         private readonly ItemRepository $itemRepository,
         private readonly UserRepository $userRepository,
+        private readonly ItemNormalizer $itemNormalizer,
         private readonly CacheInterface $cache
     )
     {
@@ -47,11 +50,13 @@ final class APIAuthorizationListenerService
 
         $id = $params['id'];
 
-        $item = $this->cache->get('item_' . $id, function (ItemInterface $item) use ($id) {
-            $item->expiresAfter(86400);
+        $item = $this->cache->getItem('item_' . $id . '_project_' . $accessToken['project']['id'])->get();
 
-            return $this->itemRepository->findOneBy(['id' => $id]);
-        });
+        if (!is_null($item)) {
+            return;
+        }
+
+        $item = $this->itemRepository->findOneBy(['id' => $id]);
 
         if (is_null($item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Item not found', 404));
@@ -61,6 +66,14 @@ final class APIAuthorizationListenerService
 
         if (!$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAdjustmentOnItem($accessToken, $item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
+        }
+
+        if ($event->getRequest()->isMethod('GET')) {
+            $itemCache = $this->cache->getItem('item_' . $id . '_project_' . $accessToken['project']['id']);
+
+            $itemCache->expiresAfter(86400);
+            $itemCache->set(json_encode($this->itemNormalizer->normalize($item)));
+            $this->cache->save($itemCache);
         }
     }
 

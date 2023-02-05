@@ -51,9 +51,6 @@ final class ItemController extends AbstractController
         int $id
     ): ?Response
     {
-        $accessToken = $request->getSession()->get('accessToken');
-        $request->getSession()->remove('accessToken');
-
         if ($request->isMethod('PATCH')) {
             $newParameter = json_decode($request->getContent(), true);
 
@@ -61,15 +58,16 @@ final class ItemController extends AbstractController
                 return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
             }
 
-            $item = $this->itemRepository->findOneBy(['id' => $id]);
+            $data = $this->itemRepository->getNameAndParameter($id);
 
-            $this->itemsService->updateItem($item, $newParameter);
-            $this->cache->delete('item_' . $id . '_project_' . $accessToken['project']['id']);
+            $this->itemsService->updateItem($id, $data, $newParameter);
+            $this->cache->delete('item_' . $id);
+            $this->cache->delete('item_' . $id . '_parameter');
 
             return $this->customResponse->notificationResponse($request, 'Parameter successfully added or updated!', 202);
         }
 
-        $item = $this->cache->getItem('item_' . $id . '_project_' . $accessToken['project']['id'])->get();
+        $item = $this->cache->getItem('item_' . $id)->get();
 
         return new Response(
             $item,
@@ -108,28 +106,26 @@ final class ItemController extends AbstractController
     }
 
     /**
-     * @Route("/api/items/{id}/parameters", name="api_item_by_id_process_parameters", methods={"DELETE", "GET"}, requirements={"id" = "\d+"})
+     * @Route("/api/items/{id}/parameter", name="api_item_by_id_process_parameter", methods={"DELETE", "GET"}, requirements={"id" = "\d+"})
      */
     public function processParameter(
         Request $request,
         int $id
     ): Response
     {
-        $accessToken = $request->getSession()->get('accessToken');
-        $request->getSession()->remove('accessToken');
-
         if ($request->isMethod('GET')) {
-            $item = $this->cache->getItem('item_' . $id . '_project_' . $accessToken['project']['id'])->get();
+            $parameter = $this->cache->getItem('item_' . $id . '_parameter')->get();
 
-            $itemParameter = json_decode($item->getParameter(), true);
-
-            return new JsonResponse(
-                $itemParameter
+            return new Response(
+                $parameter,
+                200,
+                [
+                    'Content-Type' => 'application/json'
+                ]
             );
         }
 
-        $item = $this->itemRepository->findOneBy(['id' => $id]);
-        $itemParameter = json_decode($item->getParameter(), true);
+        $itemParameter = json_decode($this->cache->getItem('item_' . $id . '_parameter')->get(), true);
 
         $parameters = json_decode($request->getContent(), true);
 
@@ -145,8 +141,9 @@ final class ItemController extends AbstractController
             return  $this->customResponse->errorResponse($request, 'Not even passed a parameter for deletion. Nothing changed!', 406);
         }
 
-        $this->itemsService->deleteParameter($parameters, $item);
-        $this->cache->delete('item_' . $id . '_project_' . $accessToken['project']['id']);
+        $this->itemsService->deleteParameter($id, $itemParameter, $parameters);
+        $this->cache->delete('item_' . $id);
+        $this->cache->delete('item_' . $id . '_parameter');
 
         return $this->customResponse->notificationResponse($request, sprintf('Parameter successfully removed from item with id: %s', $id));
     }

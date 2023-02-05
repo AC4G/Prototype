@@ -50,7 +50,7 @@ final class APIAuthorizationListenerService
 
         $id = $params['id'];
 
-        $item = $this->cache->getItem('item_' . $id . '_project_' . $accessToken['project']['id'])->get();
+        $item = $this->cache->getItem('item_' . $id)->get();
 
         if (!is_null($item)) {
             return;
@@ -64,16 +64,30 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        if (!$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAdjustmentOnItem($accessToken, $item)) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
+        if (str_contains($event->getRequest()->attributes->get('_route'), 'parameter')) {
+            $itemParameter = $this->cache->getItem('item_' . $id . '_parameter');
+
+            $itemParameter->expiresAfter(86400);
+            $itemParameter->set($item->getParameter());
+            $this->cache->save($itemParameter);
+
+            if ($event->getRequest()->isMethod('GET')) {
+                return;
+            }
         }
 
         if ($event->getRequest()->isMethod('GET')) {
-            $itemCache = $this->cache->getItem('item_' . $id . '_project_' . $accessToken['project']['id']);
+            $itemCache = $this->cache->getItem('item_' . $id);
 
             $itemCache->expiresAfter(86400);
             $itemCache->set(json_encode($this->itemNormalizer->normalize($item)));
             $this->cache->save($itemCache);
+
+            return;
+        }
+
+        if (!$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAdjustmentOnItem($accessToken, $item)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
     }
 

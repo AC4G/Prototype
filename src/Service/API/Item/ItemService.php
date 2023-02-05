@@ -24,39 +24,35 @@ final class ItemService
     }
 
     public function updateItem(
-        Item $item,
+        int $id,
+        array $itemData,
         array $newParameter
     ): void
     {
-        $normalizedItem = $this->normalizer->normalize($item);
-
         if (array_key_exists('name', $newParameter)) {
-            $item
-                ->setName($newParameter['name'])
-            ;
+            $itemData['name'] = $newParameter['name'];
         }
 
         if (array_key_exists('parameter', $newParameter) && is_array($newParameter['parameter'])) {
             $parameters = $newParameter['parameter'];
-            $data = json_decode($normalizedItem['parameter'], true);
+            $data = json_decode($itemData['parameter'], true);
 
             foreach ($parameters as $key => $parameter) {
                 $data[$key] = $parameter;
             }
 
-            $item->setParameter(json_encode($data));
+            $itemData['parameter'] = json_encode($data);
         }
 
-        $this->itemRepository->flushEntity();
+        $this->itemRepository->updateNameAndParameter($id, $itemData);
     }
 
     public function deleteParameter(
-        array $parameters,
-        Item $item
+        int $id,
+        array $allParameters,
+        array $parameters
     )
     {
-        $allParameters = json_decode($item->getParameter(), true);
-
         $cleanedParameter = [];
 
         foreach ($parameters as $parameterKey => $value) {
@@ -67,8 +63,7 @@ final class ItemService
             }
         }
 
-        $item->setParameter(json_encode($cleanedParameter));
-        $this->itemRepository->flushEntity();
+        $this->itemRepository->updateParameter($id, $cleanedParameter);
     }
 
     public function getFormat(

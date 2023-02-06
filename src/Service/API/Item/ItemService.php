@@ -6,12 +6,10 @@ use App\Entity\Item;
 use App\Serializer\ItemNormalizer;
 use App\Repository\ItemRepository;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class ItemService
 {
     public function __construct(
-        private readonly NormalizerInterface $normalizer,
         private readonly ItemRepository $itemRepository,
         private readonly ItemNormalizer $itemNormalizer
     )
@@ -51,7 +49,7 @@ final class ItemService
         int $id,
         array $allParameters,
         array $parameters
-    )
+    ): void
     {
         $cleanedParameter = [];
 
@@ -64,21 +62,6 @@ final class ItemService
         }
 
         $this->itemRepository->updateParameter($id, $cleanedParameter);
-    }
-
-    public function getFormat(
-        Request $request,
-    ): null|string
-    {
-        $header = $request->headers->all();
-
-        $format = null;
-
-        if (array_key_exists('format', $header) && $header['format'][0] === 'jsonld') {
-            $format = $header['format'][0];
-        }
-
-        return $format;
     }
 
     public function prepareData(

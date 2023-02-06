@@ -24,6 +24,7 @@ class AccessTokenNormalizer
             ],
             'user' => [
                 'id' => is_null($user) ? null : $user->getId(),
+                'uuid' => is_null($user) ? null : $user->getUuid(),
                 'nickname' => is_null($user) ? null : $user->getNickname(),
                 'roles' => is_null($user) ? null : $user->getRoles()
             ],

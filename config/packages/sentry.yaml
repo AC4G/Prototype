@@ -1,0 +1,44 @@
+sentry:
+    dsn: "%env(SENTRY_DSN)%"
+    options:
+        # Specify a fixed sample rate:
+        traces_sample_rate: 1.0
+        # Or provide a custom sampler:
+        traces_sampler: 'sentry.callback.traces_sampler'
+
+    tracing:
+        enabled: true
+        dbal: # DB queries
+            enabled: true
+        cache: # cache pools
+            enabled: true
+        twig: # templating engine
+            enabled: true
+        http_client: # Symfony HTTP client
+            enabled: true
+
+services:
+    sentry.callback.traces_sampler:
+        class: 'App\Service\Sentry'
+        factory: [ '@App\Service\Sentry', 'getTracesSampler' ]
+
+when@prod:
+    sentry:
+        dsn: '%env(SENTRY_DSN)%'
+
+#        If you are using Monolog, you also need these additional configuration and services to log the errors correctly:
+#        https://docs.sentry.io/platforms/php/guides/symfony/#monolog-integration
+#        register_error_listener: false
+
+#    monolog:
+#        handlers:
+#            sentry:
+#                type: service
+#                id: Sentry\Monolog\Handler
+
+#    services:
+#        Sentry\Monolog\Handler:
+#            arguments:
+#                $hub: '@Sentry\State\HubInterface'
+#                $level: !php/const Monolog\Logger::ERROR
+#                $bubble: false

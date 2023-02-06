@@ -44,14 +44,14 @@ final class InventoryController extends AbstractController
     }
 
     /**
-     * @Route("/api/inventories/{userId}", name="api_inventory_by_userId", methods={"GET"}, requirements={"userId" = "\d+"})
+     * @Route("/api/inventories/{uuid}", name="api_inventory_by_uuid", methods={"GET"})
      */
     public function getInventoryByUserId(
         Request $request,
-        string $userId
+        string $uuid
     ): Response
     {
-        $inventory = $this->cache->getItem('inventory_' . $userId)->get();
+        $inventory = $this->cache->getItem('inventory_' . $uuid)->get();
 
         $format = $this->inventoriesService->getFormat($request);
 
@@ -61,15 +61,15 @@ final class InventoryController extends AbstractController
     }
 
     /**
-     * @Route("/api/inventories/{userId}/{itemId}", name="api_inventory_by_userId_and_itemId", methods={"GET", "POST", "PATCH", "DELETE"}, requirements={"userId" = "\d+", "itemId" = "\d+"})
+     * @Route("/api/inventories/{uuid}/{itemId}", name="api_inventory_by_uuid_and_itemId", methods={"GET", "POST", "PATCH", "DELETE"}, requirements={"itemId" = "\d+"})
      */
     public function processInventoryByItem(
         Request $request,
-        string $userId,
+        string $uuid,
         int $itemId
     ): Response
     {
-        $user = $this->cache->getItem('user_' . $userId)->get();
+        $user = $this->cache->getItem('user_' . $uuid)->get();
 
         $parameter = json_decode($request->getContent(), true);
 
@@ -81,7 +81,7 @@ final class InventoryController extends AbstractController
         $inventory = '';
 
         if ($request->isMethod('GET')) {
-            $inventory = $this->cache->getItem('inventory_' . $userId . '_item_' . $itemId)->get();
+            $inventory = $this->cache->getItem('inventory_' . $uuid . '_item_' . $itemId)->get();
         }
 
         if (!$request->isMethod('GET')) {
@@ -102,12 +102,12 @@ final class InventoryController extends AbstractController
             }
 
             $this->inventoriesService->createEntryInInventory($parameter, $user, $item);
-            $this->cache->delete('inventory_' . $userId . '_item_' . $itemId);
+            $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
 
             return $this->customResponse->notificationResponse($request, 'Item successfully added to inventory', 201);
         }
 
-        $this->cache->delete('inventory_' . $userId . '_item_' . $itemId);
+        $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
 
         if ($request->isMethod('PATCH')) {
             $this->inventoriesService->updateInventory($parameter, $inventory);
@@ -121,25 +121,25 @@ final class InventoryController extends AbstractController
     }
 
     /**
-     * @Route("/api/inventories/{userId}/{itemId}/parameters", name="api_inventory_by_userId_and_itemId_parameters", methods={"DELETE", "GET"}, requirements={"userId" = "\d+", "itemId" = "\d+"})
+     * @Route("/api/inventories/{uuid}/{itemId}/parameters", name="api_inventory_by_uuid_and_itemId_parameters", methods={"DELETE", "GET"}, requirements={"itemId" = "\d+"})
      */
     public function processParameterFromItemInInventory(
         Request $request,
-        string $userId,
+        string $uuid,
         int $itemId
     ): Response
     {
-        $user = $this->cache->getItem('user_' . $userId)->get();
-
-        $item = $this->cache->getItem('item_' . $itemId)->get();
-
         $inventory = '';
 
         if ($request->isMethod('GET')) {
-            $inventory = $this->cache->getItem('inventory_' . $user->getId() . '_item_' . $item->getId())->get();
+            $inventory = $this->cache->getItem('inventory_' . $uuid . '_item_' . $itemId);
         }
 
         if (!$request->isMethod('GET')) {
+            $user = $this->cache->getItem('user_' . $uuid)->get();
+
+            $item = $this->cache->getItem('item_' . $itemId)->get();
+
             $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
         }
 

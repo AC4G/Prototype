@@ -56,7 +56,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     /**
      * @var string
      *
-     * @ORM\Column(name="uuid", type="text", length=0, nullable=false)
+     * @ORM\Column(name="uuid", type="string", length=255, nullable=false)
      */
     private string $uuid;
 

@@ -9,7 +9,6 @@ use App\Repository\UserRepository;
 use App\Repository\ItemRepository;
 use App\Serializer\InventoryNormalizer;
 use App\Repository\InventoryRepository;
-use Symfony\Component\HttpFoundation\Request;
 
 final class InventoriesService
 {
@@ -110,21 +109,6 @@ final class InventoriesService
         $inventory->setParameter(json_encode($parameters));
 
         $this->inventoryRepository->flushEntity();
-    }
-
-    public function getFormat(
-        Request $request,
-    ): null|string
-    {
-        $header = $request->headers->all();
-
-        $format = null;
-
-        if (array_key_exists('format', $header) && $header['format'][0] === 'jsonld') {
-            $format = $header['format'][0];
-        }
-
-        return $format;
     }
 
     public function prepareData(

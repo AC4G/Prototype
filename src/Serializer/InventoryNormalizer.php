@@ -15,28 +15,11 @@ class InventoryNormalizer
     {
         $user = $inventory->getUser();
 
-        if ($format === 'jsonld') {
-            return array_merge([
-                '@id' => '/api/items/' . $inventory->getItem()->getId(),
-                '@type' => 'Item'
-            ],
-            $this->getBasicSchema($inventory, $user)
-            );
-        }
-
-        return $this->getBasicSchema($inventory, $user);
-    }
-
-    private function getBasicSchema(
-        Inventory $inventory,
-        User $user
-    ): array
-    {
         return [
             'amount' => $inventory->getAmount(),
             'parameter' => json_decode($inventory->getParameter(), true),
             'user' => [
-                'id' => $user->getId(),
+                'uuid' => $user->getUuid(),
                 'nickname' => $user->getNickname()
             ],
             'item' => [

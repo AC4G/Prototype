@@ -44,7 +44,13 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        if (array_key_exists('userId', $params)) {
+        if (array_key_exists('uuid', $params)) {
+            return;
+        }
+
+        if (!array_key_exists('id', $params)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Item id not passed in URI!', 400));
+
             return;
         }
 
@@ -108,16 +114,27 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        $userId = $params['userId'];
+        $uuid = $params['uuid'];
 
-        $user = $this->cache->get('user_'. $userId, function (ItemInterface $item) use ($userId) {
-            $item->expiresAfter(86400);
-
-            return $this->userRepository->findOneBy(['id' => $userId]);
-        });
+        $user = $this->cache->getItem('user_'. $uuid)->get();
 
         if (is_null($user)) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User with id %s doesn\'t exists!', $userId), 404));
+            $user = $this->userRepository->findOneBy(['uuid' => $uuid]);
+
+            if (!is_null($user)) {
+                $userCache = $this->cache->getItem('user_' . $uuid);
+
+                $userCache
+                    ->set($user)
+                    ->expiresAfter(86400)
+                ;
+
+                $this->cache->save($userCache);
+            }
+        }
+
+        if (is_null($user)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User with uuid %s doesn\'t exists!', $uuid), 404));
 
             return;
         }
@@ -126,10 +143,12 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        $item = $this->cache->get('item_' . $params['itemId'], function (ItemInterface $item) use ($params) {
+        $itemId = $params['itemId'];
+
+        $item = $this->cache->get('item_' . $itemId, function (ItemInterface $item) use ($itemId) {
             $item->expiresAfter(86400);
 
-            return $this->itemRepository->findOneBy(['id' => $params['itemId']]);
+            return $this->itemRepository->findOneBy(['id' => $itemId]);
         });
 
         if (($user->isPrivate() && !$this->securityService->hasClientPermissionForAdjustmentOnUserInventory($accessToken, $user, $item) || !$user->isPrivate() && !$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAdjustmentOnUserInventory($accessToken, $user, $item))) {
@@ -144,26 +163,26 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        $inventory = $this->cache->get('inventory_' . $userId . '_item_' . $params['itemId'], function (ItemInterface $itemInterface) use ($user, $item) {
+        $inventory = $this->cache->get('inventory_' . $uuid . '_item_' . $itemId, function (ItemInterface $itemInterface) use ($user, $item) {
             $itemInterface->expiresAfter(86400);
 
             return $this->inventoryRepository->findOneBy(['user' => $user->getId(), 'item' => $item]);
         });
 
         if (is_null($inventory) && $event->getRequest()->isMethod('PATCH')) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet! Please use POST method to add item!', $params['itemId']), 406));
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet! Please use POST method to add item!', $itemId), 406));
 
             return;
         }
 
         if (!is_null($inventory) && $event->getRequest()->isMethod('POST')) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User already has item with id %s in inventory. For update use PATCH method', $params['itemId']), 406));
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User already has item with id %s in inventory. For update use PATCH method', $itemId), 406));
 
             return;
         }
 
-        if (is_null($inventory)) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet!', $params['itemId']), 406));
+        if (is_null($inventory) && !$event->getRequest()->isMethod('POST')) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet!', $itemId), 406));
         }
     }
 
@@ -204,10 +223,10 @@ final class APIAuthorizationListenerService
             return true;
         }
 
-        $inventory = $this->cache->get('inventory_' . $params['userId'], function (ItemInterface $item) use ($user) {
+        $inventory = $this->cache->get('inventory_' . $user->getUuid(), function (ItemInterface $item) use ($user) {
             $item->expiresAfter(86400);
 
-            return $this->inventoryRepository->findBy(['user' => $user->getId()]);
+            return $this->inventoryRepository->findBy(['user' => $user->getUuid()]);
         });
 
         if (count($inventory) === 0) {

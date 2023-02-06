@@ -79,14 +79,14 @@ final class ItemController extends AbstractController
     }
 
     /**
-     * @Route("/api/items/user/{userId}", name="api_items_by_nickname", methods={"GET"}, requirements={"userId" = "\d+"})
+     * @Route("/api/items/user/{uuid}", name="api_items_by_uuid", methods={"GET"})
      */
     public function getItemsByNickname(
         Request $request,
-        string $userId
+        string $uuid
     ): Response
     {
-        $user = $this->userRepository->findOneBy(['id' => $userId]);
+        $user = $this->userRepository->findOneBy(['uuid' => $uuid]);
 
         if (is_null($user)) {
             return $this->customResponse->errorResponse($request, 'User doesn\'t exists!', 404);
@@ -98,10 +98,8 @@ final class ItemController extends AbstractController
             return $this->customResponse->errorResponse($request, 'User hasn\'t created an item yet!', 400);
         }
 
-        $format = $this->itemsService->getFormat($request);
-
         return new JsonResponse(
-            $this->itemsService->prepareData($items, $format)
+            $this->itemsService->prepareData($items)
         );
     }
 

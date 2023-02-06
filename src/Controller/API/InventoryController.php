@@ -36,10 +36,8 @@ final class InventoryController extends AbstractController
             return $this->customResponse->errorResponse($request, 'No inventories here, maybe next time...');
         }
 
-        $format = $this->inventoriesService->getFormat($request);
-
         return new JsonResponse(
-            $this->inventoriesService->prepareData($inventory, $format)
+            $this->inventoriesService->prepareData($inventory)
         );
     }
 
@@ -53,10 +51,8 @@ final class InventoryController extends AbstractController
     {
         $inventory = $this->cache->getItem('inventory_' . $uuid)->get();
 
-        $format = $this->inventoriesService->getFormat($request);
-
         return new JsonResponse(
-            $this->inventoriesService->prepareData($inventory, $format)
+            $this->inventoriesService->prepareData($inventory)
         );
     }
 
@@ -89,10 +85,8 @@ final class InventoryController extends AbstractController
         }
 
         if ($request->isMethod('GET')) {
-            $format = $this->inventoriesService->getFormat($request);
-
             return new JsonResponse(
-                $this->inventoriesService->prepareData($inventory, $format),
+                $this->inventoriesService->prepareData($inventory),
             );
         }
 
@@ -121,7 +115,7 @@ final class InventoryController extends AbstractController
     }
 
     /**
-     * @Route("/api/inventories/{uuid}/{itemId}/parameters", name="api_inventory_by_uuid_and_itemId_parameters", methods={"DELETE", "GET"}, requirements={"itemId" = "\d+"})
+     * @Route("/api/inventories/{uuid}/{itemId}/parameter", name="api_inventory_by_uuid_and_itemId_parameter", methods={"DELETE", "GET"}, requirements={"itemId" = "\d+"})
      */
     public function processParameterFromItemInInventory(
         Request $request,
@@ -132,7 +126,7 @@ final class InventoryController extends AbstractController
         $inventory = '';
 
         if ($request->isMethod('GET')) {
-            $inventory = $this->cache->getItem('inventory_' . $uuid . '_item_' . $itemId);
+            $inventory = $this->cache->getItem('inventory_' . $uuid . '_item_' . $itemId)->get();
         }
 
         if (!$request->isMethod('GET')) {

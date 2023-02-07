@@ -9,6 +9,8 @@ use App\Repository\UserRepository;
 use App\Repository\ItemRepository;
 use App\Serializer\InventoryNormalizer;
 use App\Repository\InventoryRepository;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 final class InventoriesService
 {
@@ -17,6 +19,8 @@ final class InventoriesService
         private readonly InventoryNormalizer $inventoryNormalizer,
         private readonly UserRepository $userRepository,
         private readonly ItemRepository $itemRepository,
+        private readonly CacheInterface $cache
+
     )
     {
     }
@@ -128,6 +132,20 @@ final class InventoriesService
         }
 
         return $inventoryList;
+    }
+
+    public function getItemFromCacheByUuidAndItemId(
+        string $uuid,
+        int $itemId,
+        User $user,
+        Item $item
+    ): null|Inventory
+    {
+        return $this->cache->get('inventory_' . $uuid . '_item_' . $itemId,function (ItemInterface $cacheItem) use ($user, $item) {
+            $cacheItem->expiresAfter(86400);
+
+            return $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+        });
     }
 
 

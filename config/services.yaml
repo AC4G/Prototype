@@ -56,8 +56,5 @@ services:
             $globalFactory: '@limiter.security_throttling'
             $localFactory: '@limiter.login_throttling'
 
-    Monolog\Processor\PsrLogMessageProcessor:
-        tags: { name: monolog.processor, handler: sentry }
-
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

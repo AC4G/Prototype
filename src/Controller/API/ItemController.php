@@ -67,7 +67,7 @@ final class ItemController extends AbstractController
             return $this->customResponse->notificationResponse($request, 'Parameter successfully added or updated!', 202);
         }
 
-        $item = $this->cache->getItem('item_' . $id)->get();
+        $item = $this->itemsService->getItemFromCacheById($id);
 
         return new Response(
             $item,
@@ -112,7 +112,7 @@ final class ItemController extends AbstractController
     ): Response
     {
         if ($request->isMethod('GET')) {
-            $parameter = $this->cache->getItem('item_' . $id . '_parameter')->get();
+            $parameter = $this->itemsService->getItemParameterFromCacheById($id);
 
             return new Response(
                 $parameter,
@@ -123,7 +123,7 @@ final class ItemController extends AbstractController
             );
         }
 
-        $itemParameter = json_decode($this->cache->getItem('item_' . $id . '_parameter')->get(), true);
+        $itemParameter = json_decode($this->itemsService->getItemParameterFromCacheById($id), true);
 
         $parameters = json_decode($request->getContent(), true);
 

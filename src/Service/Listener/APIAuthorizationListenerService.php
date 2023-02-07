@@ -139,7 +139,7 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        if ($this->isRouteInventoryByUserId($event, $accessToken, $params, $user)) {
+        if ($this->isRouteInventoryByUuid($event, $accessToken, $params, $user)) {
             return;
         }
 
@@ -163,11 +163,17 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        $inventory = $this->cache->get('inventory_' . $uuid . '_item_' . $itemId, function (ItemInterface $itemInterface) use ($user, $item) {
-            $itemInterface->expiresAfter(86400);
+        if ($event->getRequest()->isMethod('GET')) {
+            $this->cache->get('', function (ItemInterface $item) use ($user, $item) {
+                $item->expiresAfter(86400);
 
-            return $this->inventoryRepository->findOneBy(['user' => $user->getId(), 'item' => $item]);
-        });
+                return $this->inventoryRepository->findOneBy(['user' => $user->getId(), 'item' => $item]);
+            });
+
+            return;
+        }
+
+        $inventory = $this->inventoryRepository->findOneBy(['user' => $user->getId(), 'item' => $item]);
 
         if (is_null($inventory) && $event->getRequest()->isMethod('PATCH')) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet! Please use POST method to add item!', $itemId), 406));
@@ -206,7 +212,7 @@ final class APIAuthorizationListenerService
         return false;
     }
 
-    private function isRouteInventoryByUserId(
+    private function isRouteInventoryByUuid(
         RequestEvent $event,
         array $accessToken,
         array $params,

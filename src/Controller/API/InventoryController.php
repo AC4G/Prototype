@@ -74,17 +74,10 @@ final class InventoryController extends AbstractController
         }
 
         $item = $this->cache->getItem('item_' . $itemId)->get();
-        $inventory = '';
 
         if ($request->isMethod('GET')) {
-            $inventory = $this->cache->getItem('inventory_' . $uuid . '_item_' . $itemId)->get();
-        }
+            $inventory = $this->inventoriesService->getItemFromCacheByUuidAndItemId($uuid, $itemId, $user, $item);
 
-        if (!$request->isMethod('GET')) {
-            $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
-        }
-
-        if ($request->isMethod('GET')) {
             return new JsonResponse(
                 $this->inventoriesService->prepareData($inventory),
             );
@@ -102,6 +95,8 @@ final class InventoryController extends AbstractController
         }
 
         $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
+
+        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
 
         if ($request->isMethod('PATCH')) {
             $this->inventoriesService->updateInventory($parameter, $inventory);
@@ -123,21 +118,12 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
-        $inventory = '';
+        $user = $this->cache->getItem('user_' . $uuid)->get();
+        $item = $this->cache->getItem('item_' . $itemId)->get();
 
         if ($request->isMethod('GET')) {
-            $inventory = $this->cache->getItem('inventory_' . $uuid . '_item_' . $itemId)->get();
-        }
+            $inventory = $this->inventoriesService->getItemFromCacheByUuidAndItemId($uuid, $itemId, $user, $item);
 
-        if (!$request->isMethod('GET')) {
-            $user = $this->cache->getItem('user_' . $uuid)->get();
-
-            $item = $this->cache->getItem('item_' . $itemId)->get();
-
-            $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
-        }
-
-        if ($request->isMethod('GET')) {
             return new JsonResponse(
                 json_decode(
                     $inventory->getParameter(),
@@ -145,6 +131,8 @@ final class InventoryController extends AbstractController
                 )
             );
         }
+
+        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
 
         $parameters = json_decode($request->getContent(), true);
 

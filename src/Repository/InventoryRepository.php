@@ -21,4 +21,6 @@ class InventoryRepository extends AbstractRepository
             $registry, Inventory::class
         );
     }
+
+
 }

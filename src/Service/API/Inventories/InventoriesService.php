@@ -32,6 +32,8 @@ final class InventoriesService
     {
         if (array_key_exists('amount', $parameter)) {
             $inventory->setAmount($inventory->getAmount() + $parameter['amount']);
+
+            return;
         }
 
         if (!array_key_exists('parameter', $parameter)) {

@@ -75,7 +75,7 @@ final class SecurityService
             $errors[] = 'Client not found!';
         }
 
-        if (!is_null($this->client) && $this->hasClientAuthTokenFromUser($user, $this->client)) {
+        if (!is_null($this->client) && $this->hasClientAuthTokenFromUserAndIsNotExpired($user, $this->client)) {
             $errors[] = 'Already authenticated!';
         }
 
@@ -131,12 +131,14 @@ final class SecurityService
         return $this->scopes;
     }
 
-    private function hasClientAuthTokenFromUser(
+    private function hasClientAuthTokenFromUserAndIsNotExpired(
         UserInterface $user,
         Client $client
     ): bool
     {
-        return !is_null($this->authTokenRepository->findOneBy(['user' => $user, 'project' => $client->getProject()]));
+        $authToken = $this->authTokenRepository->findOneBy(['user' => $user, 'project' => $client->getProject()], ['id' => 'DESC']);
+
+        return !is_null($authToken) && new DateTime() < $authToken->getExpireDate();
     }
 
     private function createAuthenticationToken(
@@ -147,13 +149,9 @@ final class SecurityService
     {
         $authToken = new AuthToken();
 
-        $expire = new DateTime('+ 7days');
+        $expire = new DateTime('+ 1days');
 
-        $project = $this->cache->get('project_' . $client->getProject()->getId(), function (ItemInterface $item) use ($client) {
-            $item->expiresAfter(86400);
-
-            return $this->projectRepository->findOneBy(['id' => $client->getProject()->getId()]);
-        });
+        $project = $this->projectRepository->findOneBy(['id' => $client->getProject()->getId()]);
 
         $authToken
             ->setUser($user)

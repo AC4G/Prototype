@@ -164,8 +164,8 @@ final class APIAuthorizationListenerService
         }
 
         if ($event->getRequest()->isMethod('GET')) {
-            $this->cache->get('', function (ItemInterface $item) use ($user, $item) {
-                $item->expiresAfter(86400);
+            $this->cache->get('inventory_' . $uuid . '_item_' . $itemId, function (ItemInterface $cacheItem) use ($user, $item) {
+                $cacheItem->expiresAfter(86400);
 
                 return $this->inventoryRepository->findOneBy(['user' => $user->getId(), 'item' => $item]);
             });

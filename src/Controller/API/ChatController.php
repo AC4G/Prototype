@@ -2,7 +2,6 @@
 
 namespace App\Controller\API;
 
-use App\Service\DataService;
 use App\Repository\UserRepository;
 use App\Service\API\Chat\ChatService;
 use App\Repository\ChatRoomRepository;

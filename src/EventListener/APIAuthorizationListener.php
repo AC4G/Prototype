@@ -6,6 +6,7 @@ use DateTime;
 use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use App\Service\Listener\APIAuthorizationListenerService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -14,8 +15,10 @@ final class APIAuthorizationListener implements EventSubscriberInterface
 
     public function __construct(
         private readonly APIAuthorizationListenerService $authorizationListenerService,
+        private readonly RateLimiterFactory $apiFreePerMinuteLimiter,
+        private readonly RateLimiterFactory $apiFreeLimiter,
         private readonly SecurityService $securityService,
-        private readonly CustomResponse $customResponse
+        private readonly CustomResponse $customResponse,
     )
     {
     }
@@ -52,6 +55,21 @@ final class APIAuthorizationListener implements EventSubscriberInterface
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Corrupted access token, retry again or create a new one!', 500));
+
+            return;
+        }
+
+        $apiLimiter = $this->apiFreeLimiter->create('project_' . $accessToken['project']['id']);
+        $apiLimiterPerMinute = $this->apiFreePerMinuteLimiter->create('project_per_minute_' . $accessToken['project']['id']);
+
+        if (!$apiLimiter->consume()->isAccepted()) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'User limit per day', 429));
+
+            return;
+        }
+
+        if (!$apiLimiterPerMinute->consume()->isAccepted()) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Used limit per minute', 429));
 
             return;
         }

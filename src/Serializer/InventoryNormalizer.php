@@ -5,7 +5,7 @@ namespace App\Serializer;
 use App\Entity\User;
 use App\Entity\Inventory;
 
-class InventoryNormalizer
+final class InventoryNormalizer
 {
     public function normalize(
         Inventory $inventory,

@@ -5,10 +5,10 @@ namespace App\Service\API\Project;
 use App\Entity\Project;
 use App\Serializer\ProjectNormalizer;
 
-class ProjectService
+final class ProjectService
 {
     public function __construct(
-        private ProjectNormalizer $projectNormalizer
+        private readonly ProjectNormalizer $projectNormalizer
     )
     {
     }

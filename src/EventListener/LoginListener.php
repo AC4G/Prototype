@@ -5,7 +5,7 @@ namespace App\EventListener;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
-class LoginListener
+final class LoginListener
 {
     use TargetPathTrait;
 

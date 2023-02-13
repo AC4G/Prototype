@@ -4,7 +4,7 @@ namespace App\Serializer;
 
 use App\Entity\AccessToken;
 
-class AccessTokenNormalizer
+final class AccessTokenNormalizer
 {
     public function normalize(
         AccessToken $accessToken,

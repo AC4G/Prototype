@@ -3,14 +3,13 @@
 namespace App\Provider;
 
 use App\Renderer\TwoFactorRenderer;
+use App\Repository\UserTokenRepository;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\AuthenticationContextInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorProviderInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorFormRendererInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Exception\TwoFactorProviderLogicException;
-
-use App\Repository\UserTokenRepository;
 
 final class TwoFactorProvider implements TwoFactorProviderInterface
 {

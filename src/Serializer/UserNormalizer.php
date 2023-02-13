@@ -5,7 +5,7 @@ namespace App\Serializer;
 use App\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class UserNormalizer
+final class UserNormalizer
 {
     public function normalize(
         User|UserInterface $user,

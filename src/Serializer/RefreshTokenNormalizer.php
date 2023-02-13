@@ -4,7 +4,7 @@ namespace App\Serializer;
 
 use App\Entity\RefreshToken;
 
-class RefreshTokenNormalizer
+final class RefreshTokenNormalizer
 {
     public function normalize(
         RefreshToken $refreshToken,

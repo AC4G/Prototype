@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorFormRendererInterface;
 
-class TwoFactorRenderer implements TwoFactorFormRendererInterface
+final class TwoFactorRenderer implements TwoFactorFormRendererInterface
 {
     public function __construct(
         private readonly Environment $twigEnvironment,

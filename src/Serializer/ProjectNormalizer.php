@@ -4,7 +4,7 @@ namespace App\Serializer;
 
 use App\Entity\Project;
 
-class ProjectNormalizer
+final class ProjectNormalizer
 {
     public function normalize(
         Project $project,

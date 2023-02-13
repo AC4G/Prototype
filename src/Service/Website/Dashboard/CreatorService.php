@@ -2,7 +2,7 @@
 
 namespace App\Service\Website\Dashboard;
 
-class CreatorService
+final class CreatorService
 {
     public function __construct(
 

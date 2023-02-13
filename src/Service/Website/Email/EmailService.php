@@ -5,14 +5,14 @@ namespace App\Service\Website\Email;
 use Exception;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
+use function PHPUnit\Framework\throwException;
 
-class EmailService
+final class EmailService
 {
     private TemplatedEmail $email;
-    private array $error = [];
 
     public function __construct(
-        private MailerInterface $mailer
+        private readonly MailerInterface $mailer
     )
     {
     }
@@ -37,12 +37,9 @@ class EmailService
         try {
             $this->mailer->send($this->email);
         } catch (Exception $e) {
-            $this->error['email'] = 'Error sending email. Try it one more time. Message: ' . $e->getMessage();
+            throwException(new Exception($e->getMessage()));
         }
     }
 
-    public function getError(): array
-    {
-        return $this->error;
-    }
+
 }

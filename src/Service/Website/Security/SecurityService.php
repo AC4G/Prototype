@@ -79,7 +79,7 @@ final class SecurityService
             $errors[] = 'Already authenticated!';
         }
 
-        $this->webApp = $this->cache->get('webApp_'. $query['client_id'], function (ItemInterface $item) use ($query) {
+        $this->webApp = $this->cache->get('webApp_'. $query['client_id'], function (ItemInterface $item) {
             $item->expiresAfter(86400);
 
             return $this->webAppRepository->findOneBy(['client' => $this->client]);

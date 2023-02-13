@@ -6,13 +6,11 @@ use App\Serializer\UserNormalizer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\Website\Dashboard\DashboardService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class DashboardController extends AbstractController
 {
     public function __construct(
-        private readonly DashboardService $dashboardService,
         private readonly UserNormalizer $userNormalizer
     )
     {

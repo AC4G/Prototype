@@ -98,6 +98,7 @@
     },
     "require-dev": {
         "phpmetrics/phpmetrics": "^2.8",
+        "phpstan/phpstan": "^1.9",
         "phpunit/phpunit": "^9.5",
         "symfony/maker-bundle": "^1.38",
         "symfony/phpunit-bridge": "^6.2",

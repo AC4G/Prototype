@@ -101,7 +101,7 @@ final class ResetPasswordController extends AbstractController
             $this->resetPasswordService->updateEntryAndSendEmail();
         }
 
-        if (!$request->isMethod('POST') || $newCode === true && !$request->isMethod('POST')) {
+        if (!$request->isMethod('POST') || $newCode === true) {
             return $this->renderForm('website/resetPassword/code.html.twig', [
                 'form' => $form,
                 'error' => null

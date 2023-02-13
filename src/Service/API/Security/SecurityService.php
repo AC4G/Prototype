@@ -173,14 +173,14 @@ final class SecurityService
     public function hasClientPermissionForAdjustmentOnUserInventory(
         array $accessToken,
         User $user,
-        ?Item $item
+        ?array $item
     ): bool
     {
         if (is_null($item)) {
             return $accessToken['user']['id'] === $user->getId();
         }
 
-        return $accessToken['user']['id'] === $user->getId() && $item->getProject()->getId() === $accessToken['project']['id'];
+        return $accessToken['user']['id'] === $user->getId() && $item['project']['id'] === $accessToken['project']['id'];
     }
 
     public function hasClientPermissionForAdjustmentOnItem(

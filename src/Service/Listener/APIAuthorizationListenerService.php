@@ -4,8 +4,10 @@ namespace App\Service\Listener;
 
 use App\Entity\Item;
 use App\Entity\User;
+use App\Service\API\UserService;
 use App\Repository\ItemRepository;
-use App\Repository\UserRepository;
+use App\Serializer\ItemNormalizer;
+use App\Service\API\Item\ItemService;
 use App\Repository\InventoryRepository;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -13,8 +15,6 @@ use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
-use App\Serializer\ItemNormalizer;
-use function Symfony\Component\Translation\t;
 
 final class APIAuthorizationListenerService
 {
@@ -23,8 +23,9 @@ final class APIAuthorizationListenerService
         private readonly SecurityService $securityService,
         private readonly CustomResponse $customResponse,
         private readonly ItemRepository $itemRepository,
-        private readonly UserRepository $userRepository,
         private readonly ItemNormalizer $itemNormalizer,
+        private readonly UserService $userService,
+        private readonly ItemService $itemService,
         private readonly CacheInterface $cache
     )
     {
@@ -78,9 +79,7 @@ final class APIAuthorizationListenerService
                 $itemParameter->set($item->getParameter());
                 $this->cache->save($itemParameter);
 
-                if ($event->getRequest()->isMethod('GET')) {
-                    return;
-                }
+                return;
             }
 
             $itemCache = $this->cache->getItem('item_' . $id);
@@ -117,22 +116,7 @@ final class APIAuthorizationListenerService
 
         $uuid = $params['uuid'];
 
-        $user = $this->cache->getItem('user_'. $uuid)->get();
-
-        if (is_null($user)) {
-            $user = $this->userRepository->findOneBy(['uuid' => $uuid]);
-
-            if (!is_null($user)) {
-                $userCache = $this->cache->getItem('user_' . $uuid);
-
-                $userCache
-                    ->set($user)
-                    ->expiresAfter(86400)
-                ;
-
-                $this->cache->save($userCache);
-            }
-        }
+        $user = $this->userService->getUserByUuidFromCache($uuid);
 
         if (is_null($user)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User with uuid %s doesn\'t exists!', $uuid), 404));
@@ -146,11 +130,7 @@ final class APIAuthorizationListenerService
 
         $itemId = $params['itemId'];
 
-        $item = $this->cache->get('item_' . $itemId, function (ItemInterface $item) use ($itemId) {
-            $item->expiresAfter(86400);
-
-            return $this->itemRepository->findOneBy(['id' => $itemId]);
-        });
+        $item = json_decode($this->itemService->getItemFromCacheById($itemId), true);
 
         if (($user->isPrivate() && !$this->securityService->hasClientPermissionForAdjustmentOnUserInventory($accessToken, $user, $item) || !$user->isPrivate() && !$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAdjustmentOnUserInventory($accessToken, $user, $item))) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));

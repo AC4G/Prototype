@@ -7,8 +7,8 @@ use App\Service\API\Chat\ChatService;
 use App\Repository\ChatRoomRepository;
 use App\Serializer\Chat\ChatRoomNormalizer;
 use App\Repository\ChatRoomMemberRepository;
-use App\Repository\ChatRoomMessageRepository;
 use App\Service\Response\API\CustomResponse;
+use App\Repository\ChatRoomMessageRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,9 +18,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class ChatController extends AbstractController
 {
     public function __construct(
-        private ChatRoomNormalizer $chatRoomNormalizer,
-        private CustomResponse $customResponse,
-        private ChatService $chatService
+        private readonly ChatRoomNormalizer $chatRoomNormalizer,
+        private readonly CustomResponse $customResponse,
+        private readonly ChatService $chatService
     )
     {
     }

@@ -5,7 +5,7 @@ namespace App\Serializer;
 use App\Entity\Item;
 use App\Serializer\ProjectNormalizer;
 
-class ItemNormalizer
+final class ItemNormalizer
 {
     public function __construct(
         private readonly ProjectNormalizer $projectNormalizer

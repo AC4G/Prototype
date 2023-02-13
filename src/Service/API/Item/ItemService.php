@@ -2,7 +2,6 @@
 
 namespace App\Service\API\Item;
 
-use App\Entity\Inventory;
 use App\Entity\Item;
 use App\Serializer\ItemNormalizer;
 use App\Repository\ItemRepository;

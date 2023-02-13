@@ -32,7 +32,7 @@ class RegistrationServiceTest extends TestCase
             ->with('Tests@example.com')
             ->willReturn(false);
 
-        $classUnderTest = new RegistrationService(
+        $registrationService = new RegistrationService(
             $verifyEmailHelper,
             $passwordHasher,
             $roleIdentRepository,
@@ -41,7 +41,7 @@ class RegistrationServiceTest extends TestCase
             $emailService
         );
 
-        $errors = $classUnderTest->getValidationErrors([
+        $errors = $registrationService->getValidationErrors([
             'nickname' => 'testnickname',
             'email' => 'Tests@example.com'
         ]);
@@ -50,8 +50,6 @@ class RegistrationServiceTest extends TestCase
 
         $this->assertNotContains('The specified email is invalid.', $errors);
     }
-
-
 
 
 }

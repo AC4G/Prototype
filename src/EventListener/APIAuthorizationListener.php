@@ -63,7 +63,7 @@ final class APIAuthorizationListener implements EventSubscriberInterface
         $apiLimiterPerMinute = $this->apiFreePerMinuteLimiter->create('project_per_minute_' . $accessToken['project']['id']);
 
         if (!$apiLimiter->consume()->isAccepted()) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'User limit per day', 429));
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Used limit per day', 429));
 
             return;
         }

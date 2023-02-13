@@ -185,14 +185,14 @@ final class SecurityService
 
     public function hasClientPermissionForAdjustmentOnItem(
         array $accessToken,
-        ?Item $item
+        array $item
     ): bool
     {
-        if (is_null($item) || is_null($item->getProject())) {
+        if (is_null($item['project'])) {
             return false;
         }
 
-        return $item->getProject()->getId() === $accessToken['project']['id'];
+        return $item['project']['id'] === $accessToken['project']['id'];
     }
 
     public function isClientAdmin(

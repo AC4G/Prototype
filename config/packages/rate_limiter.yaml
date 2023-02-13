@@ -2,14 +2,14 @@ framework:
   rate_limiter:
 
     api_free:
-      policy: 'token_bucket'
+      policy: 'sliding_window'
       limit: 100000
-      rate: { interval: '24 hours', amount: 100000 }
+      interval: '24 hours'
 
     api_free_per_minute:
-      policy: 'token_bucket'
+      policy: 'sliding_window'
       limit: 100
-      rate: { interval: '1 minutes', amount: 100 }
+      interval: '1 minutes'
 
     security_throttling:
       policy: 'token_bucket'

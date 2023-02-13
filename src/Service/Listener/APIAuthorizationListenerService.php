@@ -2,6 +2,7 @@
 
 namespace App\Service\Listener;
 
+use App\Entity\Item;
 use App\Entity\User;
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
@@ -13,6 +14,7 @@ use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 use App\Serializer\ItemNormalizer;
+use function Symfony\Component\Translation\t;
 
 final class APIAuthorizationListenerService
 {
@@ -40,7 +42,7 @@ final class APIAuthorizationListenerService
             return;
         }
 
-        if ($this->isRouteItems($params)) {
+        if (count($params) === 0) {
             return;
         }
 
@@ -58,31 +60,29 @@ final class APIAuthorizationListenerService
 
         $item = $this->cache->getItem('item_' . $id)->get();
 
-        if (!is_null($item)) {
-            return;
-        }
-
-        $item = $this->itemRepository->findOneBy(['id' => $id]);
-
         if (is_null($item)) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Item not found', 404));
+            $item = $this->itemRepository->findOneBy(['id' => $id]);
 
-            return;
-        }
+            if (is_null($item)) {
+                $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Item not found', 404));
 
-        if (str_contains($event->getRequest()->attributes->get('_route'), 'parameter')) {
-            $itemParameter = $this->cache->getItem('item_' . $id . '_parameter');
-
-            $itemParameter->expiresAfter(86400);
-            $itemParameter->set($item->getParameter());
-            $this->cache->save($itemParameter);
-
-            if ($event->getRequest()->isMethod('GET')) {
                 return;
             }
         }
 
-        if ($event->getRequest()->isMethod('GET')) {
+        if ($event->getRequest()->isMethod('GET') && $item instanceof Item) {
+            if (str_contains($event->getRequest()->attributes->get('_route'), 'parameter')) {
+                $itemParameter = $this->cache->getItem('item_' . $id . '_parameter');
+
+                $itemParameter->expiresAfter(86400);
+                $itemParameter->set($item->getParameter());
+                $this->cache->save($itemParameter);
+
+                if ($event->getRequest()->isMethod('GET')) {
+                    return;
+                }
+            }
+
             $itemCache = $this->cache->getItem('item_' . $id);
 
             $itemCache->expiresAfter(86400);
@@ -92,16 +92,17 @@ final class APIAuthorizationListenerService
             return;
         }
 
+        if (is_string($item)) {
+            $item = json_decode($item, true);
+        }
+
+        if ($item instanceof Item) {
+            $item = $this->itemNormalizer->normalize($item);
+        }
+
         if (!$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAdjustmentOnItem($accessToken, $item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
-    }
-
-    private function isRouteItems(
-        array $params
-    ): bool
-    {
-        return count($params) === 0;
     }
 
     public function validateJWTForInventoryController(
@@ -199,17 +200,17 @@ final class APIAuthorizationListenerService
         array $params
     ): bool
     {
-        if (count($params) === 0 && $this->securityService->isClientAdmin($accessToken)) {
-            return true;
+        if (count($params) !== 0) {
+            return false;
         }
 
-        if ((count($params) === 0) && !$this->securityService->isClientAdmin($accessToken)) {
+        if (!$this->securityService->isClientAdmin($accessToken)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
 
             return true;
         }
 
-        return false;
+        return true;
     }
 
     private function isRouteInventoryByUuid(

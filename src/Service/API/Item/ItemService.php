@@ -93,13 +93,13 @@ final class ItemService
         return $this->cache->get('item_' . $id, function (ItemInterface $item) use ($id) {
             $item->expiresAfter(86400);
 
-            return $this->itemRepository->findOneBy(['id' => $id]);
+            return json_encode($this->itemNormalizer->normalize($this->itemRepository->findOneBy(['id' => $id])));
         });
     }
 
     public function getItemParameterFromCacheById(
         int $id
-    ): null|Inventory
+    ): null|string
     {
         return $this->cache->get('item_' . $id . '_parameter', function (ItemInterface $item) use ($id) {
             $item->expiresAfter(86400);

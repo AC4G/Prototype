@@ -19,6 +19,7 @@ class ProjectNormalizer
         }
 
         return [
+            'id' => $project->getId(),
             'projectName' => $project->getProjectName(),
             'organisationName' => $project->getOrganisationName(),
             'organisationEmail' => $project->getOrganisationEmail(),

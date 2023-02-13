@@ -17,7 +17,7 @@ class ItemNormalizer
         Item $item,
         string $format = null,
         array $context = []
-    ): array
+    ): array|null
     {
         return [
             'id' => $item->getId(),

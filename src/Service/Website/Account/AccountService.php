@@ -24,7 +24,7 @@ final class AccountService
 
     public function saveProfilePicture(
         UploadedFile $file,
-        UserInterface $user
+        User $user
     ): UserInterface
     {
         $nickname = $user->getNickname();
@@ -94,7 +94,7 @@ final class AccountService
 
     public function updateNickname(
         string $nickname,
-        UserInterface $user
+        User $user
     ): void
     {
         if (!is_null($this->userRepository->findOneBy(['nickname' => $nickname]))) {
@@ -137,7 +137,7 @@ final class AccountService
 
     public function updateProfilePrivacy(
         bool $privacy,
-        UserInterface $user
+        User $user
     ): void
     {
         $user->setIsPrivate($privacy);
@@ -147,7 +147,7 @@ final class AccountService
 
     public function updateEmail(
         string $email,
-        UserInterface $user
+        User $user
     ): void
     {
         if (!is_null($this->userRepository->findOneBy(['email' => $email]))) {
@@ -161,7 +161,7 @@ final class AccountService
 
     public function updatePassword(
         string $password,
-        UserInterface $user
+        User $user
     ): void
     {
         if (password_verify($password, $user->getPassword())) {
@@ -174,7 +174,7 @@ final class AccountService
     }
 
     public function updateTwoStepSecret(
-        UserInterface $user
+        User $user
     ): void
     {
         $secret = $this->googleAuthenticator->generateSecret();
@@ -185,7 +185,7 @@ final class AccountService
     }
 
     public function unsetTwoStepVerification(
-        User|UserInterface $user
+        User $user
     ): void
     {
         $user
@@ -197,7 +197,7 @@ final class AccountService
     }
 
     public function removeTwofaRecoveryTokens(
-        User|UserInterface $user
+        User $user
     ): void
     {
         $tokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-recovery']);

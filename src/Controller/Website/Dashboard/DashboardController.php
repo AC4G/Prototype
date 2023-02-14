@@ -2,6 +2,7 @@
 
 namespace App\Controller\Website\Dashboard;
 
+use App\Entity\User;
 use App\Serializer\UserNormalizer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +24,9 @@ final class DashboardController extends AbstractController
         Request $request
     ): Response
     {
-        $user = $this->userNormalizer->normalize($this->getUser());
+        /** @var User $user */
+        $user = $this->getUser();
+        $user = $this->userNormalizer->normalize($user);
 
         return $this->render('website/dashboard/index.html.twig', [
             'user' => $user,
@@ -46,7 +49,9 @@ final class DashboardController extends AbstractController
      */
     public function showInventory(): Response
     {
-        $user = $this->userNormalizer->normalize($this->getUser());
+        /** @var User $user */
+        $user = $this->getUser();
+        $user = $this->userNormalizer->normalize($user);
 
         return $this->render('website/dashboard/inventory.html.twig', [
             'user' => $user,

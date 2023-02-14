@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Entity\User;
 use App\Service\Website\Account\AccountService;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -21,6 +22,7 @@ class CheckVerifiedUserSubscriber implements EventSubscriberInterface
     {
         $passport = $event->getPassport();
 
+        /** @var User $user */
         $user = $passport->getUser();
 
         if (is_null($user->getEmailVerified())) {
@@ -35,7 +37,7 @@ class CheckVerifiedUserSubscriber implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CheckPassportEvent::class => ['onCheckPassport', -10],

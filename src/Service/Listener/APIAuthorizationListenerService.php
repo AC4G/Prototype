@@ -10,10 +10,10 @@ use App\Serializer\ItemNormalizer;
 use App\Service\API\Item\ItemService;
 use App\Repository\InventoryRepository;
 use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 
 final class APIAuthorizationListenerService
@@ -26,7 +26,7 @@ final class APIAuthorizationListenerService
         private readonly ItemNormalizer $itemNormalizer,
         private readonly UserService $userService,
         private readonly ItemService $itemService,
-        private readonly CacheInterface $cache
+        private readonly FilesystemAdapter $cache
     )
     {
     }

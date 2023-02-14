@@ -3,13 +3,13 @@
 namespace App\Controller\API;
 
 use App\Repository\InventoryRepository;
-use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Service\API\Inventories\InventoriesService;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class InventoryController extends AbstractController
@@ -18,7 +18,7 @@ final class InventoryController extends AbstractController
         private readonly InventoryRepository $inventoryRepository,
         private readonly InventoriesService $inventoriesService,
         private readonly CustomResponse $customResponse,
-        private readonly CacheInterface $cache
+        private readonly FilesystemAdapter $cache
     )
     {
     }

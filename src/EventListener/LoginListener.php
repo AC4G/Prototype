@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use App\Entity\User;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
@@ -13,6 +14,7 @@ final class LoginListener
         InteractiveLoginEvent $event
     ): void
     {
+        /** @var User $user */
         $user = $event->getAuthenticationToken()->getUser();
 
         if ($user->isTwoFaVerified()) {

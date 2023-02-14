@@ -9,7 +9,6 @@ use chillerlan\QRCode\QRCode;
 use App\Repository\UserTokenRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\Website\Account\AccountService;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
 
@@ -24,7 +23,7 @@ final class ProfileService
     }
 
     public function updateProfile(
-        UserInterface $user,
+        User $user,
         Request $request
     ): void
     {
@@ -38,7 +37,7 @@ final class ProfileService
     }
 
     private function updatePicture(
-        UserInterface $user,
+        User $user,
         Request $request
     ): void
     {
@@ -59,7 +58,7 @@ final class ProfileService
     }
 
     private function updatePrivacy(
-        UserInterface $user,
+        User $user,
         Request $request
     ): void
     {
@@ -69,7 +68,7 @@ final class ProfileService
     }
 
     private function updateNickname(
-        UserInterface $user,
+        User $user,
         Request $request
     ): void
     {
@@ -81,7 +80,7 @@ final class ProfileService
     }
 
     private function updateEmail(
-        UserInterface $user,
+        User $user,
         Request $request
     ): void
     {
@@ -93,7 +92,7 @@ final class ProfileService
     }
 
     public function updatePassword(
-        UserInterface $user,
+        User $user,
         Request $request
     ): void
     {

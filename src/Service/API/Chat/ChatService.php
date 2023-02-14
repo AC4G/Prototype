@@ -17,10 +17,7 @@ use App\Repository\ChatRoomMessageRepository;
 final class ChatService
 {
     public function __construct(
-        private ChatRoomMessageRepository $chatRoomMessageRepository,
-        private ChatRoomMemberRepository $chatRoomMemberRepository,
         private ChatRoomTypeRepository $chatRoomTypeRepository,
-        private ChatRoomMessageRepository $messageRepository,
         private ChatRoomRepository $chatRoomRepository
     )
     {

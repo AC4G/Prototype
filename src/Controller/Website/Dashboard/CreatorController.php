@@ -2,6 +2,7 @@
 
 namespace App\Controller\Website\Dashboard;
 
+use App\Entity\User;
 use App\Repository\ItemRepository;
 use App\Serializer\UserNormalizer;
 use App\Engine\Search\ItemSearchEngine;
@@ -30,12 +31,13 @@ final class CreatorController extends AbstractController
         Request $request
     ): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
         $query = $request->query->all();
 
         $items = $this->paginationService->getDataByPage($this->itemSearchEngine->search($query, $user), $query);
 
-        $user = $this->userNormalizer->normalize($this->getUser());
+        $user = $this->userNormalizer->normalize($user);
 
         return $this->render('website/dashboard/creator.html.twig', [
             'path_name' => 'creator',

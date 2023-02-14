@@ -2,8 +2,8 @@
 
 namespace App\Controller\Website\Dashboard;
 
+use App\Entity\User;
 use App\Serializer\UserNormalizer;
-use App\Repository\UserRepository;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +19,6 @@ class ProfileController extends AbstractController
         private readonly UserNormalizer $userNormalizer,
         private readonly ProfileService $profileService,
         private readonly AccountService $accountService,
-        private readonly UserRepository $userRepository,
         private readonly Security $security
     )
     {
@@ -32,13 +31,14 @@ class ProfileController extends AbstractController
         Request $request
     ): Response
     {
+        /** @var User $user **/
         $user = $this->security->getUser();
 
         if ($request->isMethod('POST') && $this->isCsrfTokenValid($request->request->get('form'), $request->request->get('token'))) {
             $this->profileService->updateProfile($user, $request);
         }
 
-        $user = $this->userNormalizer->normalize($this->getUser());
+        $user = $this->userNormalizer->normalize($user);
 
         return $this->render('website/dashboard/profile.html.twig', [
             'user' => $user,
@@ -61,7 +61,8 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('dashboard_profile');
         }
 
-        $user = $this->userRepository->findOneBy(['id' => $this->getUser()->getId()]);
+        /** @var User $user */
+        $user = $this->getUser();
 
         if (!$user->isTwoFaVerified() && !$user->isGoogleAuthenticatorEnabled() && $query['action'] === 'disable') {
             $this->addFlash('error', '2-Step Verification already disabled!');

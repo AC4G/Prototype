@@ -5,7 +5,6 @@ namespace App\Service\API\Security;
 use DateTime;
 use Exception;
 use App\Entity\User;
-use App\Entity\Item;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use App\Entity\Client;
@@ -120,7 +119,9 @@ final class SecurityService
 
         $expire = new DateTime('+10 day');
 
-        $user = $this->userRepository->findOneBy(['id' => is_array($token) ? $token['user']['id'] : $token->getUser()->getId()]);
+        /** @var User $user */
+        $user = $token->getUser();
+        $user = $this->userRepository->findOneBy(['id' => is_array($token) ? $token['user']['id'] : $user->getId()]);
         $project = $this->projectRepository->findOneBy(['id' => is_array($token) ? $token['project']['id'] : $token->getProject()->getId()]);
 
         $accessToken
@@ -199,7 +200,7 @@ final class SecurityService
         array $accessToken
     ): bool
     {
-        return in_array('ROLE_ADMIN', $accessToken['user']['roles']);
+        return in_array('ROLE_ADMIN', $accessToken['project']['developer']['roles']);
     }
 
     public function nicknameExists(

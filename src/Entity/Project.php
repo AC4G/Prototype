@@ -80,6 +80,13 @@ class Project
         return $this->id;
     }
 
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getProjectName(): ?string
     {
         return $this->projectName;

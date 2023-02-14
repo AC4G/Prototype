@@ -2,6 +2,7 @@
 
 namespace App\Controller\Website;
 
+use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,6 +23,7 @@ final class HomeController extends AbstractController
         Request $request
     ): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
 
         if (!is_null($request->getSession()->get('redirect'))) {

@@ -21,6 +21,11 @@ final class AccessTokenNormalizer
             'scopes' => $accessToken->getScopes(),
             'project' => [
                 'id' => $project->getId(),
+                'developer' => [
+                    'id' => $project->getDeveloper()->getUser()->getId(),
+                    'uuid' => $project->getDeveloper()->getUser()->getUuid(),
+                    'roles' => $project->getDeveloper()->getUser()->getRoles()
+                ]
             ],
             'user' => [
                 'id' => is_null($user) ? null : $user->getId(),

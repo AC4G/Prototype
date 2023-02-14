@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use DateTime;
-use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 final class ThrottlingService
 {
@@ -12,7 +12,7 @@ final class ThrottlingService
     private string $client;
 
     public function __construct(
-        private readonly CacheInterface $cache
+        private readonly FilesystemAdapter $cache
     )
     {
     }

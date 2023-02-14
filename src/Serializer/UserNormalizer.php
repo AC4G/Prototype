@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 final class UserNormalizer
 {
     public function normalize(
-        User|UserInterface $user,
+        User $user,
         string $format = null,
         array $context = []
     ): array

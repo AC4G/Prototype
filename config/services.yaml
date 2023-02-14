@@ -43,7 +43,6 @@ services:
         class: App\Renderer\TwoFactorRenderer
         arguments:
             - '@twig'
-            - '@security.firewall.map'
 
     App\EventListener\LoginListener:
         tags:
@@ -54,6 +53,8 @@ services:
         arguments:
             $globalFactory: '@limiter.security_throttling'
             $localFactory: '@limiter.login_throttling'
+
+    Symfony\Component\Cache\Adapter\FilesystemAdapter:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

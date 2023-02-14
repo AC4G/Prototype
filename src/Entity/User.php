@@ -264,7 +264,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             $roles[] = $role->getRoleIdent()->getRoleName();
         }
 
-        return array_unique($roles);
+        return array_values(array_unique($roles));
     }
 
     public function eraseCredentials()

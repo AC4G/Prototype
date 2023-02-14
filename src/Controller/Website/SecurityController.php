@@ -2,10 +2,8 @@
 
 namespace App\Controller\Website;
 
+use App\Entity\User;
 use App\Form\OAuth\OAuthFormType;
-use App\Repository\UserRepository;
-use App\Repository\ClientRepository;
-use App\Repository\WebAppRepository;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,10 +19,7 @@ final class SecurityController extends AbstractController
 
     public function __construct(
         private readonly AuthenticationUtils $authenticationUtils,
-        private readonly ClientRepository $clientRepository,
-        private readonly WebAppRepository $webAppRepository,
         private readonly SecurityService $securityService,
-        private readonly UserRepository $userRepository,
         private readonly Security $security
     )
     {
@@ -41,7 +36,10 @@ final class SecurityController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        if (!is_null($this->getUser()) && $this->getUser()->isTwoFaVerified()) {
+        /** @var ?User $user **/
+        $user = $this->getUser();
+
+        if (!is_null($user) && $user->isTwoFaVerified()) {
             $request->getSession()->set('redirect', $this->getTargetPath($request->getSession(), 'main'));
         }
 

@@ -163,7 +163,7 @@ final class SecurityService
         ];
     }
 
-    public function hasClientPermissionForAccessingInventory(
+    public function hasClientPermissionForAccessingUserRelatedData(
         array $accessToken,
         User $user
     ): bool

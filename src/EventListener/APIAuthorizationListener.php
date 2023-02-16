@@ -88,6 +88,12 @@ final class APIAuthorizationListener implements EventSubscriberInterface
 
         if (str_starts_with($route, 'api_inventory') || str_starts_with($route, 'api_inventories')) {
             $this->authorizationListenerService->validateJWTForInventoryController($event, $accessToken, $params);
+
+            return;
+        }
+
+        if (str_starts_with($route, 'api_user')) {
+            $this->authorizationListenerService->validateJWTForUserController($event, $accessToken, $params);
         }
     }
 

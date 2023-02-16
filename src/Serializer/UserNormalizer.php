@@ -3,16 +3,25 @@
 namespace App\Serializer;
 
 use App\Entity\User;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 final class UserNormalizer
 {
     public function normalize(
         User $user,
         string $format = null,
-        array $context = []
+        string $context = null
     ): array
     {
+        if ('user_api' === $context) {
+            return [
+                'uuid' => $user->getUuid(),
+                'nickname' => $user->getNickname(),
+                'email' => $user->getEmail(),
+                'profilePic' => $user->getProfilePic(),
+                'isPrivate' => $user->isPrivate(),
+            ];
+        }
+
         return [
             'id' => $user->getId(),
             'uuid' => $user->getUuid(),
@@ -29,7 +38,7 @@ final class UserNormalizer
     public function supportsNormalization(
         $data,
         string $format = null,
-        array $context = []
+        string $context = null
     ): bool
     {
             return $data instanceof User;

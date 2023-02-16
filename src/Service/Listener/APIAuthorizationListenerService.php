@@ -10,10 +10,10 @@ use App\Serializer\ItemNormalizer;
 use App\Service\API\Item\ItemService;
 use App\Repository\InventoryRepository;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 
 final class APIAuthorizationListenerService
@@ -26,7 +26,7 @@ final class APIAuthorizationListenerService
         private readonly ItemNormalizer $itemNormalizer,
         private readonly UserService $userService,
         private readonly ItemService $itemService,
-        private readonly FilesystemAdapter $cache
+        private readonly CacheInterface $cache
     )
     {
     }
@@ -204,7 +204,7 @@ final class APIAuthorizationListenerService
             return false;
         }
 
-        if ($user->isPrivate() && !$this->securityService->hasClientPermissionForAccessingInventory($accessToken, $user)) {
+        if ($user->isPrivate() && !$this->securityService->hasClientPermissionForAccessingUserRelatedData($accessToken, $user)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
 
             return true;
@@ -221,6 +221,27 @@ final class APIAuthorizationListenerService
         }
 
         return true;
+    }
+
+    public function validateJWTForUserController(
+        RequestEvent $event,
+        array $accessToken,
+        array $params
+    ): void
+    {
+        $uuid = $params['uuid'];
+
+        $user = $this->userService->getUserByUuidFromCache($uuid);
+
+        if (is_null($user)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User with uuid %s doesn\'t exists!', $uuid), 404));
+
+            return;
+        }
+
+        if (!$this->securityService->hasClientPermissionForAccessingUserRelatedData($accessToken, $user)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
+        }
     }
 
 

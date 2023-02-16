@@ -12,12 +12,11 @@ use App\Repository\WebAppRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\AuthTokenRepository;
 use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 final class SecurityService
 {
-
     private ?Client $client = null;
     private ?WebApp $webApp = null;
     private array $scopes = [];
@@ -28,7 +27,7 @@ final class SecurityService
         private readonly ClientRepository $clientRepository,
         private readonly WebAppRepository $webAppRepository,
         private readonly ScopeRepository $scopeRepository,
-        private readonly FilesystemAdapter $cache,
+        private readonly CacheInterface $cache,
     )
     {
     }

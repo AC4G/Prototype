@@ -115,11 +115,11 @@ final class ProfileService
         return $qrCode->render($this->googleAuthenticator->getQRContent($user));
     }
 
-    public function getOrGenerateTwoStepVerificationResetTokens(
+    public function getOrGenerateTwoStepVerificationOneTimeTokens(
         User $user
     ): array
     {
-        $existingTokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-recovery']);
+        $existingTokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-one-time']);
 
         if (count($existingTokens) > 0) {
             return $existingTokens;
@@ -133,7 +133,7 @@ final class ProfileService
             $tokens[$i]
                 ->setUser($user)
                 ->setToken(bin2hex(random_bytes(8)))
-                ->setType('2fa-recovery')
+                ->setType('2fa-one-time')
                 ->setCreationDate(new DateTime())
             ;
 
@@ -167,7 +167,7 @@ final class ProfileService
     ): void
     {
         $this->accountService->unsetTwoStepVerification($user);
-        $this->accountService->removeTwofaRecoveryTokens($user);
+        $this->accountService->removeTwofaOneTimeTokens($user);
     }
 
 

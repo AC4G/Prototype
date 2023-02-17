@@ -8,6 +8,7 @@ use App\Service\API\UserService;
 use App\Repository\ItemRepository;
 use App\Serializer\ItemNormalizer;
 use App\Service\API\Item\ItemService;
+use App\Repository\PublicKeyRepository;
 use App\Repository\InventoryRepository;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -15,10 +16,10 @@ use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
-
 final class APIAuthorizationListenerService
 {
     public function __construct(
+        private readonly PublicKeyRepository $publicKeyRepository,
         private readonly InventoryRepository $inventoryRepository,
         private readonly SecurityService $securityService,
         private readonly CustomResponse $customResponse,
@@ -240,6 +241,37 @@ final class APIAuthorizationListenerService
         }
 
         if (!$this->securityService->hasClientPermissionForAccessingUserRelatedData($accessToken, $user)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
+        }
+    }
+
+    public function validateJWTForPublicKeyController(
+        RequestEvent $event,
+        array $accessToken,
+        array $params
+    ): void
+    {
+        $uuid = $params['uuid'];
+
+        $user = $this->userService->getUserByUuidFromCache($uuid);
+
+        if (is_null($user)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User with uuid %s doesn\'t exists!', $uuid), 404));
+
+            return;
+        }
+
+        $publicKey = $this->cache->get('public_key_' . $user->getUuid(), function (ItemInterface $item) use ($user) {
+            $item->expiresAfter(86400);
+
+            return $this->publicKeyRepository->findOneBy(['user' => $user]);
+        });
+
+        if (is_null($publicKey)) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Public key not found', 404));
+        }
+
+        if ($event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAccessingUserRelatedData($accessToken, $user) || $accessToken['project']['id'] !== 1) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
     }

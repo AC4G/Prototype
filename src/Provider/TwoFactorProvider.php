@@ -55,11 +55,11 @@ final class TwoFactorProvider implements TwoFactorProviderInterface
             return false;
         }
 
-        if (strlen($authenticationCode) !== 16) {
+        if (strlen($authenticationCode) === 6 && is_numeric($authenticationCode)) {
             return $this->googleAuthenticator->checkCode($user, $authenticationCode);
         }
 
-        $token = $this->userTokenRepository->findOneBy(['user' => $user, 'type' => '2fa-recovery', 'token' => $authenticationCode]);
+        $token = $this->userTokenRepository->findOneBy(['user' => $user, 'type' => '2fa-one-time', 'token' => $authenticationCode]);
 
         if (is_null($token)) {
             return false;

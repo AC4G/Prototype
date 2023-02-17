@@ -94,6 +94,12 @@ final class APIAuthorizationListener implements EventSubscriberInterface
 
         if (str_starts_with($route, 'api_user')) {
             $this->authorizationListenerService->validateJWTForUserController($event, $accessToken, $params);
+
+            return;
+        }
+
+        if (str_starts_with($route, 'api_public_key')) {
+            $this->authorizationListenerService->validateJWTForPublicKeyController($event, $accessToken, $params);
         }
     }
 

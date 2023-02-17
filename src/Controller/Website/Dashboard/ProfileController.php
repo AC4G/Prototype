@@ -132,7 +132,7 @@ class ProfileController extends AbstractController
         return $this->render('website/security/2fa_setup.html.twig', [
             'code' => $user->getGoogleAuthenticatorSecret(),
             'qrCode' => $this->profileService->generateTwoStepVerificationQRCode($user),
-            'reset_tokens' => $this->profileService->getOrGenerateTwoStepVerificationResetTokens($user)
+            'reset_tokens' => $this->profileService->getOrGenerateTwoStepVerificationOneTimeTokens($user)
         ]);
     }
 

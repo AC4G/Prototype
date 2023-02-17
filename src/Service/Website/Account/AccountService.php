@@ -196,11 +196,11 @@ final class AccountService
         $this->userRepository->flushEntity();
     }
 
-    public function removeTwofaRecoveryTokens(
+    public function removeTwofaOneTimeTokens(
         User $user
     ): void
     {
-        $tokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-recovery']);
+        $tokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-one-time']);
 
         foreach ($tokens as $token) {
             $this->userTokenRepository->deleteEntry($token);

@@ -32,7 +32,7 @@ class CheckVerifiedUserSubscriber implements EventSubscriberInterface
         }
 
         if (!is_null($user->getGoogleAuthenticatorSecret()) && strlen($user->getGoogleAuthenticatorSecret()) > 0 && is_null($user->getTwoFaVerified())) {
-            $this->accountService->removeTwofaRecoveryTokens($user);
+            $this->accountService->removeTwofaOneTimeTokens($user);
             $this->accountService->unsetTwoStepVerification($user);
         }
     }

@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Serializer\PublicKeyNormalizer;
+use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,33 +17,45 @@ final class PublicKeyController extends AbstractController
     public function __construct(
         private readonly PublicKeyNormalizer $publicKeyNormalizer,
         private readonly PublicKeyService $publicKeyService,
-        private readonly CustomResponse $customResponse
+        private readonly CustomResponse $customResponse,
+        private readonly CacheInterface $cache
     )
     {
     }
 
     /**
-     * @Route("/api/publicKey/{uuid}", name="api_public_key_by_uuid", methods={"GET", "POST", "PATCH"})
+     * @Route("/api/publicKey/{uuid}", name="api_public_key_by_uuid", methods={"GET", "POST", "PATCH", "DELETE"})
      */
     public function getPublicKeyAction(
         Request $request,
         string $uuid
     ): Response
     {
-        $publicKey = $this->publicKeyService->getPublicKeyByUuidFromCache($uuid);
-
         if ($request->isMethod('GET')) {
+            $publicKey = $this->publicKeyService->getPublicKeyByUuidFromCache($uuid);
+
             return new JsonResponse($this->publicKeyNormalizer->normalize($publicKey));
         }
 
-        $content = json_decode($request->getContent(), true);
+        $this->cache->delete('public_key_' . $uuid);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
+        if ($request->isMethod('DELETE')) {
+            $this->publicKeyService->deletePublicKey($uuid);
+
+            return $this->customResponse->notificationResponse($request, 'Public key successfully deleted');
         }
 
-        //todo: implement creation and updating public for official stexs client
-        return new Response();
+        $key = json_decode($request->getContent(), true)['key'];
+
+        if ($request->isMethod('POST')) {
+            $this->publicKeyService->savePublicKey($uuid, $key);
+
+            return  $this->customResponse->notificationResponse($request, 'Public successfully saved');
+        }
+
+        $this->publicKeyService->updatePublicKey($uuid, $key);
+
+        return $this->customResponse->notificationResponse($request, 'Public successfully updated');
     }
 
 

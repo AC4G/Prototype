@@ -261,18 +261,48 @@ final class APIAuthorizationListenerService
             return;
         }
 
+        if ($event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAccessingUserRelatedData($accessToken, $user) || $accessToken['project']['id'] !== 1) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
+
+            return;
+        }
+
         $publicKey = $this->cache->get('public_key_' . $user->getUuid(), function (ItemInterface $item) use ($user) {
             $item->expiresAfter(86400);
 
             return $this->publicKeyRepository->findOneBy(['user' => $user]);
         });
 
-        if (is_null($publicKey)) {
+        if (is_null($publicKey) && !$event->getRequest()->isMethod('POST')) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Public key not found', 404));
+
+            return;
         }
 
-        if ($event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAccessingUserRelatedData($accessToken, $user) || $accessToken['project']['id'] !== 1) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
+        if (!is_null($publicKey) && $event->getRequest()->isMethod('POST')) {
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User with uuid %s has already a public key', $uuid), 400));
+
+            return;
+        }
+
+        if ($event->getRequest()->isMethod('POST') || $event->getRequest()->isMethod('PATCH')) {
+            $content = json_decode($event->getRequest()->getContent(), true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Invalid Json!', 406));
+
+                return;
+            }
+
+            if (!array_key_exists('key', $content)) {
+                $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Key not provided!', 406));
+
+                return;
+            }
+
+            if (preg_match('^ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}( [^@]+@[^@]+)?$', $content['key']) === false) {
+                $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Key is not provided in OpenSSH format!', 406));
+            }
         }
     }
 

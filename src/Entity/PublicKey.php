@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * PublicKey
  *
- * @ORM\Table(name="public_key", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="key_UNIQUE", columns={"key"}), @ORM\UniqueConstraint(name="user_UNIQUE", columns={"user_id"})}, indexes={@ORM\Index(name="fk_Public_Key_User1_idx", columns={"user_id"})})
+ * @ORM\Table(name="public_key", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="key_UNIQUE", columns={"public_key"}), @ORM\UniqueConstraint(name="user_UNIQUE", columns={"user_id"})}, indexes={@ORM\Index(name="fk_Public_Key_User1_idx", columns={"user_id"})})
  * @ORM\Entity(repositoryClass="App\Repository\PublicKeyRepository")
  */
 class PublicKey
@@ -36,7 +36,7 @@ class PublicKey
     /**
      * @var string
      *
-     * @ORM\Column(name="key", type="text", length=0, nullable=false)
+     * @ORM\Column(name="public_key", type="text", length=0, nullable=false)
      */
     private string $key;
 

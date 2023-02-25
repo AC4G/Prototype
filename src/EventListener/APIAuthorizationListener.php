@@ -5,16 +5,22 @@ namespace App\EventListener;
 use DateTime;
 use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
+use App\Service\Listener\APIUserListenerService;
+use App\Service\Listener\APIItemListenerService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
-use App\Service\Listener\APIAuthorizationListenerService;
+use App\Service\Listener\APIInventoryListenerService;
+use App\Service\Listener\APIPublicKeyListenerService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class APIAuthorizationListener implements EventSubscriberInterface
 {
 
     public function __construct(
-        private readonly APIAuthorizationListenerService $authorizationListenerService,
+        private readonly APIInventoryListenerService $apiInventoryListenerService,
+        private readonly APIPublicKeyListenerService $apiPublicKeyListenerService,
+        private readonly APIItemListenerService $apiItemListenerService,
+        private readonly APIUserListenerService $apiUserListenerService,
         private readonly RateLimiterFactory $apiFreePerMinuteLimiter,
         private readonly RateLimiterFactory $apiFreeLimiter,
         private readonly SecurityService $securityService,
@@ -81,25 +87,25 @@ final class APIAuthorizationListener implements EventSubscriberInterface
         }
 
         if (str_starts_with($route, 'api_item')) {
-            $this->authorizationListenerService->validateJWTForItemController($event, $accessToken, $params);
+            $this->apiItemListenerService->validateJWTForItemController($event, $accessToken, $params);
 
             return;
         }
 
         if (str_starts_with($route, 'api_inventory') || str_starts_with($route, 'api_inventories')) {
-            $this->authorizationListenerService->validateJWTForInventoryController($event, $accessToken, $params);
+            $this->apiInventoryListenerService->validateJWTForInventoryController($event, $accessToken, $params);
 
             return;
         }
 
         if (str_starts_with($route, 'api_user')) {
-            $this->authorizationListenerService->validateJWTForUserController($event, $accessToken, $params);
+            $this->apiUserListenerService->validateJWTForUserController($event, $accessToken, $params);
 
             return;
         }
 
         if (str_starts_with($route, 'api_public_key')) {
-            $this->authorizationListenerService->validateJWTForPublicKeyController($event, $accessToken, $params);
+            $this->apiPublicKeyListenerService->validateJWTForPublicKeyController($event, $accessToken, $params);
         }
     }
 

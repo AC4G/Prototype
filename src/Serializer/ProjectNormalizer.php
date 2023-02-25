@@ -9,10 +9,10 @@ final class ProjectNormalizer
     public function normalize(
         Project $project,
         string $format = null,
-        array $context = []
+        string $context = null
     ): array
     {
-        if (in_array('pagination', $context)) {
+        if ($context === 'public') {
             return [
                 'projectName' => $project->getProjectName()
             ];
@@ -32,7 +32,7 @@ final class ProjectNormalizer
     public function supportsNormalization(
         $data,
         string $format = null,
-        array $context = []
+        string $context = null
     ): bool
     {
         return $data instanceof Project;

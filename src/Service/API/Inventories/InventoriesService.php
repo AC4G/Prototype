@@ -120,7 +120,7 @@ final class InventoriesService
     public function prepareData(
         array|Inventory $inventories,
         ?string $format = null,
-        array $context = []
+        string $context = null
     ): array
     {
         if (is_object($inventories)) {

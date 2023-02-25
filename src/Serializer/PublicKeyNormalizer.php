@@ -6,16 +6,10 @@ use App\Entity\PublicKey;
 
 final class PublicKeyNormalizer
 {
-    public function __construct(
-
-    )
-    {
-    }
-
     public function normalize(
         PublicKey $key,
         string $format = null,
-        array $context = []
+        string $context = null
     ): array|null
     {
         return [

@@ -15,7 +15,7 @@ final class ProjectService
 
     public function prepareData(
         array|Project $projects,
-        array $context = []
+        string $context = null
     ): array
     {
         if (is_object($projects)) {
@@ -30,4 +30,6 @@ final class ProjectService
 
         return $projectList;
     }
+
+
 }

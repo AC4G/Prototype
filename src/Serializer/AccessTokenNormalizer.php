@@ -9,7 +9,7 @@ final class AccessTokenNormalizer
     public function normalize(
         AccessToken $accessToken,
         string $format = null,
-        array $context = []
+        string $context = null
     ): array
     {
         $user = $accessToken->getUser();
@@ -41,7 +41,7 @@ final class AccessTokenNormalizer
     public function supportsNormalization(
         $data,
         string $format = null,
-        array $context = []
+        string $context = null
     ): bool
     {
         return $data instanceof AccessToken;

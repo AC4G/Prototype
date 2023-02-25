@@ -10,7 +10,7 @@ final class InventoryNormalizer
     public function normalize(
         Inventory $inventory,
         ?string $format = null,
-        array $context = []
+        string $context = null
     ): array
     {
         $user = $inventory->getUser();
@@ -32,7 +32,7 @@ final class InventoryNormalizer
     public function supportsNormalization(
         $data,
         string $format = null,
-        array $context = []
+        string $context = null
     ): bool
     {
         return $data instanceof Inventory;

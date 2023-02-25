@@ -69,7 +69,7 @@ final class ItemService
     public function prepareData(
         array|Item $items,
         string $format = null,
-        array $context = []
+        string $context = null
     ): array
     {
         if (is_object($items)) {
@@ -92,7 +92,7 @@ final class ItemService
         return $this->cache->get('item_' . $id, function (ItemInterface $item) use ($id) {
             $item->expiresAfter(86400);
 
-            return json_encode($this->itemNormalizer->normalize($this->itemRepository->findOneBy(['id' => $id])));
+            return json_encode($this->itemNormalizer->normalize($this->itemRepository->findOneBy(['id' => $id]), null, 'public'));
         });
     }
 

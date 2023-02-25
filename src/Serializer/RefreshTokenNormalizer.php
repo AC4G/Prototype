@@ -9,7 +9,7 @@ final class RefreshTokenNormalizer
     public function normalize(
         RefreshToken $refreshToken,
         string $format = null,
-        array $context = []
+        string $context = null
     ): array
     {
         $user = $refreshToken->getUser();
@@ -36,7 +36,7 @@ final class RefreshTokenNormalizer
     public function supportsNormalization(
         $data,
         string $format = null,
-        array $context = []
+        string $context = null
     ): bool
     {
         return $data instanceof RefreshToken;

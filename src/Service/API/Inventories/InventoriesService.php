@@ -5,8 +5,10 @@ namespace App\Service\API\Inventories;
 use App\Entity\User;
 use App\Entity\Item;
 use App\Entity\Inventory;
+use App\Service\API\UserService;
 use App\Repository\UserRepository;
 use App\Repository\ItemRepository;
+use App\Service\API\Item\ItemService;
 use App\Serializer\InventoryNormalizer;
 use App\Repository\InventoryRepository;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -19,6 +21,8 @@ final class InventoriesService
         private readonly InventoryNormalizer $inventoryNormalizer,
         private readonly UserRepository $userRepository,
         private readonly ItemRepository $itemRepository,
+        private readonly ItemService $itemService,
+        private readonly UserService $userService,
         private readonly CacheInterface $cache
 
     )
@@ -27,13 +31,17 @@ final class InventoriesService
 
     public function updateInventory(
         array $parameter,
-        Inventory $inventory
+        string $uuid,
+        int $itemId
     ): void
     {
+        $user = $this->userService->getUserByUuidFromCache($uuid);
+        $item = $this->itemService->getItemFromCacheById($itemId);
+
+        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+
         if (array_key_exists('amount', $parameter)) {
             $inventory->setAmount($inventory->getAmount() + $parameter['amount']);
-
-            return;
         }
 
         if (!array_key_exists('parameter', $parameter)) {
@@ -68,13 +76,13 @@ final class InventoriesService
 
     public function createEntryInInventory(
         array $parameter,
-        User $user,
-        Item $item
+        string $uuid,
+        int $itemId
     ): void
     {
         $inventory = new Inventory();
-        $user = $this->userRepository->findOneBy(['id' => $user->getId()]);
-        $item = $this->itemRepository->findOneBy(['id' => $item->getId()]);
+        $user = $this->userRepository->findOneBy(['uuid' => $uuid]);
+        $item = $this->itemRepository->findOneBy(['id' => $itemId]);
 
         $inventory
             ->setUser($user)
@@ -105,6 +113,19 @@ final class InventoriesService
         }
 
         $this->setParameterAndSave($inventory, $cleanedParameter);
+    }
+
+    public function deleteItemFromInventory(
+        string $uuid,
+        int $itemId
+    ): void
+    {
+        $user = $this->userService->getUserByUuidFromCache($uuid);
+        $item = $this->itemService->getItemFromCacheById($itemId);
+
+        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+
+        $this->inventoryRepository->deleteEntry($inventory);
     }
 
     private function setParameterAndSave(
@@ -139,15 +160,37 @@ final class InventoriesService
     public function getItemFromCacheByUuidAndItemId(
         string $uuid,
         int $itemId,
-        User $user,
-        Item $item
     ): null|Inventory
     {
-        return $this->cache->get('inventory_' . $uuid . '_item_' . $itemId,function (ItemInterface $cacheItem) use ($user, $item) {
+        return $this->cache->get('inventory_' . $uuid . '_item_' . $itemId,function (ItemInterface $cacheItem) use ($uuid, $itemId) {
             $cacheItem->expiresAfter(86400);
 
-            return $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+            $this->getItemInInventoryByUserAndItem($uuid, $itemId);
         });
+    }
+
+    public function getInventoryFromCacheByUuid(
+        string $uuid
+    ): array
+    {
+        return $this->cache->get('inventory_' . $uuid, function (ItemInterface $cacheItem) use ($uuid) {
+            $cacheItem->expiresAfter(86400);
+
+            $user = $this->userService->getUserByUuidFromCache($uuid);
+
+            return $this->inventoryRepository->findBy(['user' => $user]);
+        });
+    }
+
+    public function getItemInInventoryByUserAndItem(
+        string $uuid,
+        int $itemId
+    ): Inventory
+    {
+        $user = $this->userService->getUserByUuidFromCache($uuid);
+        $item = $this->itemService->getItemFromCacheById($itemId);
+
+        return $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
     }
 
 

@@ -4,6 +4,7 @@ namespace App\Controller\API;
 
 use App\Service\API\UserService;
 use App\Serializer\UserNormalizer;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,9 +19,7 @@ final class UserController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/api/user/{uuid}", name="api_user_by_uuid", methods={"GET"})
-     */
+    #[Route('/api/user/{uuid}', name: 'api_user_by_uuid', methods: [Request::METHOD_GET])]
     public function getUserInformation(
         string $uuid
     ): Response

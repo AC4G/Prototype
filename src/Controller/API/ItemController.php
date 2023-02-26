@@ -25,9 +25,7 @@ final class ItemController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/api/items", name="api_items", methods={"GET"})
-     */
+    #[Route('/api/items', name: 'api_items', methods: [Request::METHOD_GET])]
     public function showItems(
         Request $request
     ): Response
@@ -43,30 +41,11 @@ final class ItemController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/api/items/{id}", name="api_item_by_id", methods={"GET", "PATCH"}, requirements={"id" = "\d+"})
-     */
-    public function processItemById(
-        Request $request,
+    #[Route('/api/items/{id}', name: 'api_item_by_id_get', requirements: ['id' => '\d+'], methods: [Request::METHOD_GET])]
+    public function getItemById(
         int $id
-    ): ?Response
+    ): Response
     {
-        if ($request->isMethod('PATCH')) {
-            $newParameter = json_decode($request->getContent(), true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
-            }
-
-            $data = $this->itemRepository->getNameAndParameter($id);
-
-            $this->itemsService->updateItem($id, $data, $newParameter);
-            $this->cache->delete('item_' . $id);
-            $this->cache->delete('item_' . $id . '_parameter');
-
-            return $this->customResponse->notificationResponse($request, 'Parameter successfully added or updated!', 202);
-        }
-
         $item = $this->itemsService->getItemFromCacheById($id);
 
         return new Response(
@@ -78,9 +57,28 @@ final class ItemController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/api/items/user/{uuid}", name="api_items_by_uuid", methods={"GET"})
-     */
+    #[Route('/api/items/{id}', name: 'api_item_by_id_patch', requirements: ['id' => '\d+'], methods: [Request::METHOD_PATCH])]
+    public function patchItemById(
+        Request $request,
+        int $id
+    ): Response
+    {
+        $newParameter = json_decode($request->getContent(), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
+        }
+
+        $data = $this->itemRepository->getNameAndParameter($id);
+
+        $this->itemsService->updateItem($id, $data, $newParameter);
+        $this->cache->delete('item_' . $id);
+        $this->cache->delete('item_' . $id . '_parameter');
+
+        return $this->customResponse->notificationResponse($request, 'Parameter successfully added or updated!', 202);
+    }
+
+    #[Route('/api/items/user/{uuid}', name: 'api_items_by_uuid', methods: [Request::METHOD_GET])]
     public function getItemsByNickname(
         Request $request,
         string $uuid
@@ -103,26 +101,28 @@ final class ItemController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/api/items/{id}/parameter", name="api_item_by_id_process_parameter", methods={"DELETE", "GET"}, requirements={"id" = "\d+"})
-     */
-    public function processParameter(
+    #[Route('/api/items/{id}/parameter', name: 'api_item_by_id_process_parameter_get', requirements: ['id' => '\d+'], methods: [Request::METHOD_GET])]
+    public function getItemParameter(
+        int $id
+    ): Response
+    {
+        $parameter = $this->itemsService->getItemParameterFromCacheById($id);
+
+        return new Response(
+            $parameter,
+            200,
+            [
+                'Content-Type' => 'application/json'
+            ]
+        );
+    }
+
+    #[Route('/api/items/{id}/parameter', name: 'api_item_by_id_process_parameter_delete', requirements: ['id' => '\d+'], methods: [Request::METHOD_DELETE])]
+    public function deleteItemParameter(
         Request $request,
         int $id
     ): Response
     {
-        if ($request->isMethod('GET')) {
-            $parameter = $this->itemsService->getItemParameterFromCacheById($id);
-
-            return new Response(
-                $parameter,
-                200,
-                [
-                    'Content-Type' => 'application/json'
-                ]
-            );
-        }
-
         $itemParameter = json_decode($this->itemsService->getItemParameterFromCacheById($id), true);
 
         $parameters = json_decode($request->getContent(), true);

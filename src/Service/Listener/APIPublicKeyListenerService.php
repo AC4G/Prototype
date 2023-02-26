@@ -79,7 +79,13 @@ final class APIPublicKeyListenerService
 
             if (preg_match('/^ssh-rsa AAAA[0-9A-Za-z+\/]+[=]{0,3}( [^@]+@[^@]+)?$/', $content['key']) === 0) {
                 $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Key is not provided in OpenSSH format!', 406));
+
+                return;
             }
+        }
+
+        if (!$event->getRequest()->isMethod('GET')) {
+            $this->cache->delete('public_key_' . $uuid);
         }
     }
 

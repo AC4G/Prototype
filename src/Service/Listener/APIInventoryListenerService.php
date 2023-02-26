@@ -133,7 +133,7 @@ final class APIInventoryListenerService
         $inventory = $this->cache->get('inventory_' . $user->getUuid(), function (ItemInterface $item) use ($user) {
             $item->expiresAfter(86400);
 
-            return $this->inventoryRepository->findBy(['user' => $user->getUuid()]);
+            return $this->inventoryRepository->findBy(['user' => $user]);
         });
 
         if (count($inventory) === 0) {

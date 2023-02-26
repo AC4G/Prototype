@@ -29,9 +29,7 @@ final class SecurityController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/api/authorize", name="client_authorization", methods={"POST"})
-     */
+    #[Route('/api/authorize', name: 'client_authorization', methods: [Request::METHOD_POST])]
     public function authorizeClient(
         Request $request
     ): Response
@@ -145,9 +143,7 @@ final class SecurityController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/api/nickname/{nickname}", name="nickname_exists", methods={"GET"})
-     */
+    #[Route('/api/nickname/{nickname}', name: 'nickname_exists', methods: [Request::METHOD_GET])]
     public function nicknameExists(
         Request $request,
         string $nickname
@@ -159,9 +155,7 @@ final class SecurityController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/api/email/{email}", name="email_exists", methods={"GET"})
-     */
+    #[Route('/api/email/{email}', name: 'email_exists', methods: [Request::METHOD_GET])]
     public function emailExists(
         Request $request,
         string $email

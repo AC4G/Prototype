@@ -23,9 +23,7 @@ final class InventoryController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/api/inventories", name="api_inventories", methods={"GET"})
-     */
+    #[Route('/api/inventories', name: 'api_inventories', methods: [Request::METHOD_GET])]
     public function getInventories(
         Request $request
     ): Response
@@ -41,99 +39,111 @@ final class InventoryController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/api/inventories/{uuid}", name="api_inventory_by_uuid", methods={"GET"})
-     */
+    #[Route('/api/inventories/{uuid}', name: 'api_inventory_by_uuid', methods: [Request::METHOD_GET])]
     public function getInventoryByUserId(
-        Request $request,
         string $uuid
     ): Response
     {
-        $inventory = $this->cache->getItem('inventory_' . $uuid)->get();
+        $inventory = $this->inventoriesService->getInventoryFromCacheByUuid($uuid);
 
         return new JsonResponse(
             $this->inventoriesService->prepareData($inventory)
         );
     }
 
-    /**
-     * @Route("/api/inventories/{uuid}/{itemId}", name="api_inventory_by_uuid_and_itemId", methods={"GET", "POST", "PATCH", "DELETE"}, requirements={"itemId" = "\d+"})
-     */
-    public function processInventoryByItem(
+    #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_get', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_GET])]
+    public function getInventoryByItem(
+        string $uuid,
+        int $itemId
+    ): Response
+    {
+        $inventory = $this->inventoriesService->getItemFromCacheByUuidAndItemId($uuid, $itemId);
+
+        return new JsonResponse(
+            $this->inventoriesService->prepareData($inventory),
+        );
+    }
+
+    #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_post', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_POST])]
+    public function postInventoryByItem(
         Request $request,
         string $uuid,
         int $itemId
     ): Response
     {
-        $user = $this->cache->getItem('user_' . $uuid)->get();
-
         $parameter = json_decode($request->getContent(), true);
 
-        if (($request->isMethod('POST') || $request->isMethod('PATCH')) && json_last_error() !== JSON_ERROR_NONE) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
         }
 
-        $item = $this->cache->getItem('item_' . $itemId)->get();
-
-        if ($request->isMethod('GET')) {
-            $inventory = $this->inventoriesService->getItemFromCacheByUuidAndItemId($uuid, $itemId, $user, $item);
-
-            return new JsonResponse(
-                $this->inventoriesService->prepareData($inventory),
-            );
+        if (!array_key_exists('amount', $parameter)) {
+            return $this->customResponse->errorResponse($request, 'Amount is required with POST method!', 406);
         }
 
-        if ($request->isMethod('POST')) {
-            if (!array_key_exists('amount', $parameter)) {
-                return $this->customResponse->errorResponse($request, 'Amount is required with POST method!', 406);
-            }
+        $this->inventoriesService->createEntryInInventory($parameter, $uuid, $itemId);
+        $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
 
-            $this->inventoriesService->createEntryInInventory($parameter, $user, $item);
-            $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
+        return $this->customResponse->notificationResponse($request, 'Item successfully added to inventory', 201);
+    }
 
-            return $this->customResponse->notificationResponse($request, 'Item successfully added to inventory', 201);
+    #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_patch', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_PATCH])]
+    public function patchInventoryByItem(
+        Request $request,
+        string $uuid,
+        int $itemId
+    ): Response
+    {
+        $parameter = json_decode($request->getContent(), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->customResponse->errorResponse($request, 'Invalid Json!', 406);
         }
 
         $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
 
-        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+        $this->inventoriesService->updateInventory($parameter, $uuid, $itemId);
 
-        if ($request->isMethod('PATCH')) {
-            $this->inventoriesService->updateInventory($parameter, $inventory);
-
-            return $this->customResponse->notificationResponse($request, 'Inventory updated');
-        }
-
-        $this->inventoryRepository->deleteEntry($this->inventoryRepository->findOneBy(['id' => $inventory->getId()]));
-
-        return $this->customResponse->notificationResponse($request, 'Item successfully removed from inventory');
+        return $this->customResponse->notificationResponse($request, 'Inventory updated');
     }
 
-    /**
-     * @Route("/api/inventories/{uuid}/{itemId}/parameter", name="api_inventory_by_uuid_and_itemId_parameter", methods={"DELETE", "GET"}, requirements={"itemId" = "\d+"})
-     */
-    public function processParameterFromItemInInventory(
+    #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_delete', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_DELETE])]
+    public function deleteInventoryByItem(
         Request $request,
         string $uuid,
         int $itemId
     ): Response
     {
-        $user = $this->cache->getItem('user_' . $uuid)->get();
-        $item = $this->cache->getItem('item_' . $itemId)->get();
+        $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
 
-        if ($request->isMethod('GET')) {
-            $inventory = $this->inventoriesService->getItemFromCacheByUuidAndItemId($uuid, $itemId, $user, $item);
+        $this->inventoriesService->deleteItemFromInventory($uuid, $itemId);
 
-            return new JsonResponse(
-                json_decode(
-                    $inventory->getParameter(),
-                    true
-                )
-            );
-        }
+        return $this->customResponse->notificationResponse($request, 'Item successfully removed from inventory');
+    }
 
-        $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
+    #[Route('/api/inventories/{uuid}/{itemId}/parameter', name: 'api_inventory_by_uuid_and_itemId_parameter_get', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_GET])]
+    public function getParameterFromItemInInventory(
+        string $uuid,
+        int $itemId
+    ): Response
+    {
+        $inventory = $this->inventoriesService->getItemFromCacheByUuidAndItemId($uuid, $itemId);
 
+        return new JsonResponse(
+            json_decode(
+                $inventory->getParameter(),
+                true
+            )
+        );
+    }
+
+    #[Route('/api/inventories/{uuid}/{itemId}/parameter', name: 'api_inventory_by_uuid_and_itemId_parameter_delete', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_DELETE])]
+    public function deleteParameterFromItemInInventory(
+        Request $request,
+        string $uuid,
+        int $itemId
+    ): Response
+    {
         $parameters = json_decode($request->getContent(), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -144,8 +154,10 @@ final class InventoryController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Not even passed a parameter for delete. Nothing changed!', 406);
         }
 
+        $inventory = $this->inventoriesService->getItemInInventoryByUserAndItem($uuid, $itemId);
+
         $this->inventoriesService->deleteParameter($inventory, $parameters);
-        $this->cache->delete('inventory_' . $user->getId() . '_item_' . $item->getId());
+        $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
 
         return $this->customResponse->notificationResponse($request, sprintf('Inventory parameter from user %s and item %d successfully removed', $itemId, $itemId));
     }

@@ -2,9 +2,9 @@
 
 namespace App\Service\Listener;
 
-use App\Service\API\UserService;
-use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
+use App\Service\Response\API\CustomResponse;
+use App\Service\UserService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 final class APIUserListenerService

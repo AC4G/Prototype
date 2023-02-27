@@ -2,17 +2,15 @@
 
 namespace App\Service\API\Inventories;
 
-use App\Entity\User;
-use App\Entity\Item;
 use App\Entity\Inventory;
-use App\Service\API\UserService;
-use App\Repository\UserRepository;
-use App\Repository\ItemRepository;
-use App\Service\API\Item\ItemService;
-use App\Serializer\InventoryNormalizer;
 use App\Repository\InventoryRepository;
-use Symfony\Contracts\Cache\ItemInterface;
+use App\Repository\ItemRepository;
+use App\Repository\UserRepository;
+use App\Serializer\InventoryNormalizer;
+use App\Service\API\Item\ItemService;
+use App\Service\UserService;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final class InventoriesService
 {

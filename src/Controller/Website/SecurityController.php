@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Website\Security\SecurityService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -25,9 +26,7 @@ final class SecurityController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/login", name="login", methods={"GET", "POST"})
-     */
+    #[Route('/login', name: 'login_get', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function loginAction(
         Request $request
     ): Response
@@ -53,9 +52,7 @@ final class SecurityController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/loginSuccess", name="login_success", methods={"GET"})
-     */
+    #[Route('/loginSuccess', name: 'login_success', methods: [Request::METHOD_GET])]
     public function loginSuccess(
         Request $request
     ): Response
@@ -77,20 +74,16 @@ final class SecurityController extends AbstractController
         return $this->redirectToRoute('home');
     }
 
-    /**
-     * @Route("/logout", name="logout")
-     */
+    #[Route('/logout', name: 'logout', methods: [Request::METHOD_GET])]
     public function logoutAction()
     {
         //logout automatically
     }
 
-    /**
-     * @Route("/logoutSuccess", name="logout_success")
-     */
+    #[Route('/logoutSuccess', name: 'logout_success', methods: [Request::METHOD_GET])]
     public function logoutSuccess(
         Request $request
-    )
+    ): RedirectResponse
     {
         $redirect = $request->getSession()->get('redirect');
 
@@ -103,9 +96,7 @@ final class SecurityController extends AbstractController
         return $this->redirectToRoute('home');
     }
 
-    /**
-     * @Route("/oauth/authorize", name="oauth_authorize", methods={"GET", "POST"})
-     */
+    #[Route('/oauth/authorize', name: 'oauth_authorize', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function oauthLoginAction(
         Request $request
     ): Response
@@ -142,6 +133,5 @@ final class SecurityController extends AbstractController
 
         return $this->redirect($this->securityService->createAuthTokenAndBuildRedirectURI($query, $user));
     }
-
 
 }

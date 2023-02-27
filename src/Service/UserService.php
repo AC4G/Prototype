@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\API;
+namespace App\Service;
 
 use App\Repository\UserRepository;
 use Symfony\Contracts\Cache\ItemInterface;

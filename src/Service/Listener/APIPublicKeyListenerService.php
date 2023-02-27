@@ -2,13 +2,13 @@
 
 namespace App\Service\Listener;
 
-use App\Service\API\UserService;
 use App\Repository\PublicKeyRepository;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\CacheInterface;
-use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
+use App\Service\Response\API\CustomResponse;
+use App\Service\UserService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final class APIPublicKeyListenerService
 {

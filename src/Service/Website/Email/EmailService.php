@@ -7,7 +7,7 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use function PHPUnit\Framework\throwException;
 
-final class EmailService
+class EmailService
 {
     private TemplatedEmail $email;
 

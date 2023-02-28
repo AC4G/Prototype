@@ -26,7 +26,7 @@ final class SecurityController extends AbstractController
     {
     }
 
-    #[Route('/login', name: 'login_get', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[Route('/login', name: 'login', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function loginAction(
         Request $request
     ): Response

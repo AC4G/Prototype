@@ -24,8 +24,7 @@ yarn-error.log
 ###< phpstorm ###
 
 ###> ssl ###
-*.key
-private.pem
+
 ###< ssl ###
 
 ###> files ###
@@ -37,7 +36,7 @@ private.pem
 ##< npm ##
 
 ##> ddev ##
-/.ddev
+
 ##< ddev ##
 
 /.env

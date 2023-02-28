@@ -39,7 +39,6 @@ final class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
-
         return $this->renderForm('website/registration/index.html.twig', [
             'registration_form' => $form,
             'errors' => [],

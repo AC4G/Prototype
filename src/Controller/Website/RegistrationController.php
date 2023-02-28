@@ -2,7 +2,6 @@
 
 namespace App\Controller\Website;
 
-use Exception;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Component\Security\Core\Security;
@@ -26,11 +25,31 @@ final class RegistrationController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/registration", name="registration", methods={"GET", "POST"})
-     * @throws Exception
-     */
-    public function index(Request $request): Response
+    #[Route('/registration', name: 'registration_get', methods: [Request::METHOD_GET])]
+    public function getRegistration(
+        Request $request
+    ): Response
+    {
+        if ($this->security->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $this->redirectToRoute('home');
+        }
+
+        $user = new User();
+
+        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->handleRequest($request);
+
+
+        return $this->renderForm('website/registration/index.html.twig', [
+            'registration_form' => $form,
+            'errors' => [],
+        ]);
+    }
+
+    #[Route('/registration', name: 'registration_post', methods: [Request::METHOD_POST])]
+    public function postRegistration(
+        Request $request
+    ): Response
     {
         if ($this->security->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->redirectToRoute('home');
@@ -66,9 +85,7 @@ final class RegistrationController extends AbstractController
         return $this->redirectToRoute('login');
     }
 
-    /**
-     * @Route("/verify", name="verify_email")
-     */
+    #[Route('/verify', name: 'verify_email', methods: [Request::METHOD_GET])]
     public function verifyEmail(Request $request): Response
     {
         $userId = $request->query->get('id');

@@ -17,9 +17,7 @@ final class DashboardController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/dashboard", name="dashboard")
-     */
+    #[Route('/dashboard', name: 'dashboard')]
     public function showDashboard(
         Request $request
     ): Response
@@ -34,9 +32,7 @@ final class DashboardController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/dashboard/items", name="dashboard_items")
-     */
+    #[Route('/dashboard/items', name: 'dashboard_items')]
     public function showItems(): Response
     {
         return $this->render('website/dashboard/items.html.twig', [
@@ -44,9 +40,7 @@ final class DashboardController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/dashboard/inventory", name="dashboard_inventory")
-     */
+    #[Route('/dashboard/inventory', name: 'dashboard_inventory')]
     public function showInventory(): Response
     {
         /** @var User $user */
@@ -59,9 +53,7 @@ final class DashboardController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/dashboard/developer", name="dashboard_developer")
-     */
+    #[Route('/dashboard/developer', name: 'dashboard_developer')]
     public function showDeveloper(): Response
     {
         return $this->render('website/dashboard/developer.html.twig', [

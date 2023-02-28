@@ -16,9 +16,7 @@ final class HomeController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/", name="home")
-     */
+    #[Route('/', name: 'home')]
     public function showHomeTemplate(
         Request $request
     ): Response

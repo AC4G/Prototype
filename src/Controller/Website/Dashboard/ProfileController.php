@@ -24,9 +24,7 @@ class ProfileController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/dashboard/profile", name="dashboard_profile")
-     */
+    #[Route('/dashboard/profile', name: 'dashboard_profile', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function showProfile(
         Request $request
     ): Response
@@ -46,9 +44,7 @@ class ProfileController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/dashboard/profile/2-step-verification", name="dashboard_profile_two_factor_authentication", methods={"GET", "POST"})
-     */
+    #[Route('/dashboard/profile/2-step-verification', name: 'dashboard_profile_two_factor_authentication', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function twoStepVerificationAction(
         Request $request
     ): Response

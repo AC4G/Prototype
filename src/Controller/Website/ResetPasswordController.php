@@ -22,9 +22,7 @@ final class ResetPasswordController extends AbstractController
     {
     }
 
-    /**
-     * @Route("/passwordForgotten", name="password_forgotten", methods={"GET", "POST"})
-     */
+    #[Route('/passwordForgotten', name: 'password_forgotten', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function preparePwdForgottenForVerification(
         Request $request
     ): Response
@@ -67,9 +65,7 @@ final class ResetPasswordController extends AbstractController
         return $this->redirectToRoute('password_forgotten_verify');
     }
 
-    /**
-     * @Route("/passwordForgotten/verify", name="password_forgotten_verify", methods={"GET", "POST"})
-     */
+    #[Route('/passwordForgotten/verify', name: 'password_forgotten_verify', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function verifyPwdForgotten(
         Request $request
     ): Response
@@ -143,9 +139,7 @@ final class ResetPasswordController extends AbstractController
         return $this->redirectToRoute('password_forgotten_reset');
     }
 
-    /**
-     * @Route("/passwordForgotten/reset", name="password_forgotten_reset", methods={"GET", "POST"})
-     */
+    #[Route('/passwordForgotten/reset', name: 'password_forgotten_reset', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function resetPassword(
         Request $request
     ): Response

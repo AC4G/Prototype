@@ -4,7 +4,7 @@ namespace App\Service\API\PublicKey;
 
 use DateTime;
 use App\Entity\PublicKey;
-use App\Service\API\UserService;
+use App\Service\UserService;
 use App\Repository\UserRepository;
 use App\Repository\PublicKeyRepository;
 use Symfony\Contracts\Cache\ItemInterface;

@@ -3,14 +3,14 @@
 namespace App\Service\Listener;
 
 use App\Entity\User;
-use App\Service\API\UserService;
-use App\Service\API\Item\ItemService;
 use App\Repository\InventoryRepository;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\CacheInterface;
-use App\Service\Response\API\CustomResponse;
+use App\Service\API\Item\ItemService;
 use App\Service\API\Security\SecurityService;
+use App\Service\Response\API\CustomResponse;
+use App\Service\UserService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final class APIInventoryListenerService
 {
@@ -49,7 +49,7 @@ final class APIInventoryListenerService
             return;
         }
 
-        $itemId = $params['itemId'];
+        $itemId = (int)$params['itemId'];
 
         $item = json_decode($this->itemService->getItemFromCacheById($itemId), true);
 

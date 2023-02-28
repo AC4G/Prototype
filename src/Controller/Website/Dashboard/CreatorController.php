@@ -24,9 +24,7 @@ final class CreatorController extends AbstractController
 
     }
 
-    /**
-     * @Route("/dashboard/creator", name="dashboard_creator")
-     */
+    #[Route('/dashboard/creator', name: 'dashboard_creator')]
     public function showCreator(
         Request $request
     ): Response
@@ -49,36 +47,28 @@ final class CreatorController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/dashboard/creator/create_item", name="creator_create_item")
-     */
+    #[Route('/dashboard/creator/create_item', name: 'creator_create_item')]
     public function createItem(): Response
     {
 
         return new Response();
     }
 
-    /**
-     * @Route("/dashboard/creator/create_group", name="creator_create_group")
-     */
+    #[Route('/dashboard/creator/create_group', name: 'creator_create_group')]
     public function createGroup(): Response
     {
 
         return new Response();
     }
 
-    /**
-     * @Route("/dashboard/creator/create_collection", name="creator_create_collection")
-     */
+    #[Route('/dashboard/creator/create_collection', name: 'creator_create_collection')]
     public function createCollection(): Response
     {
 
         return new Response();
     }
 
-    /**
-     * @Route("/dashboard/creator/item/{id}", name="creator_item_by_id", methods={"POST", "GET"}, requirements={"id" = "\d+"})
-     */
+    #[Route('/dashboard/creator/item/{id}', name: 'creator_item_by_id', requirements: ['id' => '\d+'], methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function itemInfoSettings(
         Request $request,
         int $id

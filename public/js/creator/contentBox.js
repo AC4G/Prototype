@@ -8,6 +8,5 @@ window.addEventListener('resize', function () {
 
 function resizeContentBox()
 {
-    let maxWidth = (window.innerWidth * 0.6).toString() + 'px';
-    contentBox.style.maxWidth = maxWidth;
+    contentBox.style.maxWidth = (window.innerWidth * 0.6).toString() + 'px';
 }

@@ -2,7 +2,6 @@ let prfpicinput = document.getElementById('prf-pic-input');
 let imgprwbox = document.getElementById('imgprwbox');
 let imgprw = document.getElementById('imgprw');
 let discardprfimg = document.getElementById('discardprfimg');
-let saveprfimg = document.getElementById('saveprfimg');
 var blur = document.getElementById('blur');
 const imgTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/jpg'];
 let error = document.getElementById('picture-error');

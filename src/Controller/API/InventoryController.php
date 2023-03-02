@@ -41,10 +41,20 @@ final class InventoryController extends AbstractController
 
     #[Route('/api/inventories/{uuid}', name: 'api_inventory_by_uuid', methods: [Request::METHOD_GET])]
     public function getInventoryByUserId(
+        Request $request,
         string $uuid
     ): Response
     {
-        $inventory = $this->inventoriesService->getInventoryFromCacheByUuid($uuid);
+        if ($request->query->get('filter') === 'true') {
+            $inventory = $this->inventoriesService->getInventoryFromCacheByUUidWithFilter(
+                $uuid,
+                $request->query->get('amount'),
+                $request->query->get('projectName'),
+                $request->query->get('creator')
+            );
+        } else {
+            $inventory = $this->inventoriesService->getInventoryFromCacheByUuid($uuid);
+        }
 
         return new JsonResponse(
             $this->inventoriesService->prepareData($inventory)
@@ -52,7 +62,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_get', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_GET])]
-    public function getInventoryByItem(
+    public function getInventoryByUuidAndItemId(
         string $uuid,
         int $itemId
     ): Response
@@ -65,7 +75,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_post', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_POST])]
-    public function postInventoryByItem(
+    public function postInventoryByUuidAndItemId(
         Request $request,
         string $uuid,
         int $itemId
@@ -88,7 +98,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_patch', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_PATCH])]
-    public function patchInventoryByItem(
+    public function patchInventoryByUuidAndItemId(
         Request $request,
         string $uuid,
         int $itemId
@@ -108,7 +118,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_delete', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_DELETE])]
-    public function deleteInventoryByItem(
+    public function deleteInventoryByUuidAndItemId(
         Request $request,
         string $uuid,
         int $itemId

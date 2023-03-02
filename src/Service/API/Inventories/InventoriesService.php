@@ -9,6 +9,7 @@ use App\Repository\UserRepository;
 use App\Serializer\InventoryNormalizer;
 use App\Service\API\Item\ItemService;
 use App\Service\UserService;
+use Doctrine\Common\Collections\Criteria;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -177,6 +178,24 @@ final class InventoriesService
             $user = $this->userService->getUserByUuidFromCache($uuid);
 
             return $this->inventoryRepository->findBy(['user' => $user]);
+        });
+    }
+
+    public function getInventoryFromCacheByUUidWithFilter(
+        string $uuid,
+        ?string $amount,
+        ?string $projectName,
+        ?string $creator
+    ): array
+    {
+        return $this->cache->get('inventory_' . $uuid . '_' . $amount . '_' . $projectName . '_' . $creator, function (ItemInterface $cacheItem) use ($uuid, $amount, $projectName, $creator) {
+            $cacheItem->expiresAfter(86400);
+
+            $user = $this->userService->getUserByUuidFromCache($uuid);
+            if(!is_null($creator)) {
+                $creator = $this->userService->getUserByUuidOrNicknameFromCache($creator);
+            }
+            return $this->inventoryRepository->findWithFilter($user, $amount, $projectName, $creator);
         });
     }
 

@@ -79,7 +79,7 @@ final class ItemController extends AbstractController
     }
 
     #[Route('/api/items/user/{uuid}', name: 'api_items_by_uuid', methods: [Request::METHOD_GET])]
-    public function getItemsByNickname(
+    public function getItemsByUuid(
         Request $request,
         string $uuid
     ): Response
@@ -102,7 +102,7 @@ final class ItemController extends AbstractController
     }
 
     #[Route('/api/items/{id}/parameter', name: 'api_item_by_id_process_parameter_get', requirements: ['id' => '\d+'], methods: [Request::METHOD_GET])]
-    public function getItemParameter(
+    public function getItemParameterById(
         int $id
     ): Response
     {
@@ -118,7 +118,7 @@ final class ItemController extends AbstractController
     }
 
     #[Route('/api/items/{id}/parameter', name: 'api_item_by_id_process_parameter_delete', requirements: ['id' => '\d+'], methods: [Request::METHOD_DELETE])]
-    public function deleteItemParameter(
+    public function deleteItemParameterById(
         Request $request,
         int $id
     ): Response

@@ -20,7 +20,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('/api/user/{uuid}', name: 'api_user_by_uuid', methods: [Request::METHOD_GET])]
-    public function getUserInformation(
+    public function getUserInformationByUuid(
         string $uuid
     ): Response
     {

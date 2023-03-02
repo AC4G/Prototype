@@ -62,7 +62,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_get', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_GET])]
-    public function getInventoryByItem(
+    public function getInventoryByUuidAndItemId(
         string $uuid,
         int $itemId
     ): Response
@@ -75,7 +75,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_post', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_POST])]
-    public function postInventoryByItem(
+    public function postInventoryByUuidAndItemId(
         Request $request,
         string $uuid,
         int $itemId
@@ -98,7 +98,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_patch', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_PATCH])]
-    public function patchInventoryByItem(
+    public function patchInventoryByUuidAndItemId(
         Request $request,
         string $uuid,
         int $itemId
@@ -118,7 +118,7 @@ final class InventoryController extends AbstractController
     }
 
     #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_delete', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_DELETE])]
-    public function deleteInventoryByItem(
+    public function deleteInventoryByUuidAndItemId(
         Request $request,
         string $uuid,
         int $itemId

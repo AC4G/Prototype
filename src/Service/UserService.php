@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Criteria;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 
@@ -26,5 +27,19 @@ final class UserService
         });
     }
 
+    public function getUserByUuidOrNicknameFromCache(
+        string $identifier
+    )
+    {
+        return $this->cache->get('user_'. $identifier, function (ItemInterface $item) use ($identifier) {
+            $item->expiresAfter(86400);
+
+            return $this->userRepository->matching(
+                Criteria::create()
+                    ->where(Criteria::expr()->contains('uuid', $identifier))
+                    ->orWhere(Criteria::expr()->contains('nickname', $identifier))
+            );
+        });
+    }
 
 }

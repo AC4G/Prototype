@@ -41,10 +41,20 @@ final class InventoryController extends AbstractController
 
     #[Route('/api/inventories/{uuid}', name: 'api_inventory_by_uuid', methods: [Request::METHOD_GET])]
     public function getInventoryByUserId(
+        Request $request,
         string $uuid
     ): Response
     {
-        $inventory = $this->inventoriesService->getInventoryFromCacheByUuid($uuid);
+        if ($request->query->get('filter') === 'true') {
+            $inventory = $this->inventoriesService->getInventoryFromCacheByUUidWithFilter(
+                $uuid,
+                $request->query->get('amount'),
+                $request->query->get('projectName'),
+                $request->query->get('creator')
+            );
+        } else {
+            $inventory = $this->inventoriesService->getInventoryFromCacheByUuid($uuid);
+        }
 
         return new JsonResponse(
             $this->inventoriesService->prepareData($inventory)

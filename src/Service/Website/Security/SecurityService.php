@@ -73,7 +73,7 @@ final class SecurityService
             $errors[] = 'Already authenticated!';
         }
 
-        $this->webApp = $this->webAppRepository->getWebAppByClientId($query['client_id']);
+        $this->webApp = $this->webAppRepository->getWebAppFromCacheByClient($this->client);
 
         if (!is_null($this->client) && (is_null($this->webApp) || (is_null($this->webApp->getRedirectUrl()) || strlen($this->webApp->getRedirectUrl()) === 0) || count($this->webApp->getScopes()) === 0)) {
             $errors[] = 'Unauthorized client!';

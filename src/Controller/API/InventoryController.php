@@ -58,7 +58,7 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
-        $inventory = $this->inventoryRepository->getItemFromCacheByUuidAndItemId($uuid, $itemId);
+        $inventory = $this->inventoryRepository->getItemInInventoryFromCacheByUuidAndItemId($uuid, $itemId);
 
         return new JsonResponse(
             $this->inventoriesService->prepareData($inventory),
@@ -128,7 +128,7 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
-        $inventory = $this->inventoryRepository->getItemFromCacheByUuidAndItemId($uuid, $itemId);
+        $inventory = $this->inventoryRepository->getItemInInventoryByUuidAndItemId($uuid, $itemId);
 
         return new JsonResponse(
             json_decode(

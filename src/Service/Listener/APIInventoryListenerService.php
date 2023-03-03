@@ -48,7 +48,7 @@ final class APIInventoryListenerService
 
         $itemId = (int)$params['itemId'];
 
-        $item = json_decode($this->itemRepository->getItemFromCacheById($itemId), true);
+        $item = json_decode($this->itemRepository->getItemFromCacheInJsonFormatById($itemId), true);
 
         if (is_null($item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Item doesn\'t exists!', 404));
@@ -63,7 +63,7 @@ final class APIInventoryListenerService
         }
 
         if ($event->getRequest()->isMethod('GET')) {
-            $inventory = $this->inventoryRepository->getItemInInventoryByUuidAndItemId($uuid, $itemId);
+            $inventory = $this->inventoryRepository->getItemInInventoryFromCacheByUuidAndItemId($uuid, $itemId);
 
             if (is_null($inventory)) {
                 $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory!', $itemId), 404));

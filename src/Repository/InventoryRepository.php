@@ -72,15 +72,15 @@ class InventoryRepository extends AbstractRepository
         });
     }
 
-    public function getItemFromCacheByUuidAndItemId(
+    public function getItemInInventoryFromCacheByUuidAndItemId(
         string $uuid,
         int $itemId,
-    ): null|Inventory
+    ): array|Inventory|null
     {
         return $this->cache->get('inventory_' . $uuid . '_item_' . $itemId,function (ItemInterface $cacheItem) use ($uuid, $itemId) {
             $cacheItem->expiresAfter(86400);
 
-            $this->getItemInInventoryByUuidAndItemId($uuid, $itemId);
+            return $this->getItemInInventoryByUuidAndItemId($uuid, $itemId);
         });
     }
 

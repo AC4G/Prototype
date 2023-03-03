@@ -30,14 +30,14 @@ final class ItemController extends AbstractController
         Request $request
     ): Response
     {
-        $items = $this->itemsService->getItems();
+        $items = $this->itemRepository->findAll();
 
         if (count($items) === 0) {
             return $this->customResponse->errorResponse($request, 'Not a single item created! Maybe next time..', 404);
         }
 
         return new JsonResponse(
-            $this->itemsService->prepareData($items)
+            $this->itemsService->prepareData($items, null, 'public')
         );
     }
 
@@ -46,7 +46,7 @@ final class ItemController extends AbstractController
         int $id
     ): Response
     {
-        $item = $this->itemRepository->getItemFromCacheById($id);
+        $item = $this->itemRepository->getItemFromCacheInJsonFormatById($id);
 
         return new Response(
             $item,
@@ -84,20 +84,20 @@ final class ItemController extends AbstractController
         string $uuid
     ): Response
     {
-        $user = $this->userRepository->findOneBy(['uuid' => $uuid]);
+        $user = $this->userRepository->getUserByUuidFromCache($uuid);
 
         if (is_null($user)) {
             return $this->customResponse->errorResponse($request, 'User doesn\'t exists!', 404);
         }
 
-        $items = $this->itemRepository->findBy(['user' => $user]);
+        $items = $this->itemRepository->getItemsFromCacheByUser($user);
 
         if (count($items) === 0) {
             return $this->customResponse->errorResponse($request, 'User hasn\'t created an item yet!', 400);
         }
 
         return new JsonResponse(
-            $this->itemsService->prepareData($items)
+            $this->itemsService->prepareData($items, null, 'public')
         );
     }
 

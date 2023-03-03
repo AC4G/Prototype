@@ -15,11 +15,6 @@ final class ItemService
     {
     }
 
-    public function getItems(): ?array
-    {
-        return $this->itemRepository->findAll();
-    }
-
     public function updateItem(
         int $id,
         array $itemData,

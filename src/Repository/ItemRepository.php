@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\Item;
 use App\Serializer\ItemNormalizer;
 use Doctrine\Persistence\ManagerRegistry;
@@ -78,24 +79,47 @@ class ItemRepository extends AbstractRepository
     }
 
     public function getItemFromCacheById(
-        int $id
-    ): null|string
+        int|string $id
+    ): null|Item
     {
         return $this->cache->get('item_' . $id, function (ItemInterface $item) use ($id) {
             $item->expiresAfter(86400);
 
-            return json_encode($this->itemNormalizer->normalize($this->findOneBy(['id' => $id]), null, 'public'));
+            return $this->findOneBy(['id' => $id]);
+        });
+    }
+
+    public function getItemFromCacheInJsonFormatById(
+        int|string $id,
+        string $context = null
+    ): null|string
+    {
+        return $this->cache->get('item_' . $id . '_json' . $context, function (ItemInterface $item) use ($id, $context) {
+            $item->expiresAfter(86400);
+
+            return json_encode($this->itemNormalizer->normalize($this->findOneBy(['id' => $id]), null, $context));
         });
     }
 
     public function getItemParameterFromCacheById(
-        int $id
+        int|string $id
     ): null|string
     {
         return $this->cache->get('item_' . $id . '_parameter', function (ItemInterface $item) use ($id) {
             $item->expiresAfter(86400);
 
             return $this->findOneBy(['id' => $id])->getParameter();
+        });
+    }
+
+    public function getItemsFromCacheByUser(
+        User $user
+    ): array
+    {
+        return $this->cache->get('items_' . $user->getUuid(), function (ItemInterface $item) use ($user) {
+            $item->expiresAfter(86400);
+
+            return $this->findBy(['user' => $user]);
         });
     }
 

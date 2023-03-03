@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Client;
 use App\Entity\WebApp;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -25,14 +26,18 @@ class WebAppRepository extends AbstractRepository
         );
     }
 
-    public function getWebAppByClientId(
-        string $clientId
+    public function getWebAppFromCacheByClient(
+        null|Client $client
     ): null|WebApp
     {
-        return $this->cache->get('webApp_'. $clientId, function (ItemInterface $item) use ($clientId){
+        if (is_null($client)) {
+            return null;
+        }
+
+        return $this->cache->get('webApp_'. $client->getClientId(), function (ItemInterface $item) use ($client){
             $item->expiresAfter(86400);
 
-            return $this->findOneBy(['client' => $clientId]);
+            return $this->findOneBy(['client' => $client]);
         });
     }
 

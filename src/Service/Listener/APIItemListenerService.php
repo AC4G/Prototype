@@ -2,8 +2,6 @@
 
 namespace App\Service\Listener;
 
-use App\Entity\Item;
-use App\Serializer\ItemNormalizer;
 use App\Repository\ItemRepository;
 use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
@@ -14,7 +12,6 @@ final class APIItemListenerService
     public function __construct(
         private readonly SecurityService $securityService,
         private readonly ItemRepository $itemRepository,
-        private readonly ItemNormalizer $itemNormalizer,
         private readonly CustomResponse $customResponse
     )
     {
@@ -48,7 +45,7 @@ final class APIItemListenerService
 
         $id = $params['id'];
 
-        $item = $this->itemRepository->getItemFromCacheById($id);
+        $item = $this->itemRepository->getItemFromCacheInJsonFormatById($id);
 
         if (is_null($item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Item not found', 404));
@@ -63,17 +60,13 @@ final class APIItemListenerService
                 return;
             }
 
-            $this->itemRepository->getItemFromCacheById($id);
+            $this->itemRepository->getItemFromCacheInJsonFormatById($id);
 
             return;
         }
 
         if (is_string($item)) {
             $item = json_decode($item, true);
-        }
-
-        if ($item instanceof Item) {
-            $item = $this->itemNormalizer->normalize($item);
         }
 
         if (!$this->securityService->hasClientPermissionForAdjustmentOnItem($accessToken, $item)) {

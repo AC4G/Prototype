@@ -64,7 +64,7 @@ class InventoryRepository extends AbstractRepository
 
             $user = $this->userRepository->getUserByUuidFromCache($uuid);
 
-            if(!is_null($creator)) {
+            if (!is_null($creator)) {
                 $creator = $this->userRepository->getUserByUuidOrNicknameFromCache($creator);
             }
 

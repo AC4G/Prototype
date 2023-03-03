@@ -4,7 +4,7 @@ namespace App\Engine\Search;
 
 use App\Service\API\Item\ItemService;
 use App\Service\API\Project\ProjectService;
-use App\Service\API\Inventories\InventoriesService;
+use App\Service\API\Inventories\InventoryService;
 
 abstract class AbstractSearchEngine
 {
@@ -12,7 +12,7 @@ abstract class AbstractSearchEngine
 
     public function __construct(
         private readonly ItemService
-        |InventoriesService
+        |InventoryService
         |ProjectService $service
     )
     {

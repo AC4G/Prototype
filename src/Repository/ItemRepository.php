@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Item;
+use App\Serializer\ItemNormalizer;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * @method Item|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,6 +17,8 @@ use Doctrine\Persistence\ManagerRegistry;
 class ItemRepository extends AbstractRepository
 {
     public function __construct(
+        private readonly ItemNormalizer $itemNormalizer,
+        private readonly CacheInterface $cache,
         ManagerRegistry $registry
     )
     {
@@ -70,6 +75,28 @@ class ItemRepository extends AbstractRepository
         ;
 
         $query->execute();
+    }
+
+    public function getItemFromCacheById(
+        int $id
+    ): null|string
+    {
+        return $this->cache->get('item_' . $id, function (ItemInterface $item) use ($id) {
+            $item->expiresAfter(86400);
+
+            return json_encode($this->itemNormalizer->normalize($this->findOneBy(['id' => $id]), null, 'public'));
+        });
+    }
+
+    public function getItemParameterFromCacheById(
+        int $id
+    ): null|string
+    {
+        return $this->cache->get('item_' . $id . '_parameter', function (ItemInterface $item) use ($id) {
+            $item->expiresAfter(86400);
+
+            return $this->findOneBy(['id' => $id])->getParameter();
+        });
     }
 
 

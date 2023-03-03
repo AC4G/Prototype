@@ -2,21 +2,20 @@
 
 namespace App\Service\Listener;
 
+use App\Repository\UserRepository;
 use App\Repository\PublicKeyRepository;
-use App\Service\API\Security\SecurityService;
-use App\Service\Response\API\CustomResponse;
-use App\Service\UserService;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
+use App\Service\Response\API\CustomResponse;
+use App\Service\API\Security\SecurityService;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 final class APIPublicKeyListenerService
 {
     public function __construct(
         private readonly PublicKeyRepository $publicKeyRepository,
         private readonly SecurityService $securityService,
+        private readonly UserRepository $userRepository,
         private readonly CustomResponse $customResponse,
-        private readonly UserService $userService,
         private readonly CacheInterface $cache
     )
     {
@@ -30,7 +29,7 @@ final class APIPublicKeyListenerService
     {
         $uuid = $params['uuid'];
 
-        $user = $this->userService->getUserByUuidFromCache($uuid);
+        $user = $this->userRepository->getUserByUuidFromCache($uuid);
 
         if (is_null($user)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User with uuid %s doesn\'t exists!', $uuid), 404));
@@ -44,11 +43,7 @@ final class APIPublicKeyListenerService
             return;
         }
 
-        $publicKey = $this->cache->get('public_key_' . $user->getUuid(), function (ItemInterface $item) use ($user) {
-            $item->expiresAfter(86400);
-
-            return $this->publicKeyRepository->findOneBy(['user' => $user]);
-        });
+        $publicKey = $this->publicKeyRepository->getPublicKeyByUuidFromCache($uuid);
 
         if (is_null($publicKey) && !$event->getRequest()->isMethod('POST')) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Public key not found', 404));

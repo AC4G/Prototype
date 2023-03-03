@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Serializer\PublicKeyNormalizer;
+use App\Repository\PublicKeyRepository;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class PublicKeyController extends AbstractController
 {
     public function __construct(
+        private readonly PublicKeyRepository $publicKeyRepository,
         private readonly PublicKeyNormalizer $publicKeyNormalizer,
         private readonly PublicKeyService $publicKeyService,
         private readonly CustomResponse $customResponse
@@ -27,7 +29,7 @@ final class PublicKeyController extends AbstractController
         string $uuid
     ): Response
     {
-        $publicKey = $this->publicKeyService->getPublicKeyByUuidFromCache($uuid);
+        $publicKey = $this->publicKeyRepository->getPublicKeyByUuidFromCache($uuid);
 
         return new JsonResponse($this->publicKeyNormalizer->normalize($publicKey));
     }

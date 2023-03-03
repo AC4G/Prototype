@@ -46,7 +46,7 @@ final class ItemController extends AbstractController
         int $id
     ): Response
     {
-        $item = $this->itemsService->getItemFromCacheById($id);
+        $item = $this->itemRepository->getItemFromCacheById($id);
 
         return new Response(
             $item,
@@ -106,7 +106,7 @@ final class ItemController extends AbstractController
         int $id
     ): Response
     {
-        $parameter = $this->itemsService->getItemParameterFromCacheById($id);
+        $parameter = $this->itemRepository->getItemParameterFromCacheById($id);
 
         return new Response(
             $parameter,
@@ -123,7 +123,7 @@ final class ItemController extends AbstractController
         int $id
     ): Response
     {
-        $itemParameter = json_decode($this->itemsService->getItemParameterFromCacheById($id), true);
+        $itemParameter = json_decode($this->itemRepository->getItemParameterFromCacheById($id), true);
 
         $parameters = json_decode($request->getContent(), true);
 

@@ -8,15 +8,15 @@ use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\API\Inventories\InventoryService;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Service\API\Inventories\InventoriesService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class InventoryController extends AbstractController
 {
     public function __construct(
         private readonly InventoryRepository $inventoryRepository,
-        private readonly InventoriesService $inventoriesService,
+        private readonly InventoryService $inventoriesService,
         private readonly CustomResponse $customResponse,
         private readonly CacheInterface $cache
     )
@@ -45,16 +45,7 @@ final class InventoryController extends AbstractController
         string $uuid
     ): Response
     {
-        if ($request->query->get('filter') === 'true') {
-            $inventory = $this->inventoriesService->getInventoryFromCacheByUUidWithFilter(
-                $uuid,
-                $request->query->get('amount'),
-                $request->query->get('projectName'),
-                $request->query->get('creator')
-            );
-        } else {
-            $inventory = $this->inventoriesService->getInventoryFromCacheByUuid($uuid);
-        }
+        $inventory = $this->inventoryRepository->getInventoryFromCacheByUuid($uuid, $request->query);
 
         return new JsonResponse(
             $this->inventoriesService->prepareData($inventory)
@@ -67,7 +58,7 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
-        $inventory = $this->inventoriesService->getItemFromCacheByUuidAndItemId($uuid, $itemId);
+        $inventory = $this->inventoryRepository->getItemFromCacheByUuidAndItemId($uuid, $itemId);
 
         return new JsonResponse(
             $this->inventoriesService->prepareData($inventory),
@@ -137,7 +128,7 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
-        $inventory = $this->inventoriesService->getItemFromCacheByUuidAndItemId($uuid, $itemId);
+        $inventory = $this->inventoryRepository->getItemFromCacheByUuidAndItemId($uuid, $itemId);
 
         return new JsonResponse(
             json_decode(
@@ -164,7 +155,7 @@ final class InventoryController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Not even passed a parameter for delete. Nothing changed!', 406);
         }
 
-        $inventory = $this->inventoriesService->getItemInInventoryByUserAndItem($uuid, $itemId);
+        $inventory = $this->inventoryRepository->getItemInInventoryByUuidAndItemId($uuid, $itemId);
 
         $this->inventoriesService->deleteParameter($inventory, $parameters);
         $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);

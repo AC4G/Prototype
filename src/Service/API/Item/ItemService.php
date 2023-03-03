@@ -5,15 +5,12 @@ namespace App\Service\API\Item;
 use App\Entity\Item;
 use App\Serializer\ItemNormalizer;
 use App\Repository\ItemRepository;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\CacheInterface;
 
 final class ItemService
 {
     public function __construct(
         private readonly ItemRepository $itemRepository,
-        private readonly ItemNormalizer $itemNormalizer,
-        private readonly CacheInterface $cache
+        private readonly ItemNormalizer $itemNormalizer
     )
     {
     }
@@ -83,28 +80,6 @@ final class ItemService
         }
 
         return $itemsList;
-    }
-
-    public function getItemFromCacheById(
-        int $id
-    ): null|string
-    {
-        return $this->cache->get('item_' . $id, function (ItemInterface $item) use ($id) {
-            $item->expiresAfter(86400);
-
-            return json_encode($this->itemNormalizer->normalize($this->itemRepository->findOneBy(['id' => $id]), null, 'public'));
-        });
-    }
-
-    public function getItemParameterFromCacheById(
-        int $id
-    ): null|string
-    {
-        return $this->cache->get('item_' . $id . '_parameter', function (ItemInterface $item) use ($id) {
-            $item->expiresAfter(86400);
-
-            return $this->itemRepository->findOneBy(['id' => $id])->getParameter();
-        });
     }
 
 

@@ -6,8 +6,6 @@ use DateTime;
 use App\Repository\ClientRepository;
 use App\Repository\AuthTokenRepository;
 use App\Repository\AccessTokenRepository;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\API\Security\SecurityService;
@@ -23,8 +21,7 @@ final class SecurityController extends AbstractController
         private readonly AuthTokenRepository $authTokenRepository,
         private readonly ClientRepository $clientRepository,
         private readonly SecurityService $securityService,
-        private readonly CustomResponse $customResponse,
-        private readonly CacheInterface $cache
+        private readonly CustomResponse $customResponse
     )
     {
     }
@@ -44,11 +41,7 @@ final class SecurityController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Client credentials required!', 406);
         }
 
-        $client = $this->cache->get('client_' . $content['client_id'], function (ItemInterface $item) use ($content) {
-            $item->expiresAfter(86400);
-
-            return $this->clientRepository->findOneBy(['clientId' => $content['client_id']]);
-        });
+        $client = $this->clientRepository->getClientFromCacheByClientId($content['client_id']);
 
         if (is_null($client) || $client->getClientSecret() !== $content['client_secret']) {
             return $this->customResponse->errorResponse($request, 'Permission denied!', 403);
@@ -59,11 +52,7 @@ final class SecurityController extends AbstractController
                 return $this->customResponse->errorResponse($request, 'code required!', 406);
             }
 
-            $authToken = $this->cache->get('authToken_' . $content['code'], function (ItemInterface $item) use ($content) {
-                $item->expiresAfter(86400);
-
-                $this->authTokenRepository->findOneBy(['authToken' => $content['code']]);
-            });
+            $authToken = $this->authTokenRepository->getAuthTokenFromCacheByCode($content['code']);
 
             if (is_null($authToken) || $authToken->getProject()->getId() !== $client->getProject()->getId()) {
                 return $this->customResponse->errorResponse($request, 'Permission denied!', 403);

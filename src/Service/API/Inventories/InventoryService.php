@@ -3,26 +3,18 @@
 namespace App\Service\API\Inventories;
 
 use App\Entity\Inventory;
-use App\Repository\InventoryRepository;
 use App\Repository\ItemRepository;
 use App\Repository\UserRepository;
 use App\Serializer\InventoryNormalizer;
-use App\Service\API\Item\ItemService;
-use App\Service\UserService;
-use Doctrine\Common\Collections\Criteria;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
+use App\Repository\InventoryRepository;
 
-final class InventoriesService
+final class InventoryService
 {
     public function __construct(
         private readonly InventoryRepository $inventoryRepository,
         private readonly InventoryNormalizer $inventoryNormalizer,
         private readonly UserRepository $userRepository,
-        private readonly ItemRepository $itemRepository,
-        private readonly ItemService $itemService,
-        private readonly UserService $userService,
-        private readonly CacheInterface $cache
+        private readonly ItemRepository $itemRepository
 
     )
     {
@@ -34,8 +26,8 @@ final class InventoriesService
         int $itemId
     ): void
     {
-        $user = $this->userService->getUserByUuidFromCache($uuid);
-        $item = $this->itemService->getItemFromCacheById($itemId);
+        $user = $this->userRepository->getUserByUuidFromCache($uuid);
+        $item = $this->itemRepository->getItemFromCacheById($itemId);
 
         $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
 
@@ -119,8 +111,8 @@ final class InventoriesService
         int $itemId
     ): void
     {
-        $user = $this->userService->getUserByUuidFromCache($uuid);
-        $item = $this->itemService->getItemFromCacheById($itemId);
+        $user = $this->userRepository->getUserByUuidFromCache($uuid);
+        $item = $this->itemRepository->getItemFromCacheById($itemId);
 
         $inventory = $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
 
@@ -154,60 +146,6 @@ final class InventoriesService
         }
 
         return $inventoryList;
-    }
-
-    public function getItemFromCacheByUuidAndItemId(
-        string $uuid,
-        int $itemId,
-    ): null|Inventory
-    {
-        return $this->cache->get('inventory_' . $uuid . '_item_' . $itemId,function (ItemInterface $cacheItem) use ($uuid, $itemId) {
-            $cacheItem->expiresAfter(86400);
-
-            $this->getItemInInventoryByUserAndItem($uuid, $itemId);
-        });
-    }
-
-    public function getInventoryFromCacheByUuid(
-        string $uuid
-    ): array
-    {
-        return $this->cache->get('inventory_' . $uuid, function (ItemInterface $cacheItem) use ($uuid) {
-            $cacheItem->expiresAfter(86400);
-
-            $user = $this->userService->getUserByUuidFromCache($uuid);
-
-            return $this->inventoryRepository->findBy(['user' => $user]);
-        });
-    }
-
-    public function getInventoryFromCacheByUUidWithFilter(
-        string $uuid,
-        ?string $amount,
-        ?string $projectName,
-        ?string $creator
-    ): array
-    {
-        return $this->cache->get('inventory_' . $uuid . '_' . $amount . '_' . $projectName . '_' . $creator, function (ItemInterface $cacheItem) use ($uuid, $amount, $projectName, $creator) {
-            $cacheItem->expiresAfter(86400);
-
-            $user = $this->userService->getUserByUuidFromCache($uuid);
-            if(!is_null($creator)) {
-                $creator = $this->userService->getUserByUuidOrNicknameFromCache($creator);
-            }
-            return $this->inventoryRepository->findWithFilter($user, $amount, $projectName, $creator);
-        });
-    }
-
-    public function getItemInInventoryByUserAndItem(
-        string $uuid,
-        int $itemId
-    ): Inventory
-    {
-        $user = $this->userService->getUserByUuidFromCache($uuid);
-        $item = $this->itemService->getItemFromCacheById($itemId);
-
-        return $this->inventoryRepository->findOneBy(['user' => $user, 'item' => $item]);
     }
 
 

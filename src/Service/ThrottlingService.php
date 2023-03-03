@@ -52,6 +52,7 @@ final class ThrottlingService
         int $count = 1
     ): bool
     {
+
         $currentStatus = $this->cache->getItem('throttling_count_' . $this->client);
 
         $status = $currentStatus->get();

@@ -2,9 +2,9 @@
 
 namespace App\Service\Listener;
 
-use App\Service\API\Security\SecurityService;
+use App\Repository\UserRepository;
 use App\Service\Response\API\CustomResponse;
-use App\Service\UserService;
+use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 final class APIUserListenerService
@@ -12,7 +12,7 @@ final class APIUserListenerService
     public function __construct(
         private readonly SecurityService $securityService,
         private readonly CustomResponse $customResponse,
-        private readonly UserService $userService
+        private readonly UserRepository $userRepository
     )
     {
     }
@@ -25,7 +25,7 @@ final class APIUserListenerService
     {
         $uuid = $params['uuid'];
 
-        $user = $this->userService->getUserByUuidFromCache($uuid);
+        $user = $this->userRepository->getUserByUuidFromCache($uuid);
 
         if (is_null($user)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User with uuid %s doesn\'t exists!', $uuid), 404));

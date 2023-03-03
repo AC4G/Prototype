@@ -2,19 +2,19 @@
 
 namespace App\Controller\API;
 
-use App\Service\UserService;
+use App\Serializer\UserNormalizer;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Serializer\UserNormalizer;
 
 final class UserController extends AbstractController
 {
     public function __construct(
-        private readonly UserNormalizer $userNormalizer,
-        private readonly UserService $userService
+        private readonly UserRepository $userRepository,
+        private readonly UserNormalizer $userNormalizer
     )
     {
     }
@@ -24,7 +24,7 @@ final class UserController extends AbstractController
         string $uuid
     ): Response
     {
-        $user = $this->userNormalizer->normalize($this->userService->getUserByUuidFromCache($uuid), null, 'user_api');
+        $user = $this->userNormalizer->normalize($this->userRepository->getUserByUuidFromCache($uuid), null, 'user_api');
 
         return new JsonResponse(
             $user

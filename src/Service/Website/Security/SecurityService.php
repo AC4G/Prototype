@@ -11,7 +11,6 @@ use App\Repository\ClientRepository;
 use App\Repository\WebAppRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\AuthTokenRepository;
-use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -27,7 +26,7 @@ final class SecurityService
         private readonly ClientRepository $clientRepository,
         private readonly WebAppRepository $webAppRepository,
         private readonly ScopeRepository $scopeRepository,
-        private readonly CacheInterface $cache,
+        private readonly CacheInterface $cache
     )
     {
     }
@@ -64,11 +63,7 @@ final class SecurityService
     {
         $errors = [];
 
-        $this->client = $this->cache->get('client_'. $query['client_id'], function (ItemInterface $item) use ($query) {
-            $item->expiresAfter(86400);
-
-            return $this->clientRepository->findOneBy(['clientId' => $query['client_id']]);
-        });
+        $this->client = $this->clientRepository->getClientFromCacheByClientId($query['client_id']);
 
         if (is_null($this->client)) {
             $errors[] = 'Client not found!';
@@ -78,11 +73,7 @@ final class SecurityService
             $errors[] = 'Already authenticated!';
         }
 
-        $this->webApp = $this->cache->get('webApp_'. $query['client_id'], function (ItemInterface $item) {
-            $item->expiresAfter(86400);
-
-            return $this->webAppRepository->findOneBy(['client' => $this->client]);
-        });
+        $this->webApp = $this->webAppRepository->getWebAppByClientId($query['client_id']);
 
         if (!is_null($this->client) && (is_null($this->webApp) || (is_null($this->webApp->getRedirectUrl()) || strlen($this->webApp->getRedirectUrl()) === 0) || count($this->webApp->getScopes()) === 0)) {
             $errors[] = 'Unauthorized client!';

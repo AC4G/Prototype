@@ -41,8 +41,7 @@ final class ItemSearchEngine extends AbstractSearchEngine
 
     private function buildQuery(
         string $phrase,
-        ?UserInterface $user = null,
-        array $context = [],
+        ?UserInterface $user = null
     ): Query
     {
         $query = $this->itemRepository->createQueryBuilder('i')

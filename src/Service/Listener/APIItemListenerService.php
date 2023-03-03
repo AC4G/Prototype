@@ -5,7 +5,6 @@ namespace App\Service\Listener;
 use App\Entity\Item;
 use App\Serializer\ItemNormalizer;
 use App\Repository\ItemRepository;
-use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -16,8 +15,7 @@ final class APIItemListenerService
         private readonly SecurityService $securityService,
         private readonly ItemRepository $itemRepository,
         private readonly ItemNormalizer $itemNormalizer,
-        private readonly CustomResponse $customResponse,
-        private readonly CacheInterface $cache
+        private readonly CustomResponse $customResponse
     )
     {
     }
@@ -50,34 +48,22 @@ final class APIItemListenerService
 
         $id = $params['id'];
 
-        $item = $this->cache->getItem('item_' . $id)->get();
+        $item = $this->itemRepository->getItemFromCacheById($id);
 
         if (is_null($item)) {
-            $item = $this->itemRepository->findOneBy(['id' => $id]);
+            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Item not found', 404));
 
-            if (is_null($item)) {
-                $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Item not found', 404));
-
-                return;
-            }
+            return;
         }
 
-        if ($event->getRequest()->isMethod('GET') && $item instanceof Item) {
+        if ($event->getRequest()->isMethod('GET')) {
             if (str_contains($event->getRequest()->attributes->get('_route'), 'parameter')) {
-                $itemParameter = $this->cache->getItem('item_' . $id . '_parameter');
-
-                $itemParameter->expiresAfter(86400);
-                $itemParameter->set($item->getParameter());
-                $this->cache->save($itemParameter);
+                $this->itemRepository->getItemParameterFromCacheById($id);
 
                 return;
             }
 
-            $itemCache = $this->cache->getItem('item_' . $id);
-
-            $itemCache->expiresAfter(86400);
-            $itemCache->set(json_encode($this->itemNormalizer->normalize($item, null, 'public')));
-            $this->cache->save($itemCache);
+            $this->itemRepository->getItemFromCacheById($id);
 
             return;
         }
@@ -90,7 +76,7 @@ final class APIItemListenerService
             $item = $this->itemNormalizer->normalize($item);
         }
 
-        if (!$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAdjustmentOnItem($accessToken, $item)) {
+        if (!$this->securityService->hasClientPermissionForAdjustmentOnItem($accessToken, $item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
     }

@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\User;
 use App\Entity\Inventory;
+use App\Service\PaginationService;
+use App\Serializer\InventoryNormalizer;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -18,6 +20,8 @@ use Symfony\Component\HttpFoundation\InputBag;
 class InventoryRepository extends AbstractRepository
 {
     public function __construct(
+        private readonly InventoryNormalizer $inventoryNormalizer,
+        private readonly PaginationService $paginationService,
         private readonly ItemRepository $itemRepository,
         private readonly UserRepository $userRepository,
         private readonly CacheInterface $cache,
@@ -36,9 +40,32 @@ class InventoryRepository extends AbstractRepository
     ): array
     {
         if (!is_null($inputBag) && $inputBag->get('filter') === 'true') {
-            return $this->getInventoryFromCacheByUuidWithFilter($uuid, $inputBag);
+            $inventory = $this->getInventoryFromCacheByUuidWithFilter($uuid, $inputBag);
+        } else {
+            $inventory = json_decode($this->getInventoryInJsonFromCacheByUuid($uuid, $user) , true);
         }
 
+        $paginatedInventory = $this->paginationService->getDataByPage($inventory, is_null($inputBag) ? [] : $inputBag->all());
+
+        return [
+            'user' => [
+                'uuid' => $uuid
+            ],
+            'data' => $paginatedInventory,
+            'meta' => [
+                'totalPages' => $this->paginationService->getMaxPages(),
+                'currentPage' => $this->paginationService->getCurrentPage(),
+                'totalAmount' => $this->paginationService->getAmountOfItems(),
+                'currentAmount' => $this->paginationService->getCurrentAmount(),
+            ]
+        ];
+    }
+
+    private function getInventoryInJsonFromCacheByUuid(
+        string $uuid,
+        User $user = null
+    ): string
+    {
         return $this->cache->get('inventory_' . $uuid, function (ItemInterface $cacheItem) use ($uuid, $user) {
             $cacheItem->expiresAfter(86400);
 
@@ -46,7 +73,15 @@ class InventoryRepository extends AbstractRepository
                 $user = $this->userRepository->getUserByUuidFromCache($uuid);
             }
 
-            return $this->findBy(['user' => $user]);
+            $inventories = $this->findBy(['user' => $user]);
+
+            $normalized = [];
+
+            foreach ($inventories as $inventory) {
+                $normalized[] = $this->inventoryNormalizer->normalize($inventory, null, 'api');
+            }
+
+            return json_encode($normalized);
         });
     }
 
@@ -105,16 +140,20 @@ class InventoryRepository extends AbstractRepository
         $queryBuilder = $this->createQueryBuilder(alias: 'inv')
             ->join('inv.item','item')
             ->andWhere('inv.user = :user')
-            ->setParameter('user', $user);
+            ->setParameter('user', $user)
+        ;
+
         if (!is_null($amount)) {
             $queryBuilder->andWhere('inv.amount = :amount')
                 ->setParameter('amount', intval($amount));
         }
+
         if (!is_null($projectName)) {
             $queryBuilder->join('item.project', 'proj')
                 ->andWhere('proj.projectName = :projectName')
                 ->setParameter('projectName', $projectName);
         }
+
         if (!is_null($creator)) {
             $queryBuilder->andWhere('item.user = :creator')
                 ->setParameter('creator', $creator);

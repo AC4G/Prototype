@@ -2,6 +2,7 @@
 
 namespace App\Controller\API;
 
+use App\Service\PaginationService;
 use App\Repository\InventoryRepository;
 use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
@@ -16,7 +17,8 @@ final class InventoryController extends AbstractController
 {
     public function __construct(
         private readonly InventoryRepository $inventoryRepository,
-        private readonly InventoryService $inventoriesService,
+        private readonly PaginationService $paginationService,
+        private readonly InventoryService $inventoryService,
         private readonly CustomResponse $customResponse,
         private readonly CacheInterface $cache
     )
@@ -28,14 +30,25 @@ final class InventoryController extends AbstractController
         Request $request
     ): Response
     {
-        $inventory = $this->inventoryRepository->findAll();
+        $inventories = $this->inventoryRepository->findAll();
 
-        if (count($inventory) === 0) {
+        if (count($inventories) === 0) {
             return $this->customResponse->errorResponse($request, 'No inventories here, maybe next time...');
         }
 
+        $paginatedInventories = $this->paginationService->getDataByPage($inventories, $request->query->all());
+        $normalizedInventories = $this->inventoryService->prepareData($paginatedInventories, null, 'api_all');
+
         return new JsonResponse(
-            $this->inventoriesService->prepareData($inventory)
+            [
+                'pagination' => [
+                    'maxPages' => $this->paginationService->getMaxPages(),
+                    'currentPage' => $this->paginationService->getCurrentPage(),
+                    'maxAmount' => $this->paginationService->getAmountOfItems(),
+                    'currentAmount' => $this->paginationService->getCurrentAmount(),
+                ],
+                'data' => $normalizedInventories
+            ]
         );
     }
 
@@ -48,7 +61,7 @@ final class InventoryController extends AbstractController
         $inventory = $this->inventoryRepository->getInventoryFromCacheByUuid($uuid, $request->query);
 
         return new JsonResponse(
-            $this->inventoriesService->prepareData($inventory)
+            $inventory
         );
     }
 
@@ -61,7 +74,7 @@ final class InventoryController extends AbstractController
         $inventory = $this->inventoryRepository->getItemInInventoryFromCacheByUuidAndItemId($uuid, $itemId);
 
         return new JsonResponse(
-            $this->inventoriesService->prepareData($inventory),
+            $this->inventoryService->prepareData($inventory),
         );
     }
 
@@ -82,7 +95,7 @@ final class InventoryController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Amount is required with POST method!', 406);
         }
 
-        $this->inventoriesService->createEntryInInventory($parameter, $uuid, $itemId);
+        $this->inventoryService->createEntryInInventory($parameter, $uuid, $itemId);
         $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
 
         return $this->customResponse->notificationResponse($request, 'Item successfully added to inventory', 201);
@@ -103,7 +116,7 @@ final class InventoryController extends AbstractController
 
         $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
 
-        $this->inventoriesService->updateInventory($parameter, $uuid, $itemId);
+        $this->inventoryService->updateInventory($parameter, $uuid, $itemId);
 
         return $this->customResponse->notificationResponse($request, 'Inventory updated');
     }
@@ -117,7 +130,7 @@ final class InventoryController extends AbstractController
     {
         $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
 
-        $this->inventoriesService->deleteItemFromInventory($uuid, $itemId);
+        $this->inventoryService->deleteItemFromInventory($uuid, $itemId);
 
         return $this->customResponse->notificationResponse($request, 'Item successfully removed from inventory');
     }
@@ -157,7 +170,7 @@ final class InventoryController extends AbstractController
 
         $inventory = $this->inventoryRepository->getItemInInventoryByUuidAndItemId($uuid, $itemId);
 
-        $this->inventoriesService->deleteParameter($inventory, $parameters);
+        $this->inventoryService->deleteParameter($inventory, $parameters);
         $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
 
         return $this->customResponse->notificationResponse($request, sprintf('Inventory parameter from user %s and item %d successfully removed', $itemId, $itemId));

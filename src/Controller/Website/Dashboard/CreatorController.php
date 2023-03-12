@@ -2,15 +2,15 @@
 
 namespace App\Controller\Website\Dashboard;
 
+use App\Engine\Search\ItemSearchEngine;
 use App\Entity\User;
 use App\Repository\ItemRepository;
 use App\Serializer\UserNormalizer;
-use App\Engine\Search\ItemSearchEngine;
+use App\Service\PaginationService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\Website\Pagination\PaginationService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class CreatorController extends AbstractController
 {

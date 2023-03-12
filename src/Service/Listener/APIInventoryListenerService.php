@@ -127,7 +127,7 @@ final class APIInventoryListenerService
             return true;
         }
 
-        $inventory = $this->inventoryRepository->getInventoryFromCacheByUuid($user->getUuid(), null, $user);
+        $inventory = $this->inventoryRepository->getInventoryFromCacheByUuid($user->getUuid(),null, $user);
 
         if (count($inventory) === 0) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'User has not an item in inventory yet!', 404));

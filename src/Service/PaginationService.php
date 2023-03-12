@@ -1,19 +1,20 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Website\Pagination;
+namespace App\Service;
 
 final class PaginationService
 {
     private int $maxPages = 1;
     private int $currentPage = 1;
     private int $amount = 0;
+    private int $currentAmount = 0;
 
     public function getDataByPage(
         array $content,
         array $query
     ): array
     {
-        $limit = array_key_exists('limit', $query) ? (int)$query['limit'] : 20;
+        $limit = array_key_exists('limit', $query) ? (((int)$query['limit'] > 100) ? 100 : (int)$query['limit']) : 20;
         $page = array_key_exists('page', $query) ? (int)$query['page'] : 1;
 
         $currentPage = $this->decideForCurrentPage($this->calculateMaxPages($content, $limit), $page);
@@ -25,7 +26,11 @@ final class PaginationService
 
         $offset = $this->calculateOffset($currentPage, $limit);
 
-        return array_slice($content, $offset, $limit);
+        $slicedContent = array_slice($content, $offset, $limit);
+
+        $this->currentAmount = count($slicedContent);
+
+        return $slicedContent;
     }
 
     private function calculateOffset(
@@ -70,6 +75,11 @@ final class PaginationService
     public function getAmountOfItems(): int
     {
         return $this->amount;
+    }
+
+    public function getCurrentAmount(): int
+    {
+        return $this->currentAmount;
     }
 
 

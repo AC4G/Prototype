@@ -14,8 +14,9 @@ final class PaginationService
         array $query
     ): array
     {
-        $limit = array_key_exists('limit', $query) ? (((int)$query['limit'] > 100) ? 100 : (int)$query['limit']) : 20;
-        $page = array_key_exists('page', $query) ? (int)$query['page'] : 1;
+        $limitAndPage = $this->getLimitAndPageFromQuery($query);
+        $limit = $limitAndPage['limit'];
+        $page = $limitAndPage['page'];
 
         $currentPage = $this->decideForCurrentPage($this->calculateMaxPages($content, $limit), $page);
         $this->amount = count($content);
@@ -33,6 +34,36 @@ final class PaginationService
         return $slicedContent;
     }
 
+    public function calculateOffsetAndLimit(
+        int $amount,
+        array $query
+    ): array
+    {
+        $limitAndPage = $this->getLimitAndPageFromQuery($query);
+        $limit = $limitAndPage['limit'];
+        $page = $limitAndPage['page'];
+
+        $currentPage = $this->decideForCurrentPage($this->calculateMaxPages($amount, $limit), $page);
+
+        return [
+            'offset' => $this->calculateOffset($currentPage, $limit),
+            'limit' => $limit
+        ];
+    }
+
+    private function getLimitAndPageFromQuery(
+        array $query
+    ): array
+    {
+        $limit = array_key_exists('limit', $query) ? (((int)$query['limit'] > 100) ? 100 : (int)$query['limit']) : 20;
+        $page = array_key_exists('page', $query) ? (int)$query['page'] : 1;
+
+        return [
+            'limit' => $limit,
+            'page' => $page
+        ];
+    }
+
     private function calculateOffset(
         int $currentPage,
         int $limit
@@ -41,11 +72,11 @@ final class PaginationService
     }
 
     private function calculateMaxPages(
-        array $content,
+        array|int $content,
         int $limit
     ): int
     {
-        $max = (int)ceil(count($content) / $limit);
+        $max = (int)ceil(is_array($content) ? count($content) : $content / $limit);
 
         if ($max === 0) {
             $max = 1;

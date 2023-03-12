@@ -30,24 +30,25 @@ final class InventoryController extends AbstractController
         Request $request
     ): Response
     {
-        $inventories = $this->inventoryRepository->findAll();
+        $maxAmount = $this->inventoryRepository->count([]);
+        $limitAndOffset = $this->paginationService->calculateOffsetAndLimit($maxAmount, $request->query->all());
+        $inventories = $this->inventoryRepository->findBy([], ['id' => 'ASC'], $limitAndOffset['limit'], $limitAndOffset['offset']);
 
         if (count($inventories) === 0) {
             return $this->customResponse->errorResponse($request, 'No inventories here, maybe next time...');
         }
 
-        $paginatedInventories = $this->paginationService->getDataByPage($inventories, $request->query->all());
-        $normalizedInventories = $this->inventoryService->prepareData($paginatedInventories, null, 'api_all');
+        $normalizedInventories = $this->inventoryService->prepareData($inventories, null, 'api_all');
 
         return new JsonResponse(
             [
+                'data' => $normalizedInventories,
                 'pagination' => [
                     'maxPages' => $this->paginationService->getMaxPages(),
                     'currentPage' => $this->paginationService->getCurrentPage(),
-                    'maxAmount' => $this->paginationService->getAmountOfItems(),
-                    'currentAmount' => $this->paginationService->getCurrentAmount(),
-                ],
-                'data' => $normalizedInventories
+                    'maxAmount' => $maxAmount,
+                    'currentAmount' => count($normalizedInventories),
+                ]
             ]
         );
     }
@@ -59,9 +60,18 @@ final class InventoryController extends AbstractController
     ): Response
     {
         $inventory = $this->inventoryRepository->getInventoryFromCacheByUuid($uuid, $request->query);
+        $paginatedInventory = $this->paginationService->getDataByPage($inventory, $request->query->all());
 
         return new JsonResponse(
-            $inventory
+            [
+                'data' => $paginatedInventory,
+                'meta' => [
+                    'totalPages' => $this->paginationService->getMaxPages(),
+                    'currentPage' => $this->paginationService->getCurrentPage(),
+                    'totalAmount' => $this->paginationService->getAmountOfItems(),
+                    'currentAmount' => $this->paginationService->getCurrentAmount(),
+                ]
+            ]
         );
     }
 

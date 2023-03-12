@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\User;
 use App\Entity\Inventory;
-use App\Service\PaginationService;
 use App\Serializer\InventoryNormalizer;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -21,7 +20,6 @@ class InventoryRepository extends AbstractRepository
 {
     public function __construct(
         private readonly InventoryNormalizer $inventoryNormalizer,
-        private readonly PaginationService $paginationService,
         private readonly ItemRepository $itemRepository,
         private readonly UserRepository $userRepository,
         private readonly CacheInterface $cache,
@@ -45,20 +43,7 @@ class InventoryRepository extends AbstractRepository
             $inventory = json_decode($this->getInventoryInJsonFromCacheByUuid($uuid, $user) , true);
         }
 
-        $paginatedInventory = $this->paginationService->getDataByPage($inventory, is_null($inputBag) ? [] : $inputBag->all());
-
-        return [
-            'user' => [
-                'uuid' => $uuid
-            ],
-            'data' => $paginatedInventory,
-            'meta' => [
-                'totalPages' => $this->paginationService->getMaxPages(),
-                'currentPage' => $this->paginationService->getCurrentPage(),
-                'totalAmount' => $this->paginationService->getAmountOfItems(),
-                'currentAmount' => $this->paginationService->getCurrentAmount(),
-            ]
-        ];
+        return $inventory;
     }
 
     private function getInventoryInJsonFromCacheByUuid(

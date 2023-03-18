@@ -44,9 +44,9 @@ final class InventoryController extends AbstractController
             [
                 'data' => $normalizedInventories,
                 'pagination' => [
-                    'maxPages' => $this->paginationService->getMaxPages(),
+                    'totalPages' => $this->paginationService->getTotalPages(),
                     'currentPage' => $this->paginationService->getCurrentPage(),
-                    'maxAmount' => $maxAmount,
+                    'totalAmount' => $maxAmount,
                     'currentAmount' => count($normalizedInventories),
                 ]
             ]
@@ -66,9 +66,9 @@ final class InventoryController extends AbstractController
             [
                 'data' => $paginatedInventory,
                 'meta' => [
-                    'totalPages' => $this->paginationService->getMaxPages(),
+                    'totalPages' => $this->paginationService->getTotalPages(),
                     'currentPage' => $this->paginationService->getCurrentPage(),
-                    'totalAmount' => $this->paginationService->getAmountOfItems(),
+                    'totalAmount' => $this->paginationService->getTotalAmount(),
                     'currentAmount' => $this->paginationService->getCurrentAmount(),
                 ]
             ]
@@ -84,7 +84,9 @@ final class InventoryController extends AbstractController
         $inventory = $this->inventoryRepository->getItemInInventoryFromCacheByUuidAndItemId($uuid, $itemId);
 
         return new JsonResponse(
-            $this->inventoryService->prepareData($inventory),
+            [
+                'data' => $inventory
+            ]
         );
     }
 
@@ -151,13 +153,12 @@ final class InventoryController extends AbstractController
         int $itemId
     ): Response
     {
-        $inventory = $this->inventoryRepository->getItemInInventoryByUuidAndItemId($uuid, $itemId);
+        $inventory = $this->inventoryRepository->getItemInInventoryFromCacheByUuidAndItemId($uuid, $itemId);
 
         return new JsonResponse(
-            json_decode(
-                $inventory->getParameter(),
-                true
-            )
+            [
+                'data' => $inventory['parameter']
+            ]
         );
     }
 

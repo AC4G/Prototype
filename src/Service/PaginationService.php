@@ -76,7 +76,7 @@ final class PaginationService
         int $limit
     ): int
     {
-        $max = (int)ceil(is_array($content) ? count($content) : $content / $limit);
+        $max = (int)ceil((is_array($content) ? count($content) : $content) / $limit);
 
         if ($max === 0) {
             $max = 1;
@@ -93,7 +93,7 @@ final class PaginationService
         return $this->currentPage = min(max($page, 1), $maxPages);
     }
 
-    public function getMaxPages():int
+    public function getTotalPages():int
     {
         return $this->maxPages;
     }
@@ -103,7 +103,7 @@ final class PaginationService
         return $this->currentPage;
     }
 
-    public function getAmountOfItems(): int
+    public function getTotalAmount(): int
     {
         return $this->amount;
     }

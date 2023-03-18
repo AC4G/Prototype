@@ -2,7 +2,6 @@
 
 namespace App\Serializer;
 
-use App\Entity\User;
 use App\Entity\Inventory;
 
 final class InventoryNormalizer
@@ -36,16 +35,9 @@ final class InventoryNormalizer
         }
 
         return [
+            'itemId' => $inventory->getItem()->getId(),
             'amount' => $inventory->getAmount(),
-            'parameter' => json_decode($inventory->getParameter(), true),
-            'user' => [
-                'uuid' => $user->getUuid(),
-                'nickname' => $user->getNickname()
-            ],
-            'item' => [
-                'id' => $inventory->getItem()->getId(),
-                'name' => $inventory->getItem()->getName()
-            ]
+            'parameter' => json_decode($inventory->getParameter(), true)
         ];
     }
 

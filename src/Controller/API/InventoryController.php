@@ -30,8 +30,8 @@ final class InventoryController extends AbstractController
         Request $request
     ): Response
     {
-        $maxAmount = $this->inventoryRepository->count([]);
-        $limitAndOffset = $this->paginationService->calculateOffsetAndLimit($maxAmount, $request->query->all());
+        $totalAmount = $this->inventoryRepository->count([]);
+        $limitAndOffset = $this->paginationService->calculateOffsetAndLimit($totalAmount, $request->query->all());
         $inventories = $this->inventoryRepository->findBy([], ['id' => 'ASC'], $limitAndOffset['limit'], $limitAndOffset['offset']);
 
         if (count($inventories) === 0) {
@@ -43,10 +43,10 @@ final class InventoryController extends AbstractController
         return new JsonResponse(
             [
                 'data' => $normalizedInventories,
-                'pagination' => [
+                'meta' => [
                     'totalPages' => $this->paginationService->getTotalPages(),
                     'currentPage' => $this->paginationService->getCurrentPage(),
-                    'totalAmount' => $maxAmount,
+                    'totalAmount' => $totalAmount,
                     'currentAmount' => count($normalizedInventories),
                 ]
             ]

@@ -105,22 +105,47 @@ class ItemRepository extends AbstractRepository
         int|string $id
     ): null|string
     {
-        return $this->cache->get('item_' . $id . '_parameter', function (ItemInterface $item) use ($id) {
-            $item->expiresAfter(86400);
+        $item = $this->getItemFromCacheById($id);
 
-            return $this->findOneBy(['id' => $id])->getParameter();
-        });
+        return $item->getParameter();
     }
 
-    public function getItemsFromCacheByUser(
+    private function getItemIdsByUser(
         User $user
     ): array
     {
-        return $this->cache->get('items_' . $user->getUuid(), function (ItemInterface $item) use ($user) {
-            $item->expiresAfter(86400);
+        $query = $this->createQueryBuilder(alias: 'item')
+            ->select('item.id')
+            ->where('item.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+        ;
 
-            return $this->findBy(['user' => $user]);
+        return $query->getArrayResult();
+    }
+
+    public function getItemIdsFromCacheByUser(
+        User $user
+    ): array
+    {
+        return $this->cache->get('items_' . $user->getUuid() . '_list', function (ItemInterface $item) use ($user) {
+            $item->expiresAfter(604800);
+
+            return $this->getItemIdsByUser($user);
         });
+    }
+
+    public function getItemsByItemIdList(
+        array $itemIdList
+    ): array
+    {
+        $items = [];
+
+        foreach ($itemIdList as $item) {
+            $items[] = $this->getItemFromCacheById($item['id']);
+        }
+
+        return $items;
     }
 
 

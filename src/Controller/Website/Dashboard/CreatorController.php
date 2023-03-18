@@ -41,9 +41,9 @@ final class CreatorController extends AbstractController
             'path_name' => 'creator',
             'items' => $items,
             'user' => $user,
-            'amount' => $this->paginationService->getAmountOfItems(),
+            'amount' => $this->paginationService->getTotalAmount(),
             'current_page' => $this->paginationService->getCurrentPage(),
-            'max_pages' => $this->paginationService->getMaxPages()
+            'max_pages' => $this->paginationService->getTotalPages()
         ]);
     }
 

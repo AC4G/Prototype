@@ -34,8 +34,6 @@ services:
             - '@Predis'
             - { 'ttl': 1800 }:
 
-
-
     acme.custom_two_factor_provider:
         class: App\Provider\TwoFactorProvider
         tags:
@@ -58,6 +56,7 @@ services:
 
     Symfony\Component\Cache\Adapter\FilesystemAdapter:
         arguments:
+
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

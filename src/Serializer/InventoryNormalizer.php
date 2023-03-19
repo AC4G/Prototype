@@ -16,6 +16,7 @@ final class InventoryNormalizer
 
         if ($context === 'api') {
             return [
+                'id' => $inventory->getId(),
                 'itemId' => $inventory->getItem()->getId(),
                 'amount' => $inventory->getAmount(),
                 'parameter' => json_decode($inventory->getParameter(), true)

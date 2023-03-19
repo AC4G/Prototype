@@ -60,11 +60,11 @@ final class InventoryController extends AbstractController
     ): Response
     {
         $inventory = $this->inventoryRepository->getInventoryFromCacheByUuid($uuid, $request->query);
-        $paginatedInventory = $this->paginationService->getDataByPage($inventory, $request->query->all());
+        $inventory = $this->paginationService->getDataByPage($inventory, $request->query->all());
 
         return new JsonResponse(
             [
-                'data' => $paginatedInventory,
+                'data' => $inventory,
                 'meta' => [
                     'totalPages' => $this->paginationService->getTotalPages(),
                     'currentPage' => $this->paginationService->getCurrentPage(),

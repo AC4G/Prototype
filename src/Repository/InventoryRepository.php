@@ -37,7 +37,7 @@ class InventoryRepository extends AbstractRepository
         User $user = null
     ): array
     {
-        if (!is_null($inputBag) && $inputBag->get('filter') === 'true') {
+        if (!is_null($inputBag) && (bool)$inputBag->get('filter') === true) {
             $inventory = $this->getInventoryFromCacheByUuidWithFilter($uuid, $inputBag);
         } else {
             $inventory = json_decode($this->getInventoryInJsonFromCacheByUuid($uuid, $user) , true);
@@ -79,8 +79,8 @@ class InventoryRepository extends AbstractRepository
         $projectName = $inputBag->get('projectName');
         $creator = $inputBag->get('creator');
 
-        return $this->cache->get('inventory_' . $uuid . '_' . $amount . '_' . $projectName . '_' . $creator, function (ItemInterface $cacheItem) use ($uuid, $amount, $projectName, $creator) {
-            $cacheItem->expiresAfter(86400);
+        $list =  $this->cache->get('inventory_' . $uuid . '_item_list_filtered_' . $amount . '_' . $projectName . '_' . $creator, function (ItemInterface $cacheItem) use ($uuid, $amount, $projectName, $creator) {
+            $cacheItem->expiresAfter(1800);
 
             $user = $this->userRepository->getUserByUuidFromCache($uuid);
 
@@ -90,6 +90,20 @@ class InventoryRepository extends AbstractRepository
 
             return $this->findWithFilter($user, $amount, $projectName, $creator);
         });
+
+        $inventories = json_decode($this->getInventoryInJsonFromCacheByUuid($uuid), true);
+
+        $filteredInventory = [];
+
+        foreach ($inventories as $inventory) {
+            foreach ($list as $item) {
+                if ($inventory['id'] === $item['id']) {
+                    $filteredInventory[] = $inventory;
+                }
+            }
+        }
+
+        return $filteredInventory;
     }
 
     public function getItemInInventoryFromCacheByUuidAndItemId(
@@ -119,7 +133,7 @@ class InventoryRepository extends AbstractRepository
         return $this->findOneBy(['user' => $user, 'item' => $item]);
     }
 
-    public function findWithFilter(
+    private function findWithFilter(
         User $user,
         ?string $amount,
         ?string $projectName,
@@ -127,6 +141,7 @@ class InventoryRepository extends AbstractRepository
     ): array
     {
         $queryBuilder = $this->createQueryBuilder(alias: 'inv')
+            ->select('inv.id')
             ->join('inv.item','item')
             ->andWhere('inv.user = :user')
             ->setParameter('user', $user)
@@ -148,7 +163,7 @@ class InventoryRepository extends AbstractRepository
                 ->setParameter('creator', $creator);
         }
 
-        return $queryBuilder->getQuery()->getResult();
+        return $queryBuilder->getQuery()->getArrayResult();
     }
 
 

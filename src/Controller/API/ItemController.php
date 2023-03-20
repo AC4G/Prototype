@@ -11,6 +11,7 @@ use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class ItemController extends AbstractController
@@ -35,11 +36,14 @@ final class ItemController extends AbstractController
     {
         $totalAmount = $this->itemRepository->count([]);
         $limitAndOffset = $this->paginationService->calculateOffsetAndLimit($totalAmount, $request->query->all());
-        $items = $this->itemRepository->findBy([], ['id' => 'ASC'], $limitAndOffset['limit'], $limitAndOffset['offset']);
 
-        if (count($items) === 0) {
-            return $this->customResponse->errorResponse($request, 'Not a single item created! Maybe next time..', 404);
+        $list = $this->itemRepository->getItemIdList($request->query, $limitAndOffset);
+
+        if (count($list) === 0) {
+            return $this->customResponse->errorResponse($request, 'No items found!', 400);
         }
+
+        $items = $this->itemRepository->getItemsByList($list);
 
         $normalizedItems = $this->itemsService->prepareData($items, null, 'public');
 
@@ -56,13 +60,11 @@ final class ItemController extends AbstractController
         int $id
     ): Response
     {
-        $item = $this->itemRepository->getItemFromCacheInJsonFormatById($id);
+        $item = $this->itemsService->prepareData($this->itemRepository->getItemFromCacheById($id), null, 'public');
 
-        return new Response(
-            $item,
-            200,
+        return new JsonResponse(
             [
-                'Content-Type' => 'application/json'
+                'data' => $item
             ]
         );
     }
@@ -102,14 +104,14 @@ final class ItemController extends AbstractController
             return $this->customResponse->errorResponse($request, 'User doesn\'t exists!', 404);
         }
 
-        $itemsList = $this->itemRepository->getItemIdsFromCacheByUser($user);
+        $itemsList = $this->itemRepository->getItemIdList($request->query, null, $user);
 
         if (count($itemsList) === 0) {
-            return $this->customResponse->errorResponse($request, 'User hasn\'t created an item yet!', 400);
+            return $this->customResponse->errorResponse($request, 'No items found!', 400);
         }
 
         $paginatedList = $this->paginationService->getDataByPage($itemsList, $request->query->all());
-        $items = $this->itemRepository->getItemsByItemIdList($paginatedList);
+        $items = $this->itemRepository->getItemsByList($paginatedList);
         $normalizedItems = $this->itemsService->prepareData($items, null, 'public');
 
         return $this->customResponse->payloadResponse($normalizedItems, [

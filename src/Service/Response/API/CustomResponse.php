@@ -63,10 +63,11 @@ final class CustomResponse
         array $header = [],
     ): JsonResponse
     {
-        $data = [
-            'data' => $payload,
-            (!is_null($meta)) ?? 'meta' => $meta
-        ];
+        $data = ['data' => $payload];
+
+        if (!is_null($meta)) {
+            $data = array_merge($data, ['meta' => $meta]);
+        }
 
         return new JsonResponse(
             $data,

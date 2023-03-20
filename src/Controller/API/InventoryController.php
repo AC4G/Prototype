@@ -40,17 +40,12 @@ final class InventoryController extends AbstractController
 
         $normalizedInventories = $this->inventoryService->prepareData($inventories, null, 'api_all');
 
-        return new JsonResponse(
-            [
-                'data' => $normalizedInventories,
-                'meta' => [
-                    'totalPages' => $this->paginationService->getTotalPages(),
-                    'currentPage' => $this->paginationService->getCurrentPage(),
-                    'totalAmount' => $totalAmount,
-                    'currentAmount' => count($normalizedInventories),
-                ]
-            ]
-        );
+        return $this->customResponse->payloadResponse($normalizedInventories, [
+            'totalPages' => $this->paginationService->getTotalPages(),
+            'currentPage' => $this->paginationService->getCurrentPage(),
+            'totalAmount' => $totalAmount,
+            'currentAmount' => count($normalizedInventories)
+        ]);
     }
 
     #[Route('/api/inventories/{uuid}', name: 'api_inventory_by_uuid', methods: [Request::METHOD_GET])]
@@ -59,20 +54,29 @@ final class InventoryController extends AbstractController
         string $uuid
     ): Response
     {
-        $inventory = $this->inventoryRepository->getInventoryFromCacheByUuid($uuid, $request->query);
-        $inventory = $this->paginationService->getDataByPage($inventory, $request->query->all());
+        if ((bool)$request->query->get('filter') === true) {
+            $list = $this->inventoryRepository->getInventoryListFromCacheByUuidWithFilter($uuid, $request->query);
+            $paginatedList = $this->paginationService->getDataByPage($list, $request->query->all());
 
-        return new JsonResponse(
-            [
-                'data' => $inventory,
-                'meta' => [
-                    'totalPages' => $this->paginationService->getTotalPages(),
-                    'currentPage' => $this->paginationService->getCurrentPage(),
-                    'totalAmount' => $this->paginationService->getTotalAmount(),
-                    'currentAmount' => $this->paginationService->getCurrentAmount(),
-                ]
-            ]
-        );
+            $inventory = $this->inventoryRepository->filterInventoryByList($uuid, $paginatedList);
+
+            return $this->customResponse->payloadResponse($inventory, [
+                'totalPages' => $this->paginationService->getTotalPages(),
+                'currentPage' => $this->paginationService->getCurrentPage(),
+                'totalAmount' => $this->paginationService->getTotalAmount(),
+                'currentAmount' => $this->paginationService->getCurrentAmount()
+            ]);
+        }
+
+        $inventory = json_decode($this->inventoryRepository->getInventoryInJsonFromCacheByUuid($uuid) , true);
+        $paginatedInventory = $this->paginationService->getDataByPage($inventory, $request->query->all());
+
+        return $this->customResponse->payloadResponse($paginatedInventory, [
+            'totalPages' => $this->paginationService->getTotalPages(),
+            'currentPage' => $this->paginationService->getCurrentPage(),
+            'totalAmount' => $this->paginationService->getTotalAmount(),
+            'currentAmount' => $this->paginationService->getCurrentAmount()
+        ]);
     }
 
     #[Route('/api/inventories/{uuid}/{itemId}', name: 'api_inventory_by_uuid_and_itemId_get', requirements: ['itemId' => '\d+'], methods: [Request::METHOD_GET])]

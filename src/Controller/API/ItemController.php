@@ -11,7 +11,6 @@ use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class ItemController extends AbstractController
@@ -26,6 +25,8 @@ final class ItemController extends AbstractController
     )
     {
     }
+
+    #TODO:
 
     #[Route('/api/items', name: 'api_items', methods: [Request::METHOD_GET])]
     public function showItems(
@@ -42,17 +43,12 @@ final class ItemController extends AbstractController
 
         $normalizedItems = $this->itemsService->prepareData($items, null, 'public');
 
-        return new JsonResponse(
-            [
-                'data' => $normalizedItems,
-                'meta' => [
-                    'totalPages' => $this->paginationService->getTotalPages(),
-                    'currentPage' => $this->paginationService->getCurrentPage(),
-                    'totalAmount' => $totalAmount,
-                    'currentAmount' => count($normalizedItems),
-                ]
-            ]
-        );
+        return $this->customResponse->payloadResponse($normalizedItems, [
+            'totalPages' => $this->paginationService->getTotalPages(),
+            'currentPage' => $this->paginationService->getCurrentPage(),
+            'totalAmount' => $totalAmount,
+            'currentAmount' => count($normalizedItems)
+        ]);
     }
 
     #[Route('/api/items/{id}', name: 'api_item_by_id_get', requirements: ['id' => '\d+'], methods: [Request::METHOD_GET])]
@@ -92,6 +88,8 @@ final class ItemController extends AbstractController
         return $this->customResponse->notificationResponse($request, 'Parameter successfully added or updated!', 202);
     }
 
+    #TODO:
+
     #[Route('/api/items/user/{uuid}', name: 'api_items_by_uuid', methods: [Request::METHOD_GET])]
     public function getItemsByUuid(
         Request $request,
@@ -114,17 +112,12 @@ final class ItemController extends AbstractController
         $items = $this->itemRepository->getItemsByItemIdList($paginatedList);
         $normalizedItems = $this->itemsService->prepareData($items, null, 'public');
 
-        return new JsonResponse(
-            [
-                'data' => $normalizedItems,
-                'meta' => [
-                    'totalPages' => $this->paginationService->getTotalPages(),
-                    'currentPage' => $this->paginationService->getCurrentPage(),
-                    'totalAmount' => $this->paginationService->getTotalAmount(),
-                    'currentAmount' => $this->paginationService->getCurrentAmount(),
-                ]
-            ]
-        );
+        return $this->customResponse->payloadResponse($normalizedItems, [
+            'totalPages' => $this->paginationService->getTotalPages(),
+            'currentPage' => $this->paginationService->getCurrentPage(),
+            'totalAmount' => $this->paginationService->getTotalAmount(),
+            'currentAmount' => $this->paginationService->getCurrentAmount()
+        ]);
     }
 
     #[Route('/api/items/{id}/parameter', name: 'api_item_by_id_process_parameter_get', requirements: ['id' => '\d+'], methods: [Request::METHOD_GET])]

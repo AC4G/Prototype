@@ -56,5 +56,24 @@ final class CustomResponse
         );
     }
 
+    public function payloadResponse(
+        array $payload,
+        array $meta = null,
+        int $status = 200,
+        array $header = [],
+    ): JsonResponse
+    {
+        $data = [
+            'data' => $payload,
+            (!is_null($meta)) ?? 'meta' => $meta
+        ];
+
+        return new JsonResponse(
+            $data,
+            $status,
+            $header
+        );
+    }
+
 
 }

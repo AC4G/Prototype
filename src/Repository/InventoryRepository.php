@@ -31,22 +31,7 @@ class InventoryRepository extends AbstractRepository
         );
     }
 
-    public function getInventoryFromCacheByUuid(
-        string $uuid,
-        InputBag $inputBag = null,
-        User $user = null
-    ): array
-    {
-        if (!is_null($inputBag) && (bool)$inputBag->get('filter') === true) {
-            $inventory = $this->getInventoryFromCacheByUuidWithFilter($uuid, $inputBag);
-        } else {
-            $inventory = json_decode($this->getInventoryInJsonFromCacheByUuid($uuid, $user) , true);
-        }
-
-        return $inventory;
-    }
-
-    private function getInventoryInJsonFromCacheByUuid(
+    public function getInventoryInJsonFromCacheByUuid(
         string $uuid,
         User $user = null
     ): string
@@ -70,7 +55,7 @@ class InventoryRepository extends AbstractRepository
         });
     }
 
-    private function getInventoryFromCacheByUuidWithFilter(
+    public function getInventoryListFromCacheByUuidWithFilter(
         string $uuid,
         InputBag $inputBag
     ): array
@@ -78,8 +63,13 @@ class InventoryRepository extends AbstractRepository
         $amount = $inputBag->get('amount');
         $projectName = $inputBag->get('projectName');
         $creator = $inputBag->get('creator');
+        $query = $inputBag->get('q');
 
-        $list =  $this->cache->get('inventory_' . $uuid . '_item_list_filtered_' . $amount . '_' . $projectName . '_' . $creator, function (ItemInterface $cacheItem) use ($uuid, $amount, $projectName, $creator) {
+        if (is_null($amount) && is_null($projectName) && is_null($creator) && is_null($query)) {
+            return json_decode($this->getInventoryInJsonFromCacheByUuid($uuid) , true);
+        }
+
+        return $this->cache->get('inventory_' . $uuid . '_item_list_filtered_' . $amount . '_' . $projectName . '_' . $creator . '_' . $query, function (ItemInterface $cacheItem) use ($uuid, $amount, $projectName, $creator, $query) {
             $cacheItem->expiresAfter(1800);
 
             $user = $this->userRepository->getUserByUuidFromCache($uuid);
@@ -88,9 +78,15 @@ class InventoryRepository extends AbstractRepository
                 $creator = $this->userRepository->getUserByUuidOrNicknameFromCache($creator);
             }
 
-            return $this->findWithFilter($user, $amount, $projectName, $creator);
+            return $this->findWithFilter($user, $amount, $projectName, $creator, $query);
         });
+    }
 
+    public function filterInventoryByList(
+        string $uuid,
+        array $list
+    ): array
+    {
         $inventories = json_decode($this->getInventoryInJsonFromCacheByUuid($uuid), true);
 
         $filteredInventory = [];
@@ -137,7 +133,8 @@ class InventoryRepository extends AbstractRepository
         User $user,
         ?string $amount,
         ?string $projectName,
-        ?User $creator
+        ?User $creator,
+        ?string $query
     ): array
     {
         $queryBuilder = $this->createQueryBuilder(alias: 'inv')
@@ -161,6 +158,11 @@ class InventoryRepository extends AbstractRepository
         if (!is_null($creator)) {
             $queryBuilder->andWhere('item.user = :creator')
                 ->setParameter('creator', $creator);
+        }
+
+        if (!is_null($query)) {
+            $queryBuilder->andWhere('item.name LIKE :name')
+                ->setParameter('name', '%' . $query . '%');
         }
 
         return $queryBuilder->getQuery()->getArrayResult();

@@ -34,10 +34,6 @@ final class InventoryController extends AbstractController
         $limitAndOffset = $this->paginationService->calculateOffsetAndLimit($totalAmount, $request->query->all());
         $inventories = $this->inventoryRepository->findBy([], ['id' => 'ASC'], $limitAndOffset['limit'], $limitAndOffset['offset']);
 
-        if (count($inventories) === 0) {
-            return $this->customResponse->errorResponse($request, 'No inventories here, maybe next time...');
-        }
-
         $normalizedInventories = $this->inventoryService->prepareData($inventories, null, 'api_all');
 
         return $this->customResponse->payloadResponse($normalizedInventories, [

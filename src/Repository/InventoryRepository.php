@@ -145,23 +145,27 @@ class InventoryRepository extends AbstractRepository
         ;
 
         if (!is_null($amount)) {
-            $queryBuilder->andWhere('inv.amount = :amount')
+            $queryBuilder
+                ->andWhere('inv.amount = :amount')
                 ->setParameter('amount', intval($amount));
         }
 
         if (!is_null($projectName)) {
-            $queryBuilder->join('item.project', 'proj')
+            $queryBuilder
+                ->join('item.project', 'proj')
                 ->andWhere('proj.projectName = :projectName')
                 ->setParameter('projectName', $projectName);
         }
 
         if (!is_null($creator)) {
-            $queryBuilder->andWhere('item.user = :creator')
+            $queryBuilder
+                ->andWhere('item.user = :creator')
                 ->setParameter('creator', $creator);
         }
 
         if (!is_null($query)) {
-            $queryBuilder->andWhere('item.name LIKE :name')
+            $queryBuilder
+                ->andWhere('item.name LIKE :name')
                 ->setParameter('name', '%' . $query . '%');
         }
 

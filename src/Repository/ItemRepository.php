@@ -4,10 +4,12 @@ namespace App\Repository;
 
 use App\Entity\User;
 use App\Entity\Item;
+use Doctrine\ORM\QueryBuilder;
 use App\Serializer\ItemNormalizer;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Component\HttpFoundation\InputBag;
 
 /**
  * @method Item|null find($id, $lockMode = null, $lockVersion = null)
@@ -18,6 +20,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 class ItemRepository extends AbstractRepository
 {
     public function __construct(
+        private readonly UserRepository $userRepository,
         private readonly ItemNormalizer $itemNormalizer,
         private readonly CacheInterface $cache,
         ManagerRegistry $registry
@@ -121,6 +124,7 @@ class ItemRepository extends AbstractRepository
             ->getQuery()
         ;
 
+
         return $query->getArrayResult();
     }
 
@@ -135,7 +139,7 @@ class ItemRepository extends AbstractRepository
         });
     }
 
-    public function getItemsByItemIdList(
+    public function getItemsByList(
         array $itemIdList
     ): array
     {
@@ -146,6 +150,66 @@ class ItemRepository extends AbstractRepository
         }
 
         return $items;
+    }
+
+    public function getItemIdList(
+        InputBag $inputBag,
+        array $limitAndOffset = null,
+        User $user = null
+    ): array
+    {
+        $queryBuilder = $this->createQueryBuilder(alias: 'item')
+            ->select('item.id')
+        ;
+
+        if (!is_null($limitAndOffset)) {
+            $queryBuilder
+                ->setMaxResults($limitAndOffset['limit'])
+                ->setFirstResult($limitAndOffset['offset']);
+        }
+
+        if (!is_null($user)) {
+            $queryBuilder
+                ->andWhere('item.user = :user')
+                ->setParameter('user', $user);
+        }
+
+        $projectName = $inputBag->get('projectName');
+        $creator = $inputBag->get('creator');
+        $query = $inputBag->get('q');
+
+        if ((bool)$inputBag->get('filter') === false || (is_null($projectName) && is_null($query) && (is_null($creator) && is_null($user)))) {
+            if (!is_null($user)) {
+                return $this->getItemIdsFromCacheByUser($user);
+            }
+
+            return $queryBuilder->getQuery()->getArrayResult();
+        }
+
+        if (!is_null($projectName)) {
+            $queryBuilder
+                ->join('item.project', 'proj')
+                ->andWhere('proj.projectName = :projectName')
+                ->setParameter('projectName', $projectName);
+        }
+
+        if (!is_null($creator) && is_null($user)) {
+            $queryBuilder
+                ->andWhere('item.user = :creator')
+                ->setParameter('creator', $this->userRepository->getUserByUuidOrNicknameFromCache($creator));
+        }
+
+        if (!is_null($query)) {
+            $query = '%' . $query . '%';
+
+            $queryBuilder
+                ->andWhere('item.name LIKE :name')
+                ->orWhere('item.parameter LIKE :parameter')
+                ->setParameter('name', $query)
+                ->setParameter('parameter', $query);
+        }
+
+        return $queryBuilder->getQuery()->getArrayResult();
     }
 
 

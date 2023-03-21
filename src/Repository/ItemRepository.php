@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\User;
 use App\Entity\Item;
-use Doctrine\ORM\QueryBuilder;
 use App\Serializer\ItemNormalizer;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -97,7 +96,7 @@ class ItemRepository extends AbstractRepository
         string $context = null
     ): null|string
     {
-        return $this->cache->get('item_' . $id . '_json' . $context, function (ItemInterface $item) use ($id, $context) {
+        return $this->cache->get('item_' . $id . '_json_' . $context, function (ItemInterface $item) use ($id, $context) {
             $item->expiresAfter(86400);
 
             return json_encode($this->itemNormalizer->normalize($this->findOneBy(['id' => $id]), null, $context));

@@ -96,7 +96,7 @@ final class SecurityController extends AbstractController
         return $this->redirectToRoute('home');
     }
 
-    #[Route('/oauth/authorize', name: 'oauth_authorize', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[Route('/oauth2/authorize', name: 'oauth_authorize', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function oauthLoginAction(
         Request $request
     ): Response

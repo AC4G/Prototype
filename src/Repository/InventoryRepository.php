@@ -69,17 +69,13 @@ class InventoryRepository extends AbstractRepository
             return json_decode($this->getInventoryInJsonFromCacheByUuid($uuid) , true);
         }
 
-        return $this->cache->get('inventory_' . $uuid . '_item_list_filtered_' . $amount . '_' . $projectName . '_' . $creator . '_' . $query, function (ItemInterface $cacheItem) use ($uuid, $amount, $projectName, $creator, $query) {
-            $cacheItem->expiresAfter(1800);
+        $user = $this->userRepository->getUserByUuidFromCache($uuid);
 
-            $user = $this->userRepository->getUserByUuidFromCache($uuid);
+        if (!is_null($creator)) {
+            $creator = $this->userRepository->getUserByUuidOrNicknameFromCache($creator);
+        }
 
-            if (!is_null($creator)) {
-                $creator = $this->userRepository->getUserByUuidOrNicknameFromCache($creator);
-            }
-
-            return $this->findWithFilter($user, $amount, $projectName, $creator, $query);
-        });
+        return $this->findWithFilter($user, $amount, $projectName, $creator, $query);
     }
 
     public function filterInventoryByList(

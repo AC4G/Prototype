@@ -166,9 +166,16 @@ final class SecurityService
 
     public function hasClientPermissionForAccessingUserRelatedData(
         array $accessToken,
-        User $user
+        User $user,
+        Request $request
     ): bool
     {
+        $scopes = $request->getSession()->get('scopes');
+
+        if ($this->areGivenScopesValid($scopes, $request)) {
+            return false;
+        }
+
         return $accessToken['user']['id'] === $user->getId();
     }
 
@@ -185,15 +192,23 @@ final class SecurityService
 
         $scopes = $request->getSession()->get('scopes');
 
-        if ((!in_array('inventory.read', $scopes) && $request->isMethod('GET'))
-            || (!in_array('inventory.write', $scopes) && $request->isMethod('POST'))
-            || (!in_array('inventory.update', $scopes) && $request->isMethod('PATCH'))
-            || (!in_array('inventory.delete', $scopes) && $request->isMethod('DELETE'))
-        ) {
+        if ($this->areGivenScopesValid($scopes, $request)) {
             return false;
         }
 
         return $accessToken['user']['id'] === $user->getId() && $item['project']['id'] === $accessToken['project']['id'];
+    }
+
+    private function areGivenScopesValid(
+        array $scopes,
+        Request $request
+    ): bool
+    {
+        return ((!in_array('inventory.read', $scopes) && $request->isMethod('GET'))
+            || (!in_array('inventory.write', $scopes) && $request->isMethod('POST'))
+            || (!in_array('inventory.update', $scopes) && $request->isMethod('PATCH'))
+            || (!in_array('inventory.delete', $scopes) && $request->isMethod('DELETE'))
+        );
     }
 
     public function hasClientPermissionForAdjustmentOnItem(

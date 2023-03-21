@@ -18,6 +18,7 @@ use App\Serializer\AccessTokenNormalizer;
 use App\Repository\AccessTokenRepository;
 use App\Serializer\RefreshTokenNormalizer;
 use App\Repository\RefreshTokenRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 final class SecurityService
@@ -174,11 +175,22 @@ final class SecurityService
     public function hasClientPermissionForAdjustmentOnUserInventory(
         array $accessToken,
         User $user,
+        Request $request,
         ?array $item
     ): bool
     {
         if (is_null($item)) {
             return $accessToken['user']['id'] === $user->getId();
+        }
+
+        $scopes = $request->getSession()->get('scopes');
+
+        if ((!in_array('inventory.read', $scopes) && $request->isMethod('GET'))
+            || (!in_array('inventory.write', $scopes) && $request->isMethod('POST'))
+            || (!in_array('inventory.update', $scopes) && $request->isMethod('PATCH'))
+            || (!in_array('inventory.delete', $scopes) && $request->isMethod('DELETE'))
+        ) {
+            return false;
         }
 
         return $accessToken['user']['id'] === $user->getId() && $item['project']['id'] === $accessToken['project']['id'];
@@ -207,7 +219,7 @@ final class SecurityService
         string $nickname
     ): bool
     {
-        return !is_null($this->userRepository->findOneBy(['nickname' => $nickname]));
+        return !is_null($this->userRepository->getUserByUuidOrNicknameFromCache($nickname));
     }
 
     public function emailExists(

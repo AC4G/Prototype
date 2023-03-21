@@ -140,7 +140,7 @@ final class SecurityController extends AbstractController
         return new JsonResponse([
             'pointer' => $request->getUri(),
             'nickname' => $nickname,
-            'massage' => (int)$this->securityService->nicknameExists(urldecode($nickname))
+            'message' => (int)$this->securityService->nicknameExists(urldecode($nickname))
         ]);
     }
 
@@ -152,7 +152,7 @@ final class SecurityController extends AbstractController
         return new JsonResponse([
             'pointer' => $request->getUri(),
             'email' => $email,
-            'massage' => (int)$this->securityService->emailExists(urldecode($email))
+            'message' => (int)$this->securityService->emailExists(urldecode($email))
         ]);
     }
 

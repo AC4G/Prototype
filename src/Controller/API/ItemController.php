@@ -50,7 +50,7 @@ final class ItemController extends AbstractController
         return $this->customResponse->payloadResponse($normalizedItems, [
             'totalPages' => $this->paginationService->getTotalPages(),
             'currentPage' => $this->paginationService->getCurrentPage(),
-            'totalAmount' => $totalAmount,
+            'totalAmount' => count($list),
             'currentAmount' => count($normalizedItems)
         ]);
     }

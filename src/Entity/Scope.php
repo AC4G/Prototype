@@ -2,13 +2,12 @@
 
 namespace App\Entity;
 
-use App\Entity\Project;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Scope
  *
- * @ORM\Table(name="scope", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"})}, indexes={@ORM\Index(name="fk_Scope_Project1_idx", columns={"project_id"})})
+ * @ORM\Table(name="scope", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="scope_UNIQUE", columns={"scope"}), @ORM\UniqueConstraint(name="description_UNIQUE", columns={"description"})})
  * @ORM\Entity(repositoryClass="App\Repository\ScopeRepository")
  */
 class Scope
@@ -25,19 +24,16 @@ class Scope
     /**
      * @var string
      *
-     * @ORM\Column(name="scope", type="text", length=0, nullable=false)
+     * @ORM\Column(name="scope", type="string", length=255, nullable=false)
      */
     private string $scope;
 
     /**
-     * @var Project
+     * @var string
      *
-     * @ORM\ManyToOne(targetEntity="Project")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="project_id", referencedColumnName="id")
-     * })
+     * @ORM\Column(name="description", type="text", length=0, nullable=false)
      */
-    private Project $project;
+    private string $description;
 
     public function getId(): ?int
     {
@@ -63,14 +59,14 @@ class Scope
         return $this;
     }
 
-    public function getProject(): ?Project
+    public function getDescription(): string
     {
-        return $this->project;
+        return $this->description;
     }
 
-    public function setProject(?Project $project): self
+    public function setDescription(string $description): self
     {
-        $this->project = $project;
+        $this->description = $description;
 
         return $this;
     }

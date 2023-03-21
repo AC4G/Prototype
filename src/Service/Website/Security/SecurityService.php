@@ -79,7 +79,36 @@ final class SecurityService
             $errors[] = 'Unauthorized client!';
         }
 
+        if (!is_null($this->webApp)) {
+            $this->setScopes();
+
+            if (!$this->isScopeGivenAndQualified($query)) {
+                $errors[] = 'Given scopes are not qualified!';
+            }
+        }
+
         return $errors;
+    }
+
+    private function isScopeGivenAndQualified(
+        array $query
+    ): bool
+    {
+        if (!array_key_exists('scopes', $query)) {
+            return true;
+        }
+
+        $scopes = explode(',', $query['scopes']);
+
+        foreach ($scopes as $givenScope) {
+            foreach ($this->scopes as $savedScope) {
+                if ($givenScope !== $savedScope->getScope()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public function createAuthTokenAndBuildRedirectURI(
@@ -87,7 +116,19 @@ final class SecurityService
         UserInterface $user
     ): string
     {
-        $authToken = $this->createAuthenticationToken($user, $this->client, $this->webApp);
+        if (array_key_exists('scopes', $query)) {
+            $scopes = explode(',', $query['scopes']);
+        }
+
+        if (!array_key_exists('scopes', $query)) {
+            $scopes = [];
+
+            foreach ($this->scopes as $scope) {
+                $scopes[] = $scope->getScope();
+            }
+        }
+
+        $authToken = $this->createAuthenticationToken($user, $scopes);
 
         $redirectURI = $this->webApp->getRedirectUrl() . '?code=' . $authToken->getAuthToken();
 
@@ -108,16 +149,19 @@ final class SecurityService
         return $this->webApp;
     }
 
-    public function getScopes(): array
+    private function setScopes(): void
     {
         if (is_null($this->webApp)) {
-            return [];
+            $this->scopes = [];
         }
 
         foreach ($this->webApp->getScopes() as $scopeId) {
-            $this->scopes[] = $this->scopeRepository->findOneBy(['id' => $scopeId]);
+            $this->scopes[] = $this->scopeRepository->getScopeById($scopeId);
         }
+    }
 
+    public function getScopes(): array
+    {
         return $this->scopes;
     }
 
@@ -133,15 +177,14 @@ final class SecurityService
 
     private function createAuthenticationToken(
         UserInterface $user,
-        Client $client,
-        WebApp $webApp
+        array $scopes
     ): AuthToken
     {
         $authToken = new AuthToken();
 
         $expire = new DateTime('+ 1days');
 
-        $project = $this->projectRepository->findOneBy(['id' => $client->getProject()->getId()]);
+        $project = $this->projectRepository->findOneBy(['id' => $this->client->getProject()->getId()]);
 
         $authToken
             ->setUser($user)
@@ -149,7 +192,7 @@ final class SecurityService
             ->setAuthToken(bin2hex(random_bytes(64)))
             ->setCreationDate(new DateTime())
             ->setExpireDate($expire)
-            ->setScopes($webApp->getScopes())
+            ->setScopes($scopes)
         ;
 
         $this->authTokenRepository->persistAndFlushEntity($authToken);

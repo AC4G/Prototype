@@ -33,7 +33,7 @@ final class APIUserListenerService
             return;
         }
 
-        if (!$this->securityService->hasClientPermissionForAccessingUserRelatedData($accessToken, $user)) {
+        if (!$this->securityService->hasClientPermissionForAccessingUserRelatedData($accessToken, $user, $event->getRequest())) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
     }

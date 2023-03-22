@@ -82,7 +82,7 @@ final class SecurityService
         if (!is_null($this->webApp)) {
             $this->setScopes();
 
-            if (!$this->isScopeGivenAndQualified($query)) {
+            if (!$this->areScopesQualified($query)) {
                 $errors[] = 'Given scopes are not qualified!';
             }
         }
@@ -90,7 +90,7 @@ final class SecurityService
         return $errors;
     }
 
-    private function isScopeGivenAndQualified(
+    private function areScopesQualified(
         array $query
     ): bool
     {
@@ -118,9 +118,7 @@ final class SecurityService
     {
         if (array_key_exists('scopes', $query)) {
             $scopes = explode(',', $query['scopes']);
-        }
-
-        if (!array_key_exists('scopes', $query)) {
+        } else {
             $scopes = [];
 
             foreach ($this->scopes as $scope) {

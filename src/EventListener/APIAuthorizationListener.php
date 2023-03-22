@@ -10,7 +10,6 @@ use App\Service\Listener\APIItemListenerService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use App\Service\Listener\APIInventoryListenerService;
-use App\Service\Listener\APIPublicKeyListenerService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class APIAuthorizationListener implements EventSubscriberInterface
@@ -18,7 +17,6 @@ final class APIAuthorizationListener implements EventSubscriberInterface
 
     public function __construct(
         private readonly APIInventoryListenerService $apiInventoryListenerService,
-        private readonly APIPublicKeyListenerService $apiPublicKeyListenerService,
         private readonly APIItemListenerService $apiItemListenerService,
         private readonly APIUserListenerService $apiUserListenerService,
         private readonly RateLimiterFactory $apiFreePerMinuteLimiter,
@@ -102,12 +100,6 @@ final class APIAuthorizationListener implements EventSubscriberInterface
 
         if (str_starts_with($route, 'api_user')) {
             $this->apiUserListenerService->validateJWTForUserController($event, $accessToken, $params);
-
-            return;
-        }
-
-        if (str_starts_with($route, 'api_public_key')) {
-            $this->apiPublicKeyListenerService->validateJWTForPublicKeyController($event, $accessToken, $params);
         }
     }
 

@@ -12,11 +12,10 @@ final class UserNormalizer
         string $context = null
     ): array
     {
-        if ('user_api' === $context) {
+        if ('api' === $context) {
             return [
                 'uuid' => $user->getUuid(),
                 'nickname' => $user->getNickname(),
-                'email' => $user->getEmail(),
                 'profilePic' => $user->getProfilePic(),
                 'isPrivate' => $user->isPrivate(),
             ];

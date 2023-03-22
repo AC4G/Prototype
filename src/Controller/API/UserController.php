@@ -24,7 +24,7 @@ final class UserController extends AbstractController
         string $uuid
     ): Response
     {
-        $user = $this->userNormalizer->normalize($this->userRepository->getUserByUuidFromCache($uuid), null, 'user_api');
+        $user = $this->userNormalizer->normalize($this->userRepository->getUserByUuidFromCache($uuid), null, 'api');
 
         return new JsonResponse(
             $user

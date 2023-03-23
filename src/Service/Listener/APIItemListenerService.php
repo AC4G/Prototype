@@ -3,6 +3,7 @@
 namespace App\Service\Listener;
 
 use App\Repository\ItemRepository;
+use App\Repository\UserRepository;
 use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -11,6 +12,7 @@ final class APIItemListenerService
 {
     public function __construct(
         private readonly SecurityService $securityService,
+        private readonly UserRepository $userRepository,
         private readonly ItemRepository $itemRepository,
         private readonly CustomResponse $customResponse
     )
@@ -34,6 +36,12 @@ final class APIItemListenerService
         }
 
         if (array_key_exists('uuid', $params)) {
+            $user = $this->userRepository->getUserByUuidFromCache($params['uuid']);
+
+            if (is_null($user)) {
+                $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'User doesn\'t exists!', 404));
+            }
+
             return;
         }
 

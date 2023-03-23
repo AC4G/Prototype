@@ -34,6 +34,7 @@ class ProfileController extends AbstractController
 
         if ($request->isMethod('POST') && $this->isCsrfTokenValid($request->request->get('form'), $request->request->get('token'))) {
             $this->profileService->updateProfile($user, $request);
+
         }
 
         $user = $this->userNormalizer->normalize($user);
@@ -87,7 +88,7 @@ class ProfileController extends AbstractController
         $code = $request->request->get('code');
 
         if ($request->isMethod('POST') && $query['action'] === 'disable' && $this->isCsrfTokenValid('disable_2fa', $request->request->get('token'))) {
-            if (!$this->profileService->isTwofaCodeValid($user, $code)) {
+            if (!$this->profileService->isTwoFaCodeValid($user, $code)) {
                 $this->addFlash('error', 'The code is wrong!');
 
                 return $this->render('website/security/2fa_desetup.html.twig', [
@@ -95,19 +96,20 @@ class ProfileController extends AbstractController
                 ]);
             }
 
-            $this->profileService->removeTokensAndUnsetTwofa($user);
+            $this->profileService->removeTokensAndUnsetTwoFa($user);
             $this->addFlash('success', '2-Step Verification successfully disabled!');
 
             return $this->redirectToRoute('dashboard_profile');
         }
 
         if ($request->isMethod('POST') && $query['action'] === 'enable' && $this->isCsrfTokenValid('enable_2fa', $request->request->get('token'))) {
-            if (!$this->profileService->isTwofaCodeValid($user, $code)) {
+            if (!$this->profileService->isTwoFaCodeValid($user, $code)) {
                 $this->addFlash('error', 'The code is wrong!');
 
                 return $this->render('website/security/2fa_setup.html.twig', [
                     'code' => $user->getGoogleAuthenticatorSecret(),
-                    'qrCode' => $this->profileService->generateTwoStepVerificationQRCode($user)
+                    'qrCode' => $this->profileService->generateTwoStepVerificationQRCode($user),
+                    'reset_tokens' => $this->profileService->generateTwoStepVerificationOneTimeTokens($user)
                 ]);
             }
 
@@ -122,13 +124,13 @@ class ProfileController extends AbstractController
         }
 
         if (!$user->isGoogleAuthenticatorEnabled()) {
-            $this->accountService->updateTwoStepSecret($user);
+            $code = $this->accountService->updateTwoStepSecret($user);
         }
 
         return $this->render('website/security/2fa_setup.html.twig', [
-            'code' => $user->getGoogleAuthenticatorSecret(),
+            'code' => $code,
             'qrCode' => $this->profileService->generateTwoStepVerificationQRCode($user),
-            'reset_tokens' => $this->profileService->getOrGenerateTwoStepVerificationOneTimeTokens($user)
+            'reset_tokens' => $this->profileService->generateTwoStepVerificationOneTimeTokens($user)
         ]);
     }
 

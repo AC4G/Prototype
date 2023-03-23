@@ -6,6 +6,7 @@ use DateTime;
 use App\Repository\ClientRepository;
 use App\Repository\AuthTokenRepository;
 use App\Repository\AccessTokenRepository;
+use Symfony\Contracts\Cache\CacheInterface;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\API\Security\SecurityService;
@@ -21,7 +22,8 @@ final class SecurityController extends AbstractController
         private readonly AuthTokenRepository $authTokenRepository,
         private readonly ClientRepository $clientRepository,
         private readonly SecurityService $securityService,
-        private readonly CustomResponse $customResponse
+        private readonly CustomResponse $customResponse,
+        private readonly CacheInterface $cache
     )
     {
     }
@@ -53,6 +55,7 @@ final class SecurityController extends AbstractController
             }
 
             $authToken = $this->authTokenRepository->getAuthTokenFromCacheByCode($content['code']);
+            $this->cache->delete('authToken_' . $content['code']);
 
             if (is_null($authToken) || $authToken->getProject()->getId() !== $client->getProject()->getId()) {
                 return $this->customResponse->errorResponse($request, 'Permission denied!', 403);

@@ -6,6 +6,7 @@ use DateTime;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Repository\UserTokenRepository;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -17,7 +18,8 @@ final class AccountService
         private readonly GoogleAuthenticatorInterface $googleAuthenticator,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly UserTokenRepository $userTokenRepository,
-        private readonly UserRepository $userRepository
+        private readonly UserRepository $userRepository,
+        private readonly CacheInterface $cache
     )
     {
     }
@@ -38,8 +40,9 @@ final class AccountService
 
         $file->move($dir, $newFileName);
 
-        $user->setProfilePic($dir . $newFileName);
+        $user->setProfilePic('/' . $dir . $newFileName);
         $this->userRepository->flushEntity();
+        $this->deleteUserCache($user);
 
         return $user;
     }
@@ -103,7 +106,7 @@ final class AccountService
 
         $oldNickname = $user->getNickname();
 
-        $newPath = $this->renameFolderAndReturnNewPath($oldNickname, $nickname);
+        $newPath = '/' . $this->renameFolderAndReturnNewPath($oldNickname, $nickname);
 
         $user
             ->setNickname($nickname)
@@ -111,6 +114,7 @@ final class AccountService
         ;
 
         $this->userRepository->flushEntity();
+        $this->deleteUserCache($user);
     }
 
     private function renameFolderAndReturnNewPath(
@@ -143,6 +147,7 @@ final class AccountService
         $user->setIsPrivate($privacy);
 
         $this->userRepository->flushEntity();
+        $this->deleteUserCache($user);
     }
 
     public function updateEmail(
@@ -157,6 +162,7 @@ final class AccountService
         $user->setEmail($email);
 
         $this->userRepository->flushEntity();
+        $this->deleteUserCache($user);
     }
 
     public function updatePassword(
@@ -171,17 +177,21 @@ final class AccountService
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));
 
         $this->userRepository->flushEntity();
+        $this->deleteUserCache($user);
     }
 
     public function updateTwoStepSecret(
         User $user
-    ): void
+    ): string
     {
         $secret = $this->googleAuthenticator->generateSecret();
 
         $user->setGoogleAuthenticatorSecret($secret);
 
         $this->userRepository->flushEntity();
+        $this->deleteUserCache($user);
+
+        return $secret;
     }
 
     public function unsetTwoStepVerification(
@@ -194,9 +204,10 @@ final class AccountService
         ;
 
         $this->userRepository->flushEntity();
+        $this->deleteUserCache($user);
     }
 
-    public function removeTwofaOneTimeTokens(
+    public function removeTwoFaOneTimeTokens(
         User $user
     ): void
     {
@@ -207,21 +218,30 @@ final class AccountService
         }
     }
 
-    public function setTwofaVerified(
+    public function setTwoFaVerified(
         User $user
     ): void
     {
         $user->setTwoFaVerified(new DateTime());
 
         $this->userRepository->flushEntity();
+        $this->deleteUserCache($user);
     }
 
-    public function isTwofaValid(
+    public function isTwoFaValid(
         User $user,
         string $code
     ): bool
     {
         return $this->googleAuthenticator->checkCode($user, $code);
+    }
+
+    private function deleteUserCache(
+        User $user
+    ): void
+    {
+        $this->cache->delete('user_' . $user->getNickname());
+        $this->cache->delete('user_' . $user->getUuid());
     }
 
 

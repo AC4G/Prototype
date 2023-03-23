@@ -104,8 +104,6 @@ final class ProfileService
         }
     }
 
-    //##//
-
     public function generateTwoStepVerificationQRCode(
         TwoFactorInterface $user
     ): string
@@ -115,7 +113,7 @@ final class ProfileService
         return $qrCode->render($this->googleAuthenticator->getQRContent($user));
     }
 
-    public function getOrGenerateTwoStepVerificationOneTimeTokens(
+    public function generateTwoStepVerificationOneTimeTokens(
         User $user
     ): array
     {
@@ -128,9 +126,7 @@ final class ProfileService
         $tokens = [];
 
         for ($i = 0; $i < 10; $i++) {
-            $tokens[$i] = new UserToken();
-
-            $tokens[$i]
+            $tokens[$i] = (new UserToken())
                 ->setUser($user)
                 ->setToken(bin2hex(random_bytes(8)))
                 ->setType('2fa-one-time')
@@ -143,7 +139,7 @@ final class ProfileService
         return $tokens;
     }
 
-    public function isTwofaCodeValid(
+    public function isTwoFaCodeValid(
         User $user,
         ?string $code
     ): bool
@@ -152,22 +148,22 @@ final class ProfileService
             return false;
         }
 
-        return $this->accountService->isTwofaValid($user, $code);
+        return $this->accountService->isTwoFaValid($user, $code);
     }
 
     public function verifyTwoStepSecret(
         User $user
     ): void
     {
-        $this->accountService->setTwofaVerified($user);
+        $this->accountService->setTwoFaVerified($user);
     }
 
-    public function removeTokensAndUnsetTwofa(
+    public function removeTokensAndUnsetTwoFa(
         User $user
     ): void
     {
         $this->accountService->unsetTwoStepVerification($user);
-        $this->accountService->removeTwofaOneTimeTokens($user);
+        $this->accountService->removeTwoFaOneTimeTokens($user);
     }
 
 

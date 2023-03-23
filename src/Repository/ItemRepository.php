@@ -92,14 +92,13 @@ class ItemRepository extends AbstractRepository
     }
 
     public function getItemFromCacheInJsonFormatById(
-        int|string $id,
-        string $context = null
+        int|string $id
     ): null|string
     {
-        return $this->cache->get('item_' . $id . '_json_' . $context, function (ItemInterface $item) use ($id, $context) {
+        return $this->cache->get('item_' . $id . '_json', function (ItemInterface $item) use ($id) {
             $item->expiresAfter(86400);
 
-            return json_encode($this->itemNormalizer->normalize($this->findOneBy(['id' => $id]), null, $context));
+            return json_encode($this->itemNormalizer->normalize($this->findOneBy(['id' => $id])));
         });
     }
 
@@ -112,10 +111,12 @@ class ItemRepository extends AbstractRepository
         return $item->getParameter();
     }
 
-    private function getItemIdsByUser(
-        User $user
+    private function getItemIdsByUuid(
+        string $uuid
     ): array
     {
+        $user = $this->userRepository->getUserByUuidFromCache($uuid);
+
         $query = $this->createQueryBuilder(alias: 'item')
             ->select('item.id')
             ->where('item.user = :user')
@@ -123,18 +124,17 @@ class ItemRepository extends AbstractRepository
             ->getQuery()
         ;
 
-
         return $query->getArrayResult();
     }
 
-    public function getItemIdsFromCacheByUser(
-        User $user
+    public function getItemIdsFromCacheByUuid(
+        string $uuid
     ): array
     {
-        return $this->cache->get('items_' . $user->getUuid() . '_list', function (ItemInterface $item) use ($user) {
+        return $this->cache->get('items_' . $uuid . '_list', function (ItemInterface $item) use ($uuid) {
             $item->expiresAfter(604800);
 
-            return $this->getItemIdsByUser($user);
+            return $this->getItemIdsByUuid($uuid);
         });
     }
 
@@ -153,19 +153,15 @@ class ItemRepository extends AbstractRepository
 
     public function getItemIdList(
         InputBag $inputBag,
-        array $limitAndOffset = null,
+        array $limitAndOffset,
         User $user = null
     ): array
     {
         $queryBuilder = $this->createQueryBuilder(alias: 'item')
             ->select('item.id')
+            ->setMaxResults($limitAndOffset['limit'])
+            ->setFirstResult($limitAndOffset['offset']);
         ;
-
-        if (!is_null($limitAndOffset)) {
-            $queryBuilder
-                ->setMaxResults($limitAndOffset['limit'])
-                ->setFirstResult($limitAndOffset['offset']);
-        }
 
         if (!is_null($user)) {
             $queryBuilder
@@ -179,7 +175,7 @@ class ItemRepository extends AbstractRepository
 
         if ((bool)$inputBag->get('filter') === false || (is_null($projectName) && is_null($query) && (is_null($creator) && is_null($user)))) {
             if (!is_null($user)) {
-                return $this->getItemIdsFromCacheByUser($user);
+                return $this->getItemIdsFromCacheByUuid($user->getUuid());
             }
 
             return $queryBuilder->getQuery()->getArrayResult();

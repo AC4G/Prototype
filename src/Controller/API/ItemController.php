@@ -98,13 +98,16 @@ final class ItemController extends AbstractController
         string $uuid
     ): Response
     {
-        $user = $this->userRepository->getUserByUuidFromCache($uuid);
+        $totalAmount = count($this->itemRepository->getItemIdsFromCacheByUuid($uuid));
 
-        if (is_null($user)) {
-            return $this->customResponse->errorResponse($request, 'User doesn\'t exists!', 404);
+        if ($totalAmount === 0) {
+            return $this->customResponse->errorResponse($request, 'No items found!', 400);
         }
 
-        $itemsList = $this->itemRepository->getItemIdList($request->query, null, $user);
+        $limitAndOffset = $this->paginationService->calculateOffsetAndLimit($totalAmount, $request->query->all());
+
+        $user = $this->userRepository->getUserByUuidFromCache($uuid);
+        $itemsList = $this->itemRepository->getItemIdList($request->query, $limitAndOffset, $user);
 
         if (count($itemsList) === 0) {
             return $this->customResponse->errorResponse($request, 'No items found!', 400);
@@ -117,7 +120,7 @@ final class ItemController extends AbstractController
         return $this->customResponse->payloadResponse($normalizedItems, [
             'totalPages' => $this->paginationService->getTotalPages(),
             'currentPage' => $this->paginationService->getCurrentPage(),
-            'totalAmount' => $this->paginationService->getTotalAmount(),
+            'totalAmount' => $totalAmount,
             'currentAmount' => $this->paginationService->getCurrentAmount()
         ]);
     }

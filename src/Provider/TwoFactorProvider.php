@@ -59,15 +59,17 @@ final class TwoFactorProvider implements TwoFactorProviderInterface
             return $this->googleAuthenticator->checkCode($user, $authenticationCode);
         }
 
-        $token = $this->userTokenRepository->findOneBy(['user' => $user, 'type' => '2fa-one-time', 'token' => $authenticationCode]);
+        $tokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-one-time']);
 
-        if (is_null($token)) {
-            return false;
+        foreach ($tokens as $token) {
+            if (password_verify($authenticationCode, $token->getToken())) {
+                $this->userTokenRepository->deleteEntry($token);
+
+                return true;
+            }
         }
 
-        $this->userTokenRepository->deleteEntry($token);
-
-        return true;
+        return false;
     }
 
     public function getFormRenderer(): TwoFactorFormRendererInterface

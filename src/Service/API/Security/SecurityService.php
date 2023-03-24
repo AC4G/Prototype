@@ -164,13 +164,13 @@ final class SecurityService
         ];
     }
 
-    public function hasClientPermissionForAccessingUserRelatedData(
+    public function hasClientPermissionForUserRelatedDataAction(
         array $accessToken,
         User $user,
         Request $request
     ): bool
     {
-        $scopes = $request->getSession()->get('scopes');
+        $scopes = $request->attributes->get('scopes');
 
         if (!in_array('user.information.read', $scopes) && $request->isMethod('GET') && $request->attributes->get('_route') === 'api_user_by_uuid') {
             return false;
@@ -179,18 +179,18 @@ final class SecurityService
         return $accessToken['user']['id'] === $user->getId();
     }
 
-    public function hasClientPermissionForAdjustmentOnUserInventory(
+    public function hasClientPermissionForInventoryAction(
         array $accessToken,
         User $user,
         Request $request,
         ?array $item
     ): bool
     {
-        if (is_null($item)) {
-            return $accessToken['user']['id'] === $user->getId();
-        }
+        $scopes = $request->attributes->get('scopes');
 
-        $scopes = $request->getSession()->get('scopes');
+        if (is_null($item)) {
+            return $accessToken['user']['id'] === $user->getId() && (in_array('inventory.read', $scopes) && $request->isMethod('GET'));
+        }
 
         if ((!in_array('inventory.read', $scopes) && $request->isMethod('GET'))
             || (!in_array('inventory.write', $scopes) && $request->isMethod('POST'))
@@ -202,7 +202,7 @@ final class SecurityService
         return $accessToken['user']['id'] === $user->getId() && $item['project']['id'] === $accessToken['project']['id'];
     }
 
-    public function hasClientPermissionForAdjustmentOnItem(
+    public function hasClientPermissionForItemAction(
         array $accessToken,
         array $item
     ): bool

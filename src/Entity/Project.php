@@ -3,13 +3,12 @@
 namespace App\Entity;
 
 use DateTime;
-use App\Entity\Developer;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Project
  *
- * @ORM\Table(name="project", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="project_name_UNIQUE", columns={"project_name"})}, indexes={@ORM\Index(name="fk_Project_Developer1_idx", columns={"developer_id"}), @ORM\Index(name="project_name_fulltext", columns={"project_name"}, flags={"fulltext"})})
+ * @ORM\Table(name="project", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="project_name_UNIQUE", columns={"project_name"})}, indexes={@ORM\Index(name="project_name_fulltext", columns={"project_name"}, flags={"fulltext"})})
  * @ORM\Entity(repositoryClass="App\Repository\ProjectRepository")
  */
 class Project
@@ -64,16 +63,6 @@ class Project
      * @ORM\Column(name="creation_date", type="datetime", nullable=false)
      */
     private DateTime $creationDate;
-
-    /**
-     * @var Developer
-     *
-     * @ORM\ManyToOne(targetEntity="Developer", fetch="EAGER")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="developer_id", referencedColumnName="id")
-     * })
-     */
-    private Developer $developer;
 
     public function getId(): ?int
     {
@@ -155,18 +144,6 @@ class Project
     public function setCreationDate(DateTime $creationDate): self
     {
         $this->creationDate = $creationDate;
-
-        return $this;
-    }
-
-    public function getDeveloper(): ?Developer
-    {
-        return $this->developer;
-    }
-
-    public function setDeveloper(?Developer $developer): self
-    {
-        $this->developer = $developer;
 
         return $this;
     }

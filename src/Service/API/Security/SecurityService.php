@@ -52,7 +52,7 @@ final class SecurityService
             ->setProject($client->getProject())
             ->setCreationDate(new DateTime())
             ->setExpireDate($expire)
-            ->setScopes(['read', 'write', 'modify'])
+            ->setScopes([])
         ;
 
         $this->accessTokenRepository->persistAndFlushEntity($accessToken);

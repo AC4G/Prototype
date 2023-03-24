@@ -69,7 +69,7 @@ final class APIItemListenerService
             $item = json_decode($item, true);
         }
 
-        if (!$this->securityService->hasClientPermissionForItemAction($accessToken, $item, $event->getRequest())) {
+        if (!$this->securityService->hasClientPermissionForItemAction($accessToken, $item)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
     }

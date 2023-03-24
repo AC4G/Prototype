@@ -57,7 +57,7 @@ final class CustomResponse
     }
 
     public function payloadResponse(
-        array $payload,
+        array|int|string $payload,
         array $meta = null,
         int $status = 200,
         array $header = [],

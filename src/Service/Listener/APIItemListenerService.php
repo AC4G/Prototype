@@ -19,7 +19,7 @@ final class APIItemListenerService
     {
     }
 
-    public function validateJWTForItemController(
+    public function validateJWTAndParameterForItemController(
         RequestEvent $event,
         array $accessToken,
         array $params
@@ -62,14 +62,6 @@ final class APIItemListenerService
         }
 
         if ($event->getRequest()->isMethod('GET')) {
-            if (str_contains($event->getRequest()->attributes->get('_route'), 'parameter')) {
-                $this->itemRepository->getItemParameterFromCacheById($id);
-
-                return;
-            }
-
-            $this->itemRepository->getItemFromCacheInJsonFormatById($id);
-
             return;
         }
 
@@ -77,7 +69,7 @@ final class APIItemListenerService
             $item = json_decode($item, true);
         }
 
-        if (!$this->securityService->hasClientPermissionForAdjustmentOnItem($accessToken, $item)) {
+        if (!$this->securityService->hasClientPermissionForItemAction($accessToken, $item, $event->getRequest())) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
     }

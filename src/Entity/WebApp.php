@@ -49,7 +49,7 @@ class WebApp
     /**
      * @var array
      *
-     * @ORM\Column(name="scopes", type="array", nullable=false)
+     * @ORM\Column(name="scopes", type="json", nullable=false)
      */
     private array $scopes = [];
 

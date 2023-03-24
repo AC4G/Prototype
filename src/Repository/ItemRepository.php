@@ -199,9 +199,7 @@ class ItemRepository extends AbstractRepository
 
             $queryBuilder
                 ->andWhere('item.name LIKE :name')
-                ->orWhere('item.parameter LIKE :parameter')
-                ->setParameter('name', $query)
-                ->setParameter('parameter', $query);
+                ->setParameter('name', $query);
         }
 
         return $queryBuilder->getQuery()->getArrayResult();

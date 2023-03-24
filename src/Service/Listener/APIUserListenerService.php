@@ -17,12 +17,14 @@ final class APIUserListenerService
     {
     }
 
-    public function validateJWTForUserController(
+    public function validateJWTAndParameterForUserController(
         RequestEvent $event,
         array $accessToken,
         array $params
     ): void
     {
+        $event->getRequest()->attributes->set('scopes', $accessToken['scopes']);
+
         $uuid = $params['uuid'];
 
         $user = $this->userRepository->getUserByUuidFromCache($uuid);
@@ -33,7 +35,7 @@ final class APIUserListenerService
             return;
         }
 
-        if (!$this->securityService->hasClientPermissionForAccessingUserRelatedData($accessToken, $user, $event->getRequest())) {
+        if (!$this->securityService->hasClientPermissionForUserRelatedDataAction($accessToken, $user, $event->getRequest())) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
         }
     }

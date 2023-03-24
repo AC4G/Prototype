@@ -7,6 +7,7 @@ use App\Service\Response\API\CustomResponse;
 use App\Service\API\Security\SecurityService;
 use App\Service\Listener\APIUserListenerService;
 use App\Service\Listener\APIItemListenerService;
+use App\Service\Listener\APIStorageListenerService;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use App\Service\Listener\APIInventoryListenerService;
@@ -17,6 +18,7 @@ final class APIAuthorizationListener implements EventSubscriberInterface
 
     public function __construct(
         private readonly APIInventoryListenerService $apiInventoryListenerService,
+        private readonly APIStorageListenerService $apiStorageListenerService,
         private readonly APIItemListenerService $apiItemListenerService,
         private readonly APIUserListenerService $apiUserListenerService,
         private readonly RateLimiterFactory $apiFreePerMinuteLimiter,
@@ -84,22 +86,26 @@ final class APIAuthorizationListener implements EventSubscriberInterface
             return;
         }
 
-        $event->getRequest()->getSession()->set('scopes', $accessToken['scopes']);
-
         if (str_starts_with($route, 'api_item')) {
-            $this->apiItemListenerService->validateJWTForItemController($event, $accessToken, $params);
+            $this->apiItemListenerService->validateJWTAndParameterForItemController($event, $accessToken, $params);
 
             return;
         }
 
         if (str_starts_with($route, 'api_inventory') || str_starts_with($route, 'api_inventories')) {
-            $this->apiInventoryListenerService->validateJWTForInventoryController($event, $accessToken, $params);
+            $this->apiInventoryListenerService->validateJWTAndParameterForInventoryController($event, $accessToken, $params);
 
             return;
         }
 
         if (str_starts_with($route, 'api_user')) {
-            $this->apiUserListenerService->validateJWTForUserController($event, $accessToken, $params);
+            $this->apiUserListenerService->validateJWTAndParameterForUserController($event, $accessToken, $params);
+
+            return;
+        }
+
+        if (str_starts_with($route, 'api_storage')) {
+            $this->apiStorageListenerService->validateJWTAndParameterForStorageController($event, $accessToken, $params);
         }
     }
 

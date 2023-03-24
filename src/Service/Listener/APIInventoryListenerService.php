@@ -22,12 +22,14 @@ final class APIInventoryListenerService
     {
     }
 
-    public function validateJWTForInventoryController(
+    public function validateJWTAndParameterForInventoryController(
         RequestEvent $event,
         array $accessToken,
         array $params
     ): void
     {
+        $event->getRequest()->attributes->set('scopes', $accessToken['scopes']);
+
         if ($this->isRouteInventories($event, $accessToken, $params)) {
             return;
         }
@@ -56,7 +58,7 @@ final class APIInventoryListenerService
             return;
         }
 
-        if (($user->isPrivate() && !$this->securityService->hasClientPermissionForAdjustmentOnUserInventory($accessToken, $user, $event->getRequest(), $item) || !$user->isPrivate() && !$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForAdjustmentOnUserInventory($accessToken, $user, $event->getRequest(), $item))) {
+        if (($user->isPrivate() && !$this->securityService->hasClientPermissionForInventoryAction($accessToken, $user, $event->getRequest(), $item) || !$user->isPrivate() && !$event->getRequest()->isMethod('GET') && !$this->securityService->hasClientPermissionForInventoryAction($accessToken, $user, $event->getRequest(), $item))) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
 
             return;
@@ -121,7 +123,7 @@ final class APIInventoryListenerService
             return false;
         }
 
-        if ($user->isPrivate() && !$this->securityService->hasClientPermissionForAccessingUserRelatedData($accessToken, $user, $event->getRequest())) {
+        if ($user->isPrivate() && !$this->securityService->hasClientPermissionForInventoryAction($accessToken, $user, $event->getRequest(), null)) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
 
             return true;

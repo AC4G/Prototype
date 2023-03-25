@@ -8,15 +8,22 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;400;500&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="{{ asset('dist/style.css') }}">
+        <link rel="stylesheet" href="{{ asset('build/assets/style.css') }}">
         {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
         {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
+            {{ vite_entry_link_tags('app') }}
         {% endblock %}
-
         {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
+            {{ vite_entry_script_tags('app') }}
         {% endblock %}
+        <script type="module">
+            import RefreshRuntime from "http://localhost:5174/@react-refresh"
+            RefreshRuntime.injectIntoGlobalHook(window)
+            window.$RefreshReg$ = () => {}
+            window.$RefreshSig$ = () => (type) => type
+            window.__vite_plugin_react_preamble_installed__ = true
+        </script>
+        <script type="module" src="http://localhost:5174/src/main.ts" defer></script>
     </head>
     <body>
     {% for key, message in app.flashes('success') %}
@@ -28,5 +35,7 @@
         <div class="absolute w-full h-[100vh] left-[0px] top-[0px] right-[0px] bg-black bottom-[0px] opacity-0 z-[-1] transition-all" id="blur"></div>
         {% block body %}{% endblock %}
         <script src="{{ asset('js/basic/closeFlashMessage.js') }}"></script>
+    {% block scripts %}
+    {% endblock %}
     </body>
 </html>

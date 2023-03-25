@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Website\Dashboard;
+namespace App\Service\Website\Settings;
 
-use DateTime;
 use App\Entity\User;
 use App\Entity\UserToken;
-use chillerlan\QRCode\QRCode;
 use App\Repository\UserTokenRepository;
-use Symfony\Component\HttpFoundation\Request;
 use App\Service\Website\Account\AccountService;
+use chillerlan\QRCode\QRCode;
+use DateTime;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 final class ProfileService
 {

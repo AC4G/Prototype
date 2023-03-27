@@ -92,18 +92,6 @@
     "nikic/php-parser": {
         "version": "v4.13.2"
     },
-    "pentatrion/vite-bundle": {
-        "version": "3.1",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "1.0",
-            "ref": "33d48a1c831b2d29641175c8320e66a9f1c9911f"
-        },
-        "files": [
-            "config/routes/dev/pentatrion_vite.yaml"
-        ]
-    },
     "phpmetrics/phpmetrics": {
         "version": "v2.8.1"
     },

@@ -12,28 +12,21 @@
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
-        <script type="module">
-            import RefreshRuntime from "http://localhost:5174/@react-refresh"
-            RefreshRuntime.injectIntoGlobalHook(window)
-            window.$RefreshReg$ = () => {}
-            window.$RefreshSig$ = () => (type) => type
-            window.__vite_plugin_react_preamble_installed__ = true
-        </script>
-        <script type="module" src="http://localhost:5174/src/main.ts" defer></script>
         {% block javascripts %}
         {% endblock %}
     </head>
     <body>
-    {% for key, message in app.flashes('success') %}
-        {% include 'components/flashMessages/succes.twig' %}
-    {% endfor %}
-    {% for key, message in app.flashes('error') %}
-        {% include 'components/flashMessages/error.twig' %}
-    {% endfor %}
+        {% for key, message in app.flashes('success') %}
+            {% include 'components/flashMessages/succes.twig' %}
+        {% endfor %}
+        {% for key, message in app.flashes('error') %}
+            {% include 'components/flashMessages/error.twig' %}
+        {% endfor %}
         <div class="absolute w-full h-[100vh] left-[0px] top-[0px] right-[0px] bg-black bottom-[0px] opacity-0 z-[-1] transition-all" id="blur"></div>
         <div class="flex">
             {% include 'sideBar.html.twig' %}
-            {% block body %}{% endblock %}
+            {% block body %}
+            {% endblock %}
         </div>
         <script src="{{ asset('js/dashboard/navbar.js') }}"></script>
         <script src="{{ asset('js/basic/closeFlashMessage.js') }}"></script>

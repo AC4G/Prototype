@@ -13,5 +13,4 @@ return [
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
     Scheb\TwoFactorBundle\SchebTwoFactorBundle::class => ['all' => true],
     Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle::class => ['all' => true],
-    Pentatrion\ViteBundle\PentatrionViteBundle::class => ['all' => true],
 ];

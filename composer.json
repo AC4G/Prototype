@@ -16,7 +16,6 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.11",
         "firebase/php-jwt": "^6.2",
-        "pentatrion/vite-bundle": "^3.1",
         "predis/predis": "^2.1",
         "ramsey/uuid": "^4.7",
         "scheb/2fa-google-authenticator": "^6.4",

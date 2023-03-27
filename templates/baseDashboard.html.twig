@@ -8,26 +8,25 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;400;500&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="{{ asset('dist/style.css') }}">
+        <link rel="stylesheet" href="{{ asset('build/assets/style.css') }}">
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
-
         {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
         {% endblock %}
     </head>
     <body>
-    {% for key, message in app.flashes('success') %}
-        {% include 'components/flashMessages/succes.twig' %}
-    {% endfor %}
-    {% for key, message in app.flashes('error') %}
-        {% include 'components/flashMessages/error.twig' %}
-    {% endfor %}
+        {% for key, message in app.flashes('success') %}
+            {% include 'components/flashMessages/succes.twig' %}
+        {% endfor %}
+        {% for key, message in app.flashes('error') %}
+            {% include 'components/flashMessages/error.twig' %}
+        {% endfor %}
         <div class="absolute w-full h-[100vh] left-[0px] top-[0px] right-[0px] bg-black bottom-[0px] opacity-0 z-[-1] transition-all" id="blur"></div>
         <div class="flex">
             {% include 'sideBar.html.twig' %}
-            {% block body %}{% endblock %}
+            {% block body %}
+            {% endblock %}
         </div>
         <script src="{{ asset('js/dashboard/navbar.js') }}"></script>
         <script src="{{ asset('js/basic/closeFlashMessage.js') }}"></script>

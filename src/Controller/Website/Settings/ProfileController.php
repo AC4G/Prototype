@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Website\Dashboard;
+namespace App\Controller\Website\Settings;
 
 use App\Entity\User;
 use App\Serializer\UserNormalizer;
-use Symfony\Component\Security\Core\Security;
+use App\Service\Website\Account\AccountService;
+use App\Service\Website\Settings\ProfileService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\Website\Account\AccountService;
-use App\Service\Website\Dashboard\ProfileService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Security;
 
 class ProfileController extends AbstractController
 {

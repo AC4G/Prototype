@@ -172,8 +172,9 @@ class ItemRepository extends AbstractRepository
         $projectName = $inputBag->get('projectName');
         $creator = $inputBag->get('creator');
         $query = $inputBag->get('q');
+        $queryParameter = $inputBag->get('qp');
 
-        if ((bool)$inputBag->get('filter') === false || (is_null($projectName) && is_null($query) && (is_null($creator) && is_null($user)))) {
+        if ((bool)$inputBag->get('filter') === false || (is_null($projectName) && is_null($query) && is_null($queryParameter) && (is_null($creator) && is_null($user)))) {
             if (!is_null($user)) {
                 return $this->getItemIdsFromCacheByUuid($user->getUuid());
             }
@@ -195,11 +196,15 @@ class ItemRepository extends AbstractRepository
         }
 
         if (!is_null($query)) {
-            $query = '%' . $query . '%';
-
             $queryBuilder
                 ->andWhere('item.name LIKE :name')
-                ->setParameter('name', $query);
+                ->setParameter('name', '%' . $query . '%');
+        }
+
+        if (!is_null($queryParameter)) {
+            $queryBuilder
+                ->andWhere('item.parameter LIKE :parameter')
+                ->setParameter('parameter', '%' . $queryParameter . '%');
         }
 
         return $queryBuilder->getQuery()->getArrayResult();

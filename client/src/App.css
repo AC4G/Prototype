@@ -1,42 +1,57 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    @apply bg-black
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+p {
+    @apply text-white
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+p {
+    font-family: sans-serif;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+h1, h2, h3, h4, h5, h6 {
+    @apply text-white
 }
 
-.card {
-  padding: 2em;
+h1, h2, h3, h4, h5, h6 {
+    font-family: sans-serif;
 }
 
-.read-the-docs {
-  color: #888;
+#login-box {
+    @apply bg-[#222222] w-[400px] h-fit absolute rounded-lg
+}
+
+#login-box {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#login-content-box {
+    @apply relative w-full h-fit
+}
+
+.error-message-box {
+    @apply border-2 border-red-400 rounded w-[260px] h-fit pt-[8px] pb-[8px] pl-[30px] pr-[8px] mx-auto mt-[40px]
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    -webkit-text-fill-color: white;
+    -webkit-box-shadow: 0 0 0px 1000px #343434 inset;
+    box-shadow: 0 0 0px 1000px #343434 inset;
+    transition: background-color 5000s ease-in-out 0s;
+    color: white;
 }

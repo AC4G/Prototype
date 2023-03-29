@@ -25,25 +25,6 @@ final class InventoryController extends AbstractController
     {
     }
 
-    #[Route('/api/inventories', name: 'api_inventories', methods: [Request::METHOD_GET])]
-    public function getInventories(
-        Request $request
-    ): Response
-    {
-        $totalAmount = $this->inventoryRepository->count([]);
-        $limitAndOffset = $this->paginationService->calculateOffsetAndLimit($totalAmount, $request->query->all());
-        $inventories = $this->inventoryRepository->findBy([], ['id' => 'ASC'], $limitAndOffset['limit'], $limitAndOffset['offset']);
-
-        $normalizedInventories = $this->inventoryService->prepareData($inventories, null, 'api_all');
-
-        return $this->customResponse->payloadResponse($normalizedInventories, [
-            'totalPages' => $this->paginationService->getTotalPages(),
-            'currentPage' => $this->paginationService->getCurrentPage(),
-            'totalAmount' => $totalAmount,
-            'currentAmount' => count($normalizedInventories)
-        ]);
-    }
-
     #[Route('/api/inventories/{uuid}', name: 'api_inventory_by_uuid', methods: [Request::METHOD_GET])]
     public function getInventoryByUserId(
         Request $request,

@@ -1,10 +1,14 @@
 {
   "dependencies": {
+    "tailwindcss": "^3.3.0",
     "tailwindcss-autofill": "^1.0.2",
     "tailwindcss-shadow-fill": "^1.0.1",
     "tailwindcss-text-fill": "^0.2.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.14"
+  },
+  "scripts": {
+    "build:css": "tailwindcss -i src/CSS/style.css -o public/build/assets/style.css --watch"
   }
 }

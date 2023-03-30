@@ -10,9 +10,9 @@
         </div>
     {% endif %}
     <div class="w-fit h-fit mx-auto mt-[30px]">
-        <form action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="post">
+        <form action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="POST" id="twoFa">
             <div class="w-fit h-fit">
-                 <input autocomplete="off" class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px]" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="Type the verification code..." required="required" autofocus/>
+                 <input autocomplete="off" class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px] border-2 border-transparent transition" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="Type the verification code..." autofocus/>
             </div>
             <div class="h-[2px] w-[260px] bg-[#2e4053] rounded"></div>
             {% if isCsrfProtectionEnabled %}
@@ -28,4 +28,9 @@
             </div>
         </form>
     </div>
+    <script type="module">
+        import FormValidator from "{{ asset('build/js/FormValidator.js') }}";
+
+        const twoFa = new FormValidator('twoFa', { _auth_code: '_auth_code' })
+    </script>
 {% endblock %}

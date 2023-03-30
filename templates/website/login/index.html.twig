@@ -1,42 +1,49 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="relative top-[240px] w-fit mx-auto">
-        <div class="w-fit h-fit mx-auto">
-            <p class="text-black break-normal text-[28px] font-inter">Log In</p>
-        </div>
-        {% if error %}
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-4 rounded w-[384px] mx-auto mt-[18px]" role="alert">
-                <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    <div id="login-box">
+        <div id="login-content-box">
+            <div class="w-fit mx-auto mt-[50px]">
+                <p class="text-[22px]">Sign In</p>
             </div>
-        {% endif %}
-        <form action="{{ path('login') }}" method="post" class="relative top-[40px]">
-            <div class="w-[384px] h-fit relative mx-auto">
-                <p class="text-black text-[16px] font-inter">Nickname</p>
-                <input class="w-[384px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none" type="text" id="username" name="_username" placeholder="Enter your nickname.." value="{{ last_username }}" required>
-                <div class="h-[2px] w-[384px] bg-[#2e4053] rounded"></div>
+            <div class="w-fit h-fit mx-auto mt-[10px]">
+                <div class="w-fit h-fit mx-auto">
+                    <p class="text-[14px]">Connect to your STEXS account.</p>
+                </div>
+                <div class="w-fit h-fit flex">
+                    <p class="text-[14px]">Don't have an account?&nbsp;</p>
+                    <a href="/registration" class="text-[14px] text-[#4EA8DE] ">Sign up here</a>
+                </div>
             </div>
-            <div class="w-[384px] h-fit relative mx-auto top-[36px]">
-                <p class="text-black text-[16px] font-inter">Password</p>
-                <input class="w-[384px] text-[16px] mt-[22px] pb-[11px] font-inter focus:outline-none" type="password" id="password" name="_password" placeholder="Enter your password.." required>
-                <div class="h-[2px] w-[384px] bg-[#2e4053] rounded"></div>
+            {% if error %}
+                <div class="w-[240px] mx-auto h-fit flex justify-center border-2 border-[#ff5447] pt-[8px] pb-[8px] pl-[8px] pr-[8px] rounded mt-[20px]">
+                    <p class="text-[#ff5447] text-[14px]">{{ error.messageKey|trans(error.messageData, 'security') }}</p>
+                </div>
+            {% endif %}
+            <form action="{{ path('login') }}" method="POST" id="login">
+                <div class="w-fit h-fit mx-auto mt-[40px]">
+                    <div class="w-fit h-fit">
+                        <p class="text-[18px]">Nickname</p>
+                    </div>
+                    <input type="text" name="_username" class="rounded select-none text-white bg-[#343434] w-[260px] sm:w-[330px] h-[40px] pl-[12px] pr-[12px] mt-[12px] focus:outline-none border-2 border-transparent transition" placeholder="Enter your nickname..." value="{{ username }}" />
+                    <div class="w-fit h-fit mt-[24px]">
+                        <p class="text-[18px]">Password</p>
+                    </div>
+                    <input type="password" name="_password" class="rounded select-none text-white bg-[#343434] w-[260px] sm:w-[330px] h-[40px] pl-[12px] pr-[12px] mt-[12px] focus:outline-none border-2 border-transparent transition" placeholder="Enter your password..." />
+                </div>
+                <div class="w-fit h-fit mx-auto mt-[40px]">
+                    <button class="w-[80px] h-[35px] rounded bg-[#5E60CE] shadow-md text-white select-none hover:shadow-xl hover:text-black transition" type="submit">Log In</button>
+                </div>
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-            </div>
-            <div class="w-fit h-fit mx-auto mt-[70px] hover:shadow-xl transition">
-                <button class="text-[18px] font-inter w-[80px] h-[42px] bg-black text-white rounded" type="submit">Log In</button>
-            </div>
-        </form>
-        <div class="w-[384px] h-fit flex justify-between mt-[60px] mx-auto">
-            <div>
-                <a href="{{ path('registration_get') }}" class="text-grey font-inter text-[14px]">
-                    No account yet?
-                </a>
-            </div>
-            <div>
-                <a href="{{ path('password_forgotten') }}" class="text-grey font-inter text-[14px]">
-                    Password forgotten?
-                </a>
+            </form>
+            <div class="w-fit h-fit mx-auto mt-[30px] mb-[34px]">
+                <a href="/passwordForgotten" class="text-[14px] text-[#4EA8DE]">Forgot your password?</a>
             </div>
         </div>
     </div>
+    <script type="module">
+        import FormValidator from "{{ asset('build/js/FormValidator.js') }}";
+
+        const login = new FormValidator('login', { nickname: '_username', password: '_password' });
+    </script>
 {% endblock %}

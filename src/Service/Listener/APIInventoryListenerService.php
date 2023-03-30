@@ -30,10 +30,6 @@ final class APIInventoryListenerService
     {
         $event->getRequest()->attributes->set('scopes', $accessToken['scopes']);
 
-        if ($this->isRouteInventories($event, $accessToken, $params)) {
-            return;
-        }
-
         $uuid = $params['uuid'];
 
         $user = $this->userRepository->getUserByUuidFromCache($uuid);
@@ -91,25 +87,6 @@ final class APIInventoryListenerService
         if (is_null($inventory) && !$event->getRequest()->isMethod('POST')) {
             $event->setResponse($this->customResponse->errorResponse($event->getRequest(), sprintf('User has no item with id %s in inventory yet!', $itemId), 406));
         }
-    }
-
-    private function isRouteInventories(
-        RequestEvent $event,
-        array $accessToken,
-        array $params
-    ): bool
-    {
-        if (count($params) !== 0) {
-            return false;
-        }
-
-        if (!$this->securityService->isClientAdmin($accessToken)) {
-            $event->setResponse($this->customResponse->errorResponse($event->getRequest(), 'Permission denied!', 403));
-
-            return true;
-        }
-
-        return true;
     }
 
     private function isRouteInventoryByUuid(

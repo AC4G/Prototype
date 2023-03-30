@@ -214,13 +214,6 @@ final class SecurityService
         return $item['project']['id'] === $accessToken['project']['id'];
     }
 
-    public function isClientAdmin(
-        array $accessToken
-    ): bool
-    {
-        return in_array('ROLE_ADMIN', $accessToken['project']['developer']['roles']);
-    }
-
     public function nicknameExists(
         string $nickname
     ): bool

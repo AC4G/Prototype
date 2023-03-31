@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Inventory
  *
- * @ORM\Table(name="inventory", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="user_id_item_id_UNIQUE", columns={"user_id", "item_id"})}, indexes={@ORM\Index(name="fk_User_has_Item_Item1_idx", columns={"item_id"}), @ORM\Index(name="fk_User_has_Item_User1_idx", columns={"user_id"})})
+ * @ORM\Table(name="inventory", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="user_id_item_id_UNIQUE", columns={"user_id", "item_id"})}, indexes={@ORM\Index(name="fk_User_has_Item_Item1_idx", columns={"item_id"}), @ORM\Index(name="fk_User_has_Item_User1_idx", columns={"user_id"}), @ORM\Index(name="parameter_fulltext", columns={"parameter"}, flags={"fulltext"})})
  * @ORM\Entity(repositoryClass="App\Repository\InventoryRepository")
  */
 class Inventory

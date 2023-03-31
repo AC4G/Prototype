@@ -30,17 +30,17 @@ final class AccountService
     ): UserInterface
     {
         $nickname = $user->getNickname();
-        $dir = 'files/profile/' . $nickname . '/';
+        $dir = '../assets/files/profile/' . $nickname . '/';
         $extension = $this->getFileExtension($file);
         $newFileName = $nickname . '.' . $extension;
 
-        $this->deleteProfilePicture($user->getProfilePic(), $newFileName);
+        $this->deleteProfilePicture($user);
 
         $this->createUserProfileFolder($dir, $nickname);
 
         $file->move($dir, $newFileName);
 
-        $user->setProfilePic('/' . $dir . $newFileName);
+        $user->setProfilePic('/files/profile/' . $user->getUuid());
         $this->userRepository->flushEntity();
         $this->deleteUserCache($user);
 
@@ -60,32 +60,22 @@ final class AccountService
     ): void
     {
         if (!file_exists($dir)) {
-            mkdir('files/profile/' . $nickname);
+            mkdir('../assets/files/profile/' . $nickname);
         }
     }
 
     private function deleteProfilePicture(
-        ?string $oldProfilePicture,
-        string $newFileName
+        User $user
     ): void
     {
-        if (is_null($oldProfilePicture) || !$this->fileExists($oldProfilePicture)) {
-            return;
+        $files = glob('../assets/files/profile/' . $user->getNickname() . '/*');
+
+        foreach ($files as $file) {
+            if (is_file($file) && pathinfo($file)['filename'] === $user->getNickname()) {
+                unlink($file);
+                return;
+            }
         }
-
-        if ($this->newFileNameMatchesOldOne($oldProfilePicture, $newFileName)) {
-            return;
-        }
-
-        unlink($oldProfilePicture);
-    }
-
-    private function newFileNameMatchesOldOne(
-        string $oldProfilePicture,
-        string $newFileName
-    ): bool
-    {
-        return strpos($oldProfilePicture, $newFileName) > 0;
     }
 
     private function fileExists(

@@ -5,10 +5,14 @@ namespace App\Repository;
 use App\Entity\User;
 use App\Entity\Item;
 use App\Serializer\ItemNormalizer;
+use Doctrine\ORM\Query\Expr\Comparison;
+use Doctrine\ORM\Query\Expr\Func;
+use Doctrine\ORM\Query\Expr\Literal;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\HttpFoundation\InputBag;
+use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @method Item|null find($id, $lockMode = null, $lockVersion = null)
@@ -172,9 +176,8 @@ class ItemRepository extends AbstractRepository
         $projectName = $inputBag->get('projectName');
         $creator = $inputBag->get('creator');
         $query = $inputBag->get('q');
-        $queryParameter = $inputBag->get('qp');
 
-        if ((bool)$inputBag->get('filter') === false || (is_null($projectName) && is_null($query) && is_null($queryParameter) && (is_null($creator) && is_null($user)))) {
+        if ((bool)$inputBag->get('filter') === false || (is_null($projectName) && is_null($query) && (is_null($creator) && is_null($user)))) {
             if (!is_null($user)) {
                 return $this->getItemIdsFromCacheByUuid($user->getUuid());
             }
@@ -195,16 +198,16 @@ class ItemRepository extends AbstractRepository
                 ->setParameter('creator', $this->userRepository->getUserByUuidOrNicknameFromCache($creator));
         }
 
-        if (!is_null($query)) {
+        if (!is_null($query) && mb_strlen($query) > 4) {
             $queryBuilder
-                ->andWhere('item.name LIKE :name')
-                ->setParameter('name', '%' . $query . '%');
+                ->andWhere('MATCH (item.parameter, item.parameter) AGAINST (:query IN BOOLEAN MODE) > 0')
+                ->setParameter('query', $query);
         }
 
-        if (!is_null($queryParameter)) {
+        if (!is_null($query) && mb_strlen($query) <= 4) {
             $queryBuilder
-                ->andWhere('item.parameter LIKE :parameter')
-                ->setParameter('parameter', '%' . $queryParameter . '%');
+                ->andWhere('item.name LIKE :query')
+                ->setParameter('query', $query);
         }
 
         return $queryBuilder->getQuery()->getArrayResult();

@@ -159,10 +159,18 @@ class InventoryRepository extends AbstractRepository
                 ->setParameter('creator', $creator);
         }
 
-        if (!is_null($query)) {
+        if (!is_null($query) && mb_strlen($query) > 4) {
             $queryBuilder
-                ->andWhere('item.name LIKE :name')
-                ->setParameter('name', '%' . $query . '%');
+                ->andWhere('MATCH (inv.parameter) AGAINST (:query IN BOOLEAN MODE) > 0')
+                ->setParameter(':query', $query)
+                ->andWhere('MATCH (item.parameter, item.parameter) AGAINST (:query IN BOOLEAN MODE) > 0')
+                ->setParameter('query', $query);
+        }
+
+        if (!is_null($query) && mb_strlen($query) <= 4) {
+            $queryBuilder
+                ->andWhere('item.name LIKE :query')
+                ->setParameter('query', '%' . $query . '%');
         }
 
         return $queryBuilder->getQuery()->getArrayResult();

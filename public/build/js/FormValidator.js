@@ -3,7 +3,7 @@ export default function FormValidator(formName, inputs) {
 
     function isInputValid(event, name) {
         if (!event.target[name]['value']) {
-            errors.nickname = true;
+            errors[name] = true;
             event.target[name].style.borderColor = '#ff5447';
         }
 
@@ -19,7 +19,10 @@ export default function FormValidator(formName, inputs) {
             isInputValid(event, input);
         });
 
+        console.log(errors);
+
         if (Object.keys(errors).length > 0) {
+            Object.keys(errors).forEach(key => delete errors[key]);
             return;
         }
 

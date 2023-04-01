@@ -3,4 +3,4 @@ sensio_framework_extra:
         auto_convert: false
         converters: true
     router:
-        annotations: true
+        annotations: false

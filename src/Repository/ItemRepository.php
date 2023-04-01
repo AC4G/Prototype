@@ -207,7 +207,7 @@ class ItemRepository extends AbstractRepository
         if (!is_null($query) && mb_strlen($query) <= 4) {
             $queryBuilder
                 ->andWhere('item.name LIKE :query')
-                ->setParameter('query', $query);
+                ->setParameter('query', '%' . $query . '%');
         }
 
         return $queryBuilder->getQuery()->getArrayResult();

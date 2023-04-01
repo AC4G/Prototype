@@ -12,7 +12,7 @@
                 </div>
                 <div class="w-fit h-fit flex">
                     <p class="text-[14px]">Don't have an account?&nbsp;</p>
-                    <a href="/registration" class="text-[14px] text-[#4EA8DE] ">Sign up here</a>
+                    <a href="/registration" class="text-[14px] text-[#4EA8DE]">Sign up here</a>
                 </div>
             </div>
             {% if error %}
@@ -32,7 +32,7 @@
                     <input type="password" name="_password" class="rounded select-none text-white bg-[#343434] w-[260px] sm:w-[330px] h-[40px] pl-[12px] pr-[12px] mt-[12px] focus:outline-none border-2 border-transparent transition" placeholder="Enter your password..." />
                 </div>
                 <div class="w-fit h-fit mx-auto mt-[40px]">
-                    <button class="w-[80px] h-[35px] rounded bg-[#5E60CE] shadow-md text-white select-none hover:shadow-xl hover:text-black transition" type="submit">Log In</button>
+                    <button class="submit-button" type="submit">Log In</button>
                 </div>
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
             </form>

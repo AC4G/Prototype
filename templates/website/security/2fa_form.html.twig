@@ -1,32 +1,43 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="w-fit h-fit mx-auto mt-[360px]">
-        <p class="font-inter text-[24px] text-center">2-Step Verification</p>
-    </div>
-    {% if authenticationError %}
-        <div class="mx-auto mt-[20px] border-2 bg-red-100 border-red-400 rounded w-[260px] h-fit pt-[6px] pb-[6px] pl-[4px] pr-[4px]">
-            <p class="font-inter text-[14px] text-center break-normal opacity-[96%]">{{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}</p>
-        </div>
-    {% endif %}
-    <div class="w-fit h-fit mx-auto mt-[30px]">
-        <form action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="POST" id="twoFa">
-            <div class="w-fit h-fit">
-                 <input autocomplete="off" class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px] border-2 border-transparent transition" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="Type the verification code..." autofocus/>
+    <div id="twoFa-box">
+        <div id="twoFa-content-box">
+            <div class="w-fit mx-auto mt-[50px]">
+                <p class="text-[22px]">2-Step Verification</p>
             </div>
-            <div class="h-[2px] w-[260px] bg-[#2e4053] rounded"></div>
-            {% if isCsrfProtectionEnabled %}
-                <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
-            {% endif %}
-            <div class="w-[240px] h-fit mx-auto mt-[40px] flex justify-between">
-                <div class="w-fit h-fit pt-[6px]">
-                    <a class="font-inter text-[18px] hover:text-grey transition" href="{{ logoutPath }}">{{ "cancel"|trans({}, 'SchebTwoFactorBundle') }}</a>
-                </div>
+            <div class="w-fit h-fit mx-auto mt-[10px]">
                 <div class="w-fit h-fit">
-                    <button type="submit" class="font-inter text-[18px] text-white w-[80px] h-[40px] bg-black hover:text-grey transition rounded">Login</button>
+                    <p class="text-[14px]">Don't have access to authenticator?</p>
+                </div>
+                <div class="w-fit h-fit mx-auto">
+                    <p class="text-[14px]">Use the recovery token.</p>
                 </div>
             </div>
-        </form>
+            {% if authenticationError %}
+                <div class="w-[240px] mx-auto h-fit flex justify-center border-2 border-[#ff5447] pt-[8px] pb-[8px] pl-[8px] pr-[8px] rounded mt-[20px]">
+                    <p class="text-[#ff5447] text-[14px]">{{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}</p>
+                </div>
+            {% endif %}
+            <form action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="POST" id="twoFa">
+                <div class="w-fit h-fit mx-auto mt-[20px]">
+                    <input autocomplete="off" class="rounded select-none text-white bg-[#343434] w-[247.5px] h-[40px] pl-[12px] pr-[12px] mt-[12px] focus:outline-none border-2 border-transparent transition" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="Type the verification code..." autofocus/>
+                </div>
+                {% if isCsrfProtectionEnabled %}
+                    <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
+                {% endif %}
+                <div class="w-[247.5px] mx-auto h-fit mt-[40px] flex justify-between mb-[50px]">
+                    <a href="{{ logoutPath }}" class="w-[80px] h-[35px] rounded hover:bg-black transition">
+                        <div class="w-full h-full flex items-center justify-center">
+                            <p class="text-[16px] w-fit h-fit">Cancel</p>
+                        </div>
+                    </a>
+                    <div class="w-fit h-fit">
+                        <button type="submit" class="submit-button">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
     <script type="module">
         import FormValidator from "{{ asset('build/js/FormValidator.js') }}";

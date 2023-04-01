@@ -21,9 +21,9 @@ private.pem
 ###< ssl ###
 
 ###> files ###
-/assets/files/items
-/assets/files/profile
-/assets/files/project
+/assets/files/items/*
+/assets/files/profile/*
+/assets/files/project/*
 ###< files ###
 
 ##> npm ##

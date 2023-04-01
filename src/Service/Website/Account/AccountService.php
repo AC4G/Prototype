@@ -78,13 +78,6 @@ final class AccountService
         }
     }
 
-    private function fileExists(
-        ?string $oldProfilePicture
-    ): bool
-    {
-        return file_exists($oldProfilePicture);
-    }
-
     public function updateNickname(
         string $nickname,
         User $user

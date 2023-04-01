@@ -5,14 +5,10 @@ namespace App\Repository;
 use App\Entity\User;
 use App\Entity\Item;
 use App\Serializer\ItemNormalizer;
-use Doctrine\ORM\Query\Expr\Comparison;
-use Doctrine\ORM\Query\Expr\Func;
-use Doctrine\ORM\Query\Expr\Literal;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\HttpFoundation\InputBag;
-use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @method Item|null find($id, $lockMode = null, $lockVersion = null)

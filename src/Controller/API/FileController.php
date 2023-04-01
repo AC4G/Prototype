@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Controller\Website;
+namespace App\Controller\API;
 
-use App\Repository\UserRepository;
 use App\Repository\FileRepository;
+use App\Repository\UserRepository;
 use App\Service\Response\API\CustomResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

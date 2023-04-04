@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 :root {
-    @apply bg-black
+    @apply bg-[#121212]
 }
 
 p {
     @apply text-white
 }
 
-p {
+p, a {
     font-family: sans-serif;
 }
 
@@ -23,11 +23,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a {
-    @apply text-white
+    @apply text-white hover:bg-[#5E60CE] transition
+}
+
+details, summary {
+    @apply list-none
 }
 
 #login-box {
-    @apply bg-[#222222] w-[300px] h-fit absolute rounded-lg sm:w-[400px]
+    @apply bg-[#222222] w-[300px] h-fit absolute rounded-lg sm:w-[400px] drop-shadow-md
 }
 
 #login-box {
@@ -60,11 +64,11 @@ select:-webkit-autofill:focus {
     color: white;
 }
 
-#twoFa-box {
-    @apply bg-[#222222] w-[300px] h-fit absolute rounded-lg
+#twoFa-box, #twoFa-disable-box {
+    @apply bg-[#222222] w-[300px] h-fit absolute rounded-lg drop-shadow-md
 }
 
-#twoFa-box {
+#twoFa-box, #twoFa-disable-box {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -72,4 +76,22 @@ select:-webkit-autofill:focus {
 
 .submit-button {
     @apply w-[80px] h-[35px] rounded bg-[#5E60CE] shadow-md text-white text-[16px] select-none hover:shadow-xl hover:text-black transition
+}
+
+.menu {
+    @apply absolute w-[120px] h-fit px-[6px] py-[8px] bg-[#343434] shadow-md z-[100] rounded left-auto right-[0px] mt-[4px]
+}
+
+@media screen and (max-width: 550px) {
+    #navbar {
+        @apply grid grid-cols-1 grid-rows-2
+    }
+
+    #navbar nav {
+        @apply col-start-1 col-end-2 row-start-2 row-end-3 mx-auto mt-[8px]
+    }
+
+    #navbar div {
+        @apply col-start-1 col-end-2 row-start-1 row-end-2
+    }
 }

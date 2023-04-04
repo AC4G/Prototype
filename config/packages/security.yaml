@@ -47,8 +47,11 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/dashboard/profile, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/settings, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/dashboard, roles: ROLE_USER }
+        - { path: ^/developer, roles: ROLE_USER }
+        - { path: ^/creator, roles: ROLE_USER }
+        - { path: ^/inventory, roles: ROLE_USER }
 
 when@test:
     security:

@@ -19,8 +19,6 @@ export default function FormValidator(formName, inputs) {
             isInputValid(event, input);
         });
 
-        console.log(errors);
-
         if (Object.keys(errors).length > 0) {
             Object.keys(errors).forEach(key => delete errors[key]);
             return;

@@ -1,10 +1,10 @@
 {% extends 'base-without-components.html.twig' %}
 
 {% block body %}
-    <div id="twoFa-box">
-        <div id="twoFa-content-box">
+    <div id="twoFa-disable-box">
+        <div id="twoFa-disable-content-box">
             <div class="w-fit mx-auto mt-[50px]">
-                <p class="text-[22px]">2-Step Verification</p>
+                <p class="text-[22px]">Disable 2-Step Verification</p>
             </div>
             <div class="w-fit h-fit mx-auto mt-[10px]">
                 <div class="w-fit h-fit">
@@ -15,15 +15,16 @@
                 </div>
             </div>
             {% include 'website/components/formError.html.twig' %}
-            <form action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="POST" id="twoFa">
+            <form action="{{ path('two_factor_authentication_disable') }}" method="POST" id="twoFa-disable">
                 <div class="w-fit h-fit mx-auto mt-[20px]">
-                    <input autocomplete="off" class="rounded select-none text-white bg-[#343434] w-[247.5px] h-[40px] pl-[12px] pr-[12px] mt-[12px] focus:outline-none border-2 border-transparent transition" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="Type the verification code..." autofocus/>
+                    <input autocomplete="off" class="rounded select-none text-white bg-[#343434] w-[247.5px] h-[40px] pl-[12px] pr-[12px] mt-[12px] focus:outline-none border-2 border-transparent transition" id="code" type="text" name="code" placeholder="Type the verification code..." autofocus/>
+                    <input type="hidden" name="token" value="{{ csrf_token('disable_2fa') }}">
                 </div>
-                {% if isCsrfProtectionEnabled %}
-                    <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
-                {% endif %}
+                <div class="w-fit h-fit mx-auto mt-[30px]">
+                    <p class="text-[14px] text-center w-[240px]">By clicking 'Continue' you will remove your 2-Step Verification</p>
+                </div>
                 <div class="w-[247.5px] mx-auto h-fit mt-[40px] flex justify-between mb-[50px]">
-                    <a href="{{ logoutPath }}" class="w-[80px] h-[35px] rounded hover:bg-black transition">
+                    <a href="{{ path('settings_profile') }}" class="w-[80px] h-[35px] rounded hover:bg-black transition">
                         <div class="w-full h-full flex items-center justify-center">
                             <p class="text-[16px] w-fit h-fit">Cancel</p>
                         </div>
@@ -38,6 +39,6 @@
     <script type="module">
         import FormValidator from "{{ asset('build/js/FormValidator.js') }}";
 
-        const twoFa = new FormValidator('twoFa', { _auth_code: '_auth_code' })
+        const twoFaDisable = new FormValidator('twoFa-disable', { code: 'code' })
     </script>
 {% endblock %}

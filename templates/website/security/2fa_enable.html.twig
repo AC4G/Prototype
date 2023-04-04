@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'base-without-components.html.twig' %}
 
 {% block body %}
     <div class="w-fit h-fit mx-auto mt-[100px]">
@@ -18,7 +18,7 @@
             <p class="font-inter text-[14px]">Use this code</p>
         </div>
         <div class="max-w-[260px] h-fit mt-[8px]">
-            <p class="font-inter text-[16px] text-center break-all">{{ code }}</p>
+            <p class="font-inter text-[16px] text-center break-all">{{ secret }}</p>
         </div>
     </div>
     <div class="w-fit h-fit pt-[12px] pl-[6px] pb-[12px] pr-[6px] mt-[30px] border-2 border shadow rounded mx-auto">
@@ -31,7 +31,7 @@
         <div class="w-full h-[2px] bg-[#e5e7eb] mt-[12px]"></div>
         <div id="2fa-recovery-codes" class="flex w-[280px] h-[260px] mx-auto mt-[30px] flex-wrap gap-x-2 gap-y-0 justify-evenly">
             {% for token in reset_tokens %}
-                <p class="font-inter text-[14px] text-center w-fit h-fit token">{{ token.getToken }}</p>
+                <p class="font-inter text-[14px] text-center w-fit h-fit token">{{ token }}</p>
             {% endfor %}
         </div>
         <div class="w-fit h-fit mx-auto mb-[30px]">
@@ -45,8 +45,9 @@
             <p class="font-inter text-center text-[14px] font-bold">Safe the recovery codes secure, far from third parties!</p>
         </div>
     </div>
+    {% include 'website/components/formError.html.twig' %}
     <div class="w-fit h-fit mx-auto mt-[50px] mb-[100px]">
-        <form action="{{ path('dashboard_profile_two_factor_authentication') }}?action=enable" method="post">
+        <form action="{{ path('two_factor_authentication_enable') }}" method="post">
             <div class="w-fit h-fit mx-auto">
                 <input autocomplete="off" type="text" name="code" class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px]" placeholder="Type the verification code..." required/>
             </div>
@@ -54,7 +55,7 @@
             <input type="hidden" name="token" value="{{ csrf_token('enable_2fa') }}">
             <div class="w-[220px] h-fit mx-auto mt-[40px] flex justify-between">
                 <div class="w-fit h-fit mt-[8px]">
-                    <a href="{{ path('dashboard_profile_two_factor_authentication') }}?action=cancel">
+                    <a href="{{ path('settings_profile') }}">
                         <p class="font-inter text-[18px] hover:text-grey transition">Cancel</p>
                     </a>
                 </div>

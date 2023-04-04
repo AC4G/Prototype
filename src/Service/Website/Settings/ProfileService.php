@@ -2,15 +2,15 @@
 
 namespace App\Service\Website\Settings;
 
+use DateTime;
 use App\Entity\User;
 use App\Entity\UserToken;
-use App\Repository\UserTokenRepository;
-use App\Service\Website\Account\AccountService;
 use chillerlan\QRCode\QRCode;
-use DateTime;
+use App\Repository\UserTokenRepository;
+use Symfony\Component\HttpFoundation\Request;
+use App\Service\Website\Account\AccountService;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 final class ProfileService
 {
@@ -114,27 +114,23 @@ final class ProfileService
     }
 
     public function generateTwoStepVerificationOneTimeTokens(
-        User $user
+        User $user,
+        Request $request
     ): array
     {
-        $existingTokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-one-time']);
+        $existingTokens = $request->getSession()->get('2fa_one_time_tokens');
 
-        if (count($existingTokens) > 0) {
+        if (!is_null($existingTokens)) {
             return $existingTokens;
         }
 
         $tokens = [];
 
         for ($i = 0; $i < 10; $i++) {
-            $tokens[$i] = (new UserToken())
-                ->setUser($user)
-                ->setToken(bin2hex(random_bytes(8)))
-                ->setType('2fa-one-time')
-                ->setCreationDate(new DateTime())
-            ;
-
-            $this->userTokenRepository->persistAndFlushEntity($tokens[$i]);
+            $tokens[] = bin2hex(random_bytes(8));
         }
+
+        $request->getSession()->set('2fa_one_time_tokens', $tokens);
 
         return $tokens;
     }
@@ -156,6 +152,24 @@ final class ProfileService
     ): void
     {
         $this->accountService->setTwoFaVerified($user);
+    }
+
+    public function saveTwoStepOneTimeTokens(
+        User $user,
+        Request $request
+    ): void
+    {
+        $tokens = $request->getSession()->get('2fa_one_time_tokens');
+
+        foreach ($tokens as $token) {
+            $userToken = (new UserToken())
+                ->setUser($user)
+                ->setToken($token)
+                ->setType('2fa-one-time')
+                ->setCreationDate(new DateTime());
+
+            $this->userTokenRepository->persistAndFlushEntity($userToken);
+        }
     }
 
     public function removeTokensAndUnsetTwoFa(

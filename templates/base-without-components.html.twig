@@ -3,12 +3,9 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}Metaverse{% endblock %}</title>
+        <title>{% block title %}STEXS{% endblock %}</title>
         <link rel="icon" href="{% block icon %}{% endblock %}">
         <link rel="stylesheet" href="{{ asset('build/assets/style.css') }}">
-        <script src="{{ asset('build/js/jquery-3.6.4.min.js') }}"></script>
-        {% block stylesheets %}
-        {% endblock %}
         {% block javascripts %}
         {% endblock %}
     </head>
@@ -19,12 +16,7 @@
         {% for key, message in app.flashes('error') %}
             {% include 'components/flashMessages/error.twig' %}
         {% endfor %}
-            <div class="absolute w-full h-[100vh] left-[0px] top-[0px] right-[0px] bg-black bottom-[0px] opacity-0 z-[-1] transition-all" id="blur"></div>
-            {% include 'components/navbar.html.twig' %}
-            {% block body %}
-            {% endblock %}
-        {% block scripts %}
+        {% block body %}
         {% endblock %}
-        <script src="{{ asset('build/js/closeMenu.js') }}"></script>
     </body>
 </html>

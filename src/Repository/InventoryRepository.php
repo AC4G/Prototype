@@ -163,7 +163,7 @@ class InventoryRepository extends AbstractRepository
             $queryBuilder
                 ->andWhere('MATCH (inv.parameter) AGAINST (:query IN BOOLEAN MODE) > 0')
                 ->setParameter(':query', $query)
-                ->andWhere('MATCH (item.parameter, item.parameter) AGAINST (:query IN BOOLEAN MODE) > 0')
+                ->orWhere('MATCH (item.parameter, item.parameter) AGAINST (:query IN BOOLEAN MODE) > 0')
                 ->setParameter('query', $query);
         }
 

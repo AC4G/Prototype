@@ -1,0 +1,78 @@
+<div class="w-full h-fit bg-[#222222] shadow-lg px-[6px] py-3">
+    <div id="navbar" class="relative flex items-center mx-6 justify-center">
+        <div class="w-fit h-fit mr-auto">
+            <a href="{{ path('home') }}" class="block px-[6px] py-1 rounded text-[22px]">STEXS</a>
+        </div>
+        <nav class="w-fit">
+            <a href="{{ path('documentation') }}" class="w-full h-full flex items-center text-[18px] px-[6px] py-1 rounded">Documentation</a>
+        </nav>
+        <div class="w-fit h-fit flex gap-x-[20px] ml-auto">
+            {% if is_granted('ROLE_USER') %}
+                <details class="relative">
+                    <summary class="w-fit h-fit" aria-haspopup="menu" role="button">
+                        <div class="w-fit h-fit flex items-center py-[3px] px-[3px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" class="bi bi-plus" viewBox="0 0 16 16">
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                            </svg>
+                        </div>
+                    </summary>
+                    <div class="menu">
+                        <div class="w-full h-fit mx-auto text-center rounded px-[6px] py-[8px] bg-[#464646] shadow-md">
+                            <p class="text-[14px]">Create</p>
+                        </div>
+                        <div class="w-full h-fit px-[6px] mt-[8px] mb-[8px]">
+                            <div class="w-full h-[40px]">
+                                <a href="{{ path('developer_project_create') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded">Project</a>
+                            </div>
+                            <div class="w-full h-[40px] mt-[8px]">
+                                <a href="{{ path('creator_create_item') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded">Item</a>
+                            </div>
+                            <div class="w-full h-[40px] mt-[8px]">
+                                <a href="{{ path('creator_create_group') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded">Group</a>
+                            </div>
+                            <div class="w-full h-[40px] mt-[8px]">
+                                <a href="{{ path('creator_create_collection') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded">Collection</a>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+                <details class="relative">
+                    <summary class="rounded-md h-[30px] w-fit bg-[#343434] list-none px-[4px] py-[2px] flex items-center gap-x-1 shadow-md hover:bg-[#464646] transition" aria-haspopup="menu" role="button">
+                        <img src="{{ asset(user.profilePic) }}" class="rounded-full w-[28px] h-full object-cover select-none">
+                        <div class="w-fit h-fit">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="w-[12px] h-[12px]" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </div>
+                    </summary>
+                    <div class="menu">
+                        <div class="w-full h-fit mx-auto text-center rounded px-[6px] py-[8px] bg-[#464646] shadow-md">
+                            <p class="text-[14px]">Signed In as</p>
+                            <a href="#" class="text-[14px] block w-full rounded px-[6px] py-[4px]">{{ user.nickname|length > 9 ? user.nickname|slice(0,8) ~ '...' : user.nickname }}</a>
+                        </div>
+                        <div class="w-full h-fit px-[6px] mt-[8px] mb-[8px]">
+                            <div class="w-full h-[40px]">
+                                <a href="{{ path('dashboard') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded">Dashboard</a>
+                            </div>
+                            <div class="w-full h-[40px] mt-[8px]">
+                                <a href="{{ path('developer') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded">Developer</a>
+                            </div>
+                            <div class="w-full h-[40px] mt-[8px]">
+                                <a href="{{ path('creator') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded">Creator</a>
+                            </div>
+                            <div class="w-full h-[40px] mt-[8px]">
+                                <a href="{{ path('settings_profile') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded">Settings</a>
+                            </div>
+                        </div>
+                        <div class="h-[2px] w-full bg-white rounded-md"></div>
+                        <div class="w-full pt-[8px] px-[6px]">
+                            <a href="{{ path('logout') }}" class="text-[16px] block rounded px-[6px] py-[6px]">Sign Out</a>
+                        </div>
+                    </div>
+                </details>
+            {% else %}
+                <a href="{{ path('login') }}">Sign In</a>
+            {% endif %}
+        </div>
+    </div>
+</div>

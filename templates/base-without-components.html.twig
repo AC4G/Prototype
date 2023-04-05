@@ -6,6 +6,9 @@
         <title>{% block title %}STEXS{% endblock %}</title>
         <link rel="icon" href="{% block icon %}{% endblock %}">
         <link rel="stylesheet" href="{{ asset('build/assets/style.css') }}">
+        <script src="{{ asset('build/js/jquery-3.6.4.min.js') }}"></script>
+        {% block stylesheets %}
+        {% endblock %}
         {% block javascripts %}
         {% endblock %}
     </head>

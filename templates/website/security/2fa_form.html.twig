@@ -1,38 +1,36 @@
 {% extends 'base-without-components.html.twig' %}
 
 {% block body %}
-    <div id="twoFa-box">
-        <div id="twoFa-content-box">
-            <div class="w-fit mx-auto mt-[50px]">
-                <p class="text-[22px]">2-Step Verification</p>
-            </div>
-            <div class="w-fit h-fit mx-auto mt-[10px]">
-                <div class="w-fit h-fit">
-                    <p class="text-[14px]">Don't have access to authenticator?</p>
-                </div>
-                <div class="w-fit h-fit mx-auto">
-                    <p class="text-[14px]">Use the recovery token.</p>
-                </div>
-            </div>
-            <form action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="POST" id="twoFa">
-                <div class="w-fit h-fit mx-auto mt-[20px]">
-                    <input autocomplete="off" class="rounded select-none text-white bg-[#343434] w-[247.5px] h-[40px] pl-[12px] pr-[12px] mt-[12px] focus:outline-none border-2 border-transparent transition" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="Type the verification code..." autofocus/>
-                </div>
-                {% if isCsrfProtectionEnabled %}
-                    <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
-                {% endif %}
-                <div class="w-[247.5px] mx-auto h-fit mt-[40px] flex justify-between mb-[50px]">
-                    <a href="{{ logoutPath }}" class="w-[80px] h-[35px] rounded hover:bg-black transition">
-                        <div class="w-full h-full flex items-center justify-center">
-                            <p class="text-[16px] w-fit h-fit">Cancel</p>
-                        </div>
-                    </a>
-                    <div class="w-fit h-fit">
-                        <button type="submit" class="submit-button">Submit</button>
-                    </div>
-                </div>
-            </form>
+    <div class="twoFa-box">
+        <div class="w-fit mx-auto mt-[50px]">
+            <p class="text-[22px]">2-Step Verification</p>
         </div>
+        <div class="w-fit h-fit mx-auto mt-[10px]">
+            <div class="w-fit h-fit">
+                <p class="text-[14px]">Don't have access to authenticator?</p>
+            </div>
+            <div class="w-fit h-fit mx-auto">
+                <p class="text-[14px]">Use the recovery token.</p>
+            </div>
+        </div>
+        <form action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="POST" id="twoFa">
+            <div class="w-fit h-fit mx-auto mt-[20px]">
+                <input autocomplete="off" class="input" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="Type the verification code..." autofocus/>
+            </div>
+            {% if isCsrfProtectionEnabled %}
+                <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
+            {% endif %}
+            <div class="w-[247.5px] mx-auto h-fit mt-[40px] flex justify-between mb-[50px]">
+                <a href="{{ logoutPath }}" class="w-[80px] h-[35px] rounded hover:bg-black transition">
+                    <div class="w-full h-full flex items-center justify-center">
+                        <p class="text-[16px] w-fit h-fit">Cancel</p>
+                    </div>
+                </a>
+                <div class="w-fit h-fit">
+                    <button type="submit" class="submit-button">Submit</button>
+                </div>
+            </div>
+        </form>
     </div>
     <script type="module">
         import FormValidator from "{{ asset('build/js/FormValidator.js') }}";

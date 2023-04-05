@@ -6,7 +6,8 @@
     "tailwindcss-text-fill": "^0.2.0"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.14"
+    "autoprefixer": "^10.4.14",
+    "tailwind-scrollbar": "^3.0.0"
   },
   "scripts": {
     "build:css": "tailwindcss -i src/CSS/style.css -o public/build/assets/style.css --watch"

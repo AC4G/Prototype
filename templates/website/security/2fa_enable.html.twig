@@ -1,70 +1,81 @@
 {% extends 'base-without-components.html.twig' %}
 
 {% block body %}
-    <div class="w-fit h-fit mx-auto mt-[100px]">
-        <p class="font-inter text-[20px] text-center">2-Step Verification Set Up</p>
-    </div>
-    <div class="w-fit h-fit mx-auto text-center mt-[20px]">
-        <p class="font-inter text-[16px]">Scan this QR code with Authenticator App</p>
-    </div>
-    <div class="w-fit h-fit mx-auto">
-        <img class="mt-[20px] w-[200px] h-[200px]" src="{{ qrCode }}"/>
-    </div>
-    <details class="">
-        <summary class="w-fit h-fit mx-auto"  aria-haspopup="menu" role="button">
-            <p class="text-[14px] mx-auto">Can't scan the QR code?</p>
-        </summary>
-        <div class="w-fit mx-auto">
-            <div class="w-fit h-fit mx-auto mt-[4px]">
-                <p class="font-inter text-[14px]">Use this code</p>
+    <div class="w-fit h-fit mx-auto scroll-padding-top">
+        <div class="bg-[#222222] w-[300px] h-fit rounded-lg drop-shadow-md">
+            <div class="w-fit mx-auto pt-[50px] mt-[100px]">
+                <p class="text-[22px]">Enable 2-Step Verification</p>
             </div>
-            <div class="max-w-[260px] h-fit mt-[8px]">
-                <p class="font-inter text-[16px] text-center break-all">{{ secret }}</p>
+            <div class="w-fit h-fit mx-auto text-center mt-[10px]">
+                <p class="text-[14px]">Scan this QR code with Authenticator App</p>
             </div>
-        </div>
-    </details>
-    <div class="w-fit h-fit pt-[12px] pl-[6px] pb-[12px] pr-[6px] mt-[30px] border-2 border shadow rounded mx-auto">
-        <div class="w-fit h-fit mx-auto">
-            <p class="font-inter text-[16px]">Recovery Codes</p>
-        </div>
-        <div class="w-[280px] h-fit mx-auto mt-[12px]">
-            <p class="font-inter text-[14px] text-center break-normal">Recovery codes are used to access your account in the event you can not receive 2-Step verification codes.</p>
-        </div>
-        <div class="w-full h-[2px] bg-[#e5e7eb] mt-[12px]"></div>
-        <div id="2fa-recovery-codes" class="flex w-[280px] h-[260px] mx-auto mt-[30px] flex-wrap gap-x-2 gap-y-0 justify-evenly">
-            {% for token in reset_tokens %}
-                <p class="font-inter text-[14px] text-center w-fit h-fit token">{{ token }}</p>
-            {% endfor %}
-        </div>
-        <div class="w-fit h-fit mx-auto mb-[30px]">
-            <button id="copy-recovery-codes" class="h-[30px] w-[60px] rounded font-inter text-[16px] bg-[#e5e7eb] hover:bg-[#bcd7f7] shadow-md transition" type="button" onclick="copyRecoveryTokensToClipBoard()">Copy</button>
-            <div id="copied" class="select-none opacity-0 w-fit h-fit pr-[4px] pt-[2px] pl-[4px] pb-[2px] absolute inline-block mt-[2px] ml-[10px] rounded z-[10] bg-[#1a1b1c] transition">
-                <p class="font-inter text-[14px] text-white">Copied</p>
+            <div class="w-fit h-fit mx-auto mt-[20px] rounded bg-[#cfcdc8] shadow-lg">
+                <img class="w-[200px] h-[200px]" src="{{ qrCode }}"/>
             </div>
-        </div>
-        <div class="w-full h-[2px] bg-[#e5e7eb]"></div>
-        <div class="w-[280px] h-fit mx-auto mt-[12px] rounded bg-[#e5e7eb] pt-[6px] pl-[4px] pr-[4px] pb-[6px]">
-            <p class="font-inter text-center text-[14px] font-bold">Safe the recovery codes secure, far from third parties!</p>
-        </div>
-    </div>
-    <div class="w-fit h-fit mx-auto mt-[50px] mb-[100px]">
-        <form action="{{ path('two_factor_authentication_enable') }}" method="post">
-            <div class="w-fit h-fit mx-auto">
-                <input autocomplete="off" type="text" name="code" class="text-[16px] pl-[8px] pr-[8px] pb-[11px] font-inter focus:outline-none w-[260px]" placeholder="Type the verification code..." required/>
-            </div>
-            <div class="h-[2px] mx-auto w-[260px] bg-[#2e4053] rounded"></div>
-            <input type="hidden" name="token" value="{{ csrf_token('enable_2fa') }}">
-            <div class="w-[220px] h-fit mx-auto mt-[40px] flex justify-between">
-                <div class="w-fit h-fit mt-[8px]">
-                    <a href="{{ path('settings_profile') }}">
-                        <p class="font-inter text-[18px] hover:text-grey transition">Cancel</p>
-                    </a>
+            <details class="mt-[20px]">
+                <summary class="w-fit h-fit mx-auto"  aria-haspopup="menu" role="button">
+                    <p class="text-[14px] text-[#4EA8DE]">Can't scan the QR code?</p>
+                </summary>
+                <div class="w-fit mx-auto">
+                    <div class="w-fit h-fit mx-auto mt-[4px]">
+                        <p class="font-inter text-[14px]">Use this code</p>
+                    </div>
+                    <div class="max-w-[240px] h-fit mt-[8px]">
+                        <p class="font-inter text-[16px] text-center break-all">{{ secret }}</p>
+                    </div>
                 </div>
-                <div class="w-fit h-fit">
-                    <button class="font-inter text-[18px] text-white w-[90px] h-[40px] bg-black hover:text-grey transition rounded">Continue</button>
+            </details>
+            <div class="max-w-[280px] h-fit mx-auto px-[8px] py-[12px] bg-[#343434] rounded shadow-md mt-[20px]">
+                <div class="w-fit h-fit mx-auto px-[8px] py-[8px] bg-[#464646] rounded shadow-md">
+                    <p class="text-[14px]">Recovery tokens</p>
+                </div>
+                <div class="h-fit mt-[12px] mb-[20px] px-[14px]">
+                    <p class="text-[14px]">Recovery tokens are used to access your account in the event you can not receive 2-Step verification codes.</p>
+                </div>
+                <div class="w-full h-[2px] rounded bg-white"></div>
+                <div id="2fa-recovery-codes" class="flex w-fit h-fit mt-[20px] mx-auto hidden flex-wrap gap-x-2 gap-y-0 justify-evenly">
+                    {% for token in reset_tokens %}
+                        <p class="font-inter text-[14px] text-center w-fit h-fit token">{{ token }}</p>
+                    {% endfor %}
+                </div>
+                <div class="w-fit h-fit text-center mx-auto mt-[20px]">
+                    <p class="text-[14px]">Copy the codes by clicking the button!</p>
+                </div>
+                <div class="w-fit h-fit mx-auto mt-[20px] mb-[20px] flex">
+                    <button id="copy-recovery-codes" class="copy-button" type="button" onclick="copyRecoveryTokensToClipBoard()">Copy</button>
+                    <div id="copied" class="select-none w-fit h-fit pr-[4px] py-[2px] pl-[4px] absolute mt-[2px] hidden ml-[70px] rounded z-[10] bg-[#1a1b1c] transition">
+                        <p class="font-inter text-[14px] text-white">Copied</p>
+                    </div>
+                </div>
+                <div class="w-full h-[2px] rounded bg-white"></div>
+                <div class="w-fit h-fit mt-[20px] rounded border-2 border-[#f0a911] px-[14px] py-[8px] bg-[#464646] shadow-lg">
+                    <p class="text-[14px]">Safe the recovery tokens secure, far from third parties!</p>
                 </div>
             </div>
-        </form>
+            <form action="{{ path('two_factor_authentication_enable') }}" method="POST" id="twoFa-enable">
+                <div class="w-fit h-fit mt-[20px] mx-auto">
+                    <div class="w-fit h-fit">
+                        <input type="text" name="code" class="input" placeholder="Type the verification code..." autofocus/>
+                    </div>
+                    <input type="hidden" name="token" value="{{ csrf_token('enable_2fa') }}">
+                    <div class="w-[247.5px] mx-auto h-fit mt-[40px] flex justify-between pb-[50px] mb-[100px]">
+                        <a href="{{ path('settings_profile') }}" class="w-[80px] h-[35px] rounded hover:bg-black transition">
+                            <div class="w-full h-full flex items-center justify-center">
+                                <p class="text-[16px] w-fit h-fit">Cancel</p>
+                            </div>
+                        </a>
+                        <div class="w-fit h-fit">
+                            <button type="submit" class="submit-button">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-    <script src="{{ asset('js/profile/2faCode.js') }}"></script>
+    <script src="{{ asset('build/js/copyTwoFaCodes.js') }}"></script>
+    <script type="module">
+        import FormValidator from "{{ asset('build/js/FormValidator.js') }}";
+
+        const twoFaEnable = new FormValidator('twoFa-enable', { code: 'code' });
+    </script>
 {% endblock %}

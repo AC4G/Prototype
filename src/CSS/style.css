@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 :root {
-    @apply bg-[#121212]
+    @apply bg-[#121212] scrollbar scrollbar-thumb-[#464646] scrollbar-track-[#222222]
+}
+
+:root {
+    scroll-behavior: smooth;
 }
 
 p {
@@ -64,11 +68,11 @@ select:-webkit-autofill:focus {
     color: white;
 }
 
-#twoFa-box, #twoFa-disable-box {
+.twoFa-box {
     @apply bg-[#222222] w-[300px] h-fit absolute rounded-lg drop-shadow-md
 }
 
-#twoFa-box, #twoFa-disable-box {
+.twoFa-box {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -78,8 +82,16 @@ select:-webkit-autofill:focus {
     @apply w-[80px] h-[35px] rounded bg-[#5E60CE] shadow-md text-white text-[16px] select-none hover:shadow-xl hover:text-black transition
 }
 
+.copy-button {
+    @apply bg-[#9D4EDD] text-white select-none h-[30px] w-[60px] rounded text-[16px] hover:shadow-xl hover:text-black transition
+}
+
 .menu {
     @apply absolute w-[120px] h-fit px-[6px] py-[8px] bg-[#343434] shadow-md z-[100] rounded left-auto right-[0px] mt-[4px]
+}
+
+.input {
+    @apply rounded select-none text-white bg-[#343434] w-[247.5px] h-[40px] pl-[12px] pr-[12px] mt-[12px] focus:outline-none border-2 border-transparent transition
 }
 
 @media screen and (max-width: 550px) {

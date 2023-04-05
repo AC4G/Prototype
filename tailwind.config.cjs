@@ -12,6 +12,7 @@ module.exports = {
   plugins: [
     require("tailwindcss-autofill"),
     require("tailwindcss-shadow-fill"),
-    require("tailwindcss-text-fill")
+    require("tailwindcss-text-fill"),
+    require("tailwind-scrollbar")
   ],
 }

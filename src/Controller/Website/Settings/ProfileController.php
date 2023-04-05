@@ -53,7 +53,7 @@ class ProfileController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        if (!$user->isTwoFaVerified() && !$user->isGoogleAuthenticatorEnabled()) {
+        if (!$user->isTwoFaVerified()) {
             $this->addFlash('error', '2-Step Verification already disabled!');
 
             return $this->redirectToRoute('settings_profile');

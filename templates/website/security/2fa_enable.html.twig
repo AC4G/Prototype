@@ -10,17 +10,19 @@
     <div class="w-fit h-fit mx-auto">
         <img class="mt-[20px] w-[200px] h-[200px]" src="{{ qrCode }}"/>
     </div>
-    <div class="w-fit h-fit mx-auto">
-        <button id="cannot-scan-qr-code" class="font-inter text-[14px] mx-auto">Can't scan the QR code?</button>
-    </div>
-    <div id="code-2fa" class="w-fit h-fit mx-auto mt-[8px] hidden">
-        <div class="w-fit h-fit mx-auto mt-[4px]">
-            <p class="font-inter text-[14px]">Use this code</p>
+    <details class="">
+        <summary class="w-fit h-fit mx-auto"  aria-haspopup="menu" role="button">
+            <p class="text-[14px] mx-auto">Can't scan the QR code?</p>
+        </summary>
+        <div class="w-fit mx-auto">
+            <div class="w-fit h-fit mx-auto mt-[4px]">
+                <p class="font-inter text-[14px]">Use this code</p>
+            </div>
+            <div class="max-w-[260px] h-fit mt-[8px]">
+                <p class="font-inter text-[16px] text-center break-all">{{ secret }}</p>
+            </div>
         </div>
-        <div class="max-w-[260px] h-fit mt-[8px]">
-            <p class="font-inter text-[16px] text-center break-all">{{ secret }}</p>
-        </div>
-    </div>
+    </details>
     <div class="w-fit h-fit pt-[12px] pl-[6px] pb-[12px] pr-[6px] mt-[30px] border-2 border shadow rounded mx-auto">
         <div class="w-fit h-fit mx-auto">
             <p class="font-inter text-[16px]">Recovery Codes</p>
@@ -45,7 +47,6 @@
             <p class="font-inter text-center text-[14px] font-bold">Safe the recovery codes secure, far from third parties!</p>
         </div>
     </div>
-    {% include 'website/components/formError.html.twig' %}
     <div class="w-fit h-fit mx-auto mt-[50px] mb-[100px]">
         <form action="{{ path('two_factor_authentication_enable') }}" method="post">
             <div class="w-fit h-fit mx-auto">

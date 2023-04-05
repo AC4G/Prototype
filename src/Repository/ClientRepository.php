@@ -25,7 +25,7 @@ class ClientRepository extends AbstractRepository
         );
     }
 
-    public function getClientFromCacheByClientId(
+    public function getClientFromCacheById(
         string $clientId
     ): null|Client
     {

@@ -16,6 +16,7 @@ final class UserNormalizer
             return [
                 'uuid' => $user->getUuid(),
                 'nickname' => $user->getNickname(),
+                'email' => $user->getEmail(),
                 'profilePic' => $user->getProfilePic(),
                 'isPrivate' => $user->isPrivate(),
             ];

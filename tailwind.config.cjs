@@ -6,7 +6,7 @@ module.exports = {
 
     },
     fontSize: {
-      '10': '10px'
+
     }
   },
   plugins: [

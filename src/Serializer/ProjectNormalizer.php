@@ -18,13 +18,15 @@ final class ProjectNormalizer
             ];
         }
 
+        $organisation = $project->getOrganisation();
+
         return [
             'id' => $project->getId(),
             'projectName' => $project->getProjectName(),
-            'organisationName' => $project->getOrganisationName(),
-            'organisationEmail' => $project->getOrganisationEmail(),
-            'organisationLogo' => $project->getOrganisationLogo(),
-            'supportEmail' => $project->getSupportEmail(),
+            'organisationName' => $organisation->getOrganisationName(),
+            'organisationEmail' => $organisation->getOrganisationEmail(),
+            'organisationLogo' => $organisation->getOrganisationLogo(),
+            'supportEmail' => $organisation->getSupportEmail(),
             'creationDate' => $project->getCreationDate()
         ];
     }

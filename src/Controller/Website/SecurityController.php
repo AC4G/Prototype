@@ -122,7 +122,6 @@ final class SecurityController extends AbstractController
             return $this->renderForm('website/oauth/index.html.twig', [
                 'user' => $user,
                 'client' => $this->securityService->getClient(),
-                'organisation' => $this->securityService->getOrganisation(),
                 'webApp' => $this->securityService->getWebApp(),
                 'scopes' => $this->securityService->getScopes(),
                 'form' => $form,

@@ -19,7 +19,7 @@ class FileRepository
     ): string|null
     {
         return $this->cache->get('profile_picture_' . $user->getUuid(), function (ItemInterface $item) use ($user) {
-            $item->expiresAfter(86400);
+            $item->expiresAfter(3600);
 
             $files = glob('../assets/files/profile/' . $user->getNickname() . '/*');
 

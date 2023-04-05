@@ -12,19 +12,16 @@ use App\Repository\ClientRepository;
 use App\Repository\WebAppRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\AuthTokenRepository;
-use App\Repository\OrganisationRepository;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 final class SecurityService
 {
     private ?Client $client = null;
-    private ?Organisation $organisation = null;
     private ?WebApp $webApp = null;
     private array $scopes = [];
 
     public function __construct(
-        private readonly OrganisationRepository $organisationRepository,
         private readonly AuthTokenRepository $authTokenRepository,
         private readonly ProjectRepository $projectRepository,
         private readonly ClientRepository $clientRepository,
@@ -71,10 +68,6 @@ final class SecurityService
 
         if (is_null($this->client)) {
             $errors[] = 'Client not found!';
-        }
-
-        if (!is_null($this->client)) {
-            $this->organisation = $this->organisationRepository->getOrganisationFromCacheById($this->client->getProject()->getOrganisation()->getId());
         }
 
         if (!is_null($this->client) && $this->hasClientAuthTokenFromUserAndIsNotExpired($user, $this->client)) {
@@ -148,11 +141,6 @@ final class SecurityService
     public function getClient(): ?Client
     {
         return $this->client;
-    }
-
-    public function getOrganisation(): ?Organisation
-    {
-        return $this->organisation;
     }
 
     public function getWebApp(): ?WebApp

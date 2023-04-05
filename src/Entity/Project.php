@@ -40,6 +40,13 @@ class Project
     private Organisation $organisation;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="with_invitation", type="boolean", nullable=false)
+     */
+    private bool $withInvitation;
+
+    /**
      * @var DateTime
      *
      * @ORM\Column(name="creation_date", type="datetime", nullable=false)
@@ -80,6 +87,18 @@ class Project
         $this->organisation = $organisation;
 
         return $this;
+    }
+
+    public function setWithInvitation(bool $withInvitation): self
+    {
+        $this->withInvitation = $withInvitation;
+
+        return $this;
+    }
+
+    public function isWithInvitation(): bool
+    {
+        return $this->withInvitation;
     }
 
     public function getCreationDate(): ?DateTime

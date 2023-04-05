@@ -42,15 +42,18 @@ class StorageRepository extends AbstractRepository
 
     public function updateValueById(
         int $id,
-        string $value
+        string $value,
+        int $length
     ): void
     {
         $query = $this->createQueryBuilder('s')
             ->update('App:Storage', 's')
             ->set('s.value', ':value')
+            ->set('s.length', ':length')
             ->where('s.id = :id')
             ->setParameter('value', $value)
             ->setParameter('id', $id)
+            ->setParameter('length', $length)
             ->getQuery()
         ;
 

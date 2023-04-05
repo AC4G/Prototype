@@ -45,6 +45,13 @@ class Storage
      */
     private string $value;
 
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="length", type="integer", nullable=false)
+     */
+    private int $length;
+
     public function getId(): int
     {
         return $this->id;
@@ -89,6 +96,18 @@ class Storage
     public function setValue(string $value): self
     {
         $this->value = $value;
+
+        return $this;
+    }
+
+    public function getLength(): int
+    {
+        return $this->length;
+    }
+
+    public function setLength(int $length): self
+    {
+        $this->length = $length;
 
         return $this;
     }

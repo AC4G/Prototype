@@ -43,7 +43,7 @@ final class SecurityController extends AbstractController
             return $this->customResponse->errorResponse($request, 'Client credentials required!', 406);
         }
 
-        $client = $this->clientRepository->getClientFromCacheByClientId($content['client_id']);
+        $client = $this->clientRepository->getClientFromCacheById($content['client_id']);
 
         if (is_null($client) || $client->getClientSecret() !== $content['client_secret']) {
             return $this->customResponse->errorResponse($request, 'Permission denied!', 403);

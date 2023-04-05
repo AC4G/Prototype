@@ -4,7 +4,7 @@
     <div class="relative max-w-[1000px] mx-auto h-fit top-[180px] w-fit">
         <div class="flex w-[300px] h-fit justify-evenly">
             <div class="relative w-[90px] h-[90px] rounded-full bg-[#2e4053]">
-                {% if client is not null and client.project.organisationLogo is not null %}<img src="{{ asset(client.project.organisationLogo) }}" class="mt-[2px] ml-[2px] object-cover w-[86px] h-[86px] rounded-full select-none">{% endif %}
+                {% if client is not null and organisation.organisationLogo is not null %}<img src="{{ asset(organisation.organisationLogo) }}" class="mt-[2px] ml-[2px] object-cover w-[86px] h-[86px] rounded-full select-none">{% endif %}
             </div>
             <div class="w-fit h-fit relative top-[30px]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" class="fill-[#2e4053]" viewBox="0 0 16 16">

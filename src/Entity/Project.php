@@ -30,32 +30,14 @@ class Project
     private string $projectName;
 
     /**
-     * @var string
+     * @var Organisation
      *
-     * @ORM\Column(name="organisation_name", type="string", length=255, nullable=false)
+     * @ORM\ManyToOne(targetEntity="Organisation", fetch="EAGER")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="organisation_id", referencedColumnName="id", onDelete="CASCADE")
+     * })
      */
-    private string $organisationName;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="organisation_email", type="string", length=255, nullable=false)
-     */
-    private string $organisationEmail;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="organisation_logo", type="text", length=0, nullable=true)
-     */
-    private ?string $organisationLogo;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="support_email", type="string", length=255, nullable=false)
-     */
-    private string $supportEmail;
+    private Organisation $organisation;
 
     /**
      * @var DateTime
@@ -88,50 +70,14 @@ class Project
         return $this;
     }
 
-    public function getOrganisationName(): ?string
+    public function getOrganisation(): Organisation
     {
-        return $this->organisationName;
+        return $this->organisation;
     }
 
-    public function setOrganisationName(string $organisationName): self
+    public function setOrganisation(Organisation $organisation): self
     {
-        $this->organisationName = $organisationName;
-
-        return $this;
-    }
-
-    public function getOrganisationEmail(): ?string
-    {
-        return $this->organisationEmail;
-    }
-
-    public function setOrganisationEmail(string $organisationEmail): self
-    {
-        $this->organisationEmail = $organisationEmail;
-
-        return $this;
-    }
-
-    public function getOrganisationLogo(): ?string
-    {
-        return $this->organisationLogo;
-    }
-
-    public function setOrganisationLogo(?string $organisationLogo): self
-    {
-        $this->organisationLogo = $organisationLogo;
-
-        return $this;
-    }
-
-    public function getSupportEmail(): ?string
-    {
-        return $this->supportEmail;
-    }
-
-    public function setSupportEmail(string $supportEmail): self
-    {
-        $this->supportEmail = $supportEmail;
+        $this->organisation = $organisation;
 
         return $this;
     }

@@ -3,7 +3,9 @@
 namespace App\Controller\Website;
 
 use App\Entity\User;
-use App\Form\OAuth\OAuthFormType;
+use App\Repository\ScopeRepository;
+use App\Repository\ClientRepository;
+use App\Repository\WebAppRepository;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +22,9 @@ final class SecurityController extends AbstractController
 
     public function __construct(
         private readonly AuthenticationUtils $authenticationUtils,
+        private readonly ClientRepository $clientRepository,
+        private readonly WebAppRepository $webAppRepository,
+        private readonly ScopeRepository $scopeRepository,
         private readonly SecurityService $securityService,
         private readonly Security $security
     )
@@ -111,27 +116,59 @@ final class SecurityController extends AbstractController
         }
 
         $query = $request->query->all();
-        $errors = $this->securityService->validateQuery($query);
 
-        $request->getSession()->set('redirect', $request->getRequestUri());
-
-        $form = $this->createForm(OAuthFormType::class);
-        $form->handleRequest($request);
-
-        if ((count($errors) === 0 && count($errors = $this->securityService->prepareParameter($query, $user)) > 0) || !$form->isSubmitted() || !$form->isValid() || count($errors) > 0) {
-            return $this->renderForm('website/oauth/index.html.twig', [
-                'user' => $user,
-                'client' => $this->securityService->getClient(),
-                'webApp' => $this->securityService->getWebApp(),
-                'scopes' => $this->securityService->getScopes(),
-                'form' => $form,
-                'errors' => $errors
+        if (!$this->securityService->isQueryValid($query)) {
+            return $this->render('website/oauth/error.html.twig', [
+                'error' => 'OAuth url is not valid!'
             ]);
         }
 
-        $request->getSession()->remove('redirect');
+        $client = $this->clientRepository->getClientFromCacheById($query['client_id']);
 
-        return $this->redirect($this->securityService->createAuthTokenAndBuildRedirectURI($query, $user));
+        if (is_null($client)) {
+            return $this->render('website/oauth/error.html.twig', [
+                'error' => 'The client not found!'
+            ]);
+        }
+
+        $webApp = $this->webAppRepository->getWebAppFromCacheByClient($client);
+
+        if (is_null($webApp)) {
+            return $this->render('website/oauth/error.html.twig', [
+                'error' => 'Web app not found!'
+            ]);
+        }
+
+        if ($this->securityService->hasClientAuthTokenFromUserAndIsNotExpired($user, $client)) {
+            return $this->render('website/oauth/error.html.twig', [
+                'error' => 'Auth token already created!'
+            ]);
+        }
+
+        $scopes = $this->scopeRepository->getScopesByIds($webApp->getScopes());
+
+        if (count($scopes) === 0) {
+            return $this->render('website/oauth/error.html.twig', [
+                'error' => 'The client has wrong settings!'
+            ]);
+        }
+
+        if (!$this->securityService->areScopesQualified($query, $scopes)) {
+            return $this->render('website/oauth/error.html.twig', [
+                'error' => 'Given scopes are not qualified!'
+            ]);
+        }
+
+        if (!$request->isMethod('POST')) {
+            return $this->renderForm('website/oauth/index.html.twig', [
+                'user' => $user,
+                'client' => $client,
+                'webApp' => $webApp,
+                'scopes' => $scopes
+            ]);
+        }
+
+        return $this->redirect($this->securityService->createAuthTokenAndBuildRedirectURI($query, $user, $client, $webApp, $scopes));
     }
 
 }

@@ -23,7 +23,7 @@ private.pem
 ###> files ###
 /assets/files/items/*
 /assets/files/profile/*
-/assets/files/project/*
+/assets/files/organisation/*
 ###< files ###
 
 ##> npm ##

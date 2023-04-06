@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-    @apply bg-[#121212] scrollbar scrollbar-thumb-[#464646] scrollbar-track-[#222222]
+    @apply bg-[#121212] scrollbar scrollbar-thumb-[#464646]
 }
 
 :root {
@@ -26,7 +26,7 @@ h1, h2, h3, h4, h5, h6 {
     font-family: sans-serif;
 }
 
-a {
+.a {
     @apply text-white hover:bg-[#5E60CE] transition
 }
 
@@ -72,7 +72,7 @@ select:-webkit-autofill:focus {
     @apply bg-[#222222] w-[300px] h-fit absolute rounded-lg drop-shadow-md
 }
 
-.twoFa-box {
+.box-center {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

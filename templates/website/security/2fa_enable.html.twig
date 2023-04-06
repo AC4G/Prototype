@@ -53,7 +53,7 @@
             <form action="{{ path('two_factor_authentication_enable') }}" method="POST" id="twoFa-enable">
                 <div class="w-fit h-fit mt-[20px] mx-auto">
                     <div class="w-fit h-fit">
-                        <input type="text" name="code" class="input" placeholder="Type the verification code..." autofocus/>
+                        <input type="text" name="code" class="input" placeholder="XXXXXX" autofocus/>
                     </div>
                     <input type="hidden" name="token" value="{{ csrf_token('enable_2fa') }}">
                     <div class="w-[247.5px] mx-auto h-fit mt-[40px] flex justify-between pb-[50px] mb-[100px]">

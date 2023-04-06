@@ -1,97 +1,71 @@
 {% extends 'base-without-components.html.twig' %}
 
 {% block body %}
-    <div class="relative max-w-[1000px] mx-auto h-fit top-[180px] w-fit">
-        <div class="flex w-[300px] h-fit justify-evenly">
-            <div class="relative w-[90px] h-[90px] rounded-full bg-[#2e4053]">
-                {% if client is not null and client.project.organisation.organisationLogo is not null %}<img src="{{ asset(client.project.organisation.organisationLogo) }}" class="mt-[2px] ml-[2px] object-cover w-[86px] h-[86px] rounded-full select-none">{% endif %}
+    <div class="box-center bg-[#222222] w-[300px] h-fit absolute rounded-lg drop-shadow-md px-[14px]">
+        <div class="h-fit mt-[50px] flex justify-evenly">
+            <div class="relative w-[90px] h-[90px] rounded-full bg-[#343434]">
+                <img src="{{ asset(client.project.organisation.organisationLogo) }}" class="mt-[2px] ml-[2px] object-cover w-[86px] h-[86px] rounded-full select-none">
             </div>
             <div class="w-fit h-fit relative top-[30px]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" class="fill-[#2e4053]" viewBox="0 0 16 16">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" class="fill-[#464646]" viewBox="0 0 16 16">
                     <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
                 </svg>
             </div>
-            <div class="w-[90px] h-[90px] rounded-full bg-[#2e4053]">
+            <div class="w-[90px] h-[90px] rounded-full bg-[#343434] items-center">
                 {% if user.profilePic is not null %}
                     <img src="{{ asset(user.profilePic) }}" class="mt-[2px] ml-[2.2px] object-cover w-[86px] h-[86px] rounded-full select-none">
-                {% else %}
-                    <div class="rounded-full w-fit h-fit bg-white mt-[2px] ml-[2.2px]">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="86" height="86" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
-                        </svg>
-                    </div>
                 {% endif %}
             </div>
         </div>
-        {% if not (errors is empty) %}
-            <div id="error-box" class="bg-red-100 border border-red-400 text-red-700 px-4 py-4 rounded w-[300px] mx-auto mt-[20px] mb-[20px]" role="alert">
-                <ul class="px-4 list-decimal font-inter text-[14px]">
-                    {% for error in errors%}
-                        <li>
-                            <p class="font-inter text-[14px]">{{ error }}</p>
-                        </li>
-                    {%  endfor %}
-                </ul>
+        <div class="w-[240px] mx-auto h-fit mt-[16px]">
+            <p class="text-[18px] font-bold text-center break-words">{{ webApp.name }}</p>
+        </div>
+        <div class="w-fit h-fit mx-auto">
+            <p class="text-[14px]">wants to access your account!</p>
+        </div>
+        <div class="w-fit h-fit flex mx-auto">
+            <p class="text-[14px]">Signed in as&ensp;</p>
+            <p class="text-[14px] font-bold">{{ user.getNickname|length > 10 ? user.getNickname|slice(0,10) ~ '...' : user.getNickname }}&ensp;</p>
+            <a href="{{ path('logout') }}" class="text-[14px] text-[#4EA8DE]">Not you?</a>
+        </div>
+        <div class="h-fit w-full bg-[#343434] shadow-md rounded py-[14px] mt-[20px]">
+            <div class="w-fit h-fit mx-auto px-[8px] py-[8px] bg-[#464646] rounded shadow-md">
+                <p class="font-inter text-[16px] font-bold">This will allow {{ client.project.projectName|length > 12 ? client.project.projectName|slice(0,12) ~ '...' : client.project.projectName }} to</p>
             </div>
-        {% endif %}
-        <div class="w-fit mx-auto h-fit mt-[16px]">
-            {% if client is not null %}
-                <p class="font-inter text-[18px] font-bold">{{ client.project.projectName }}</p>
-            {% endif %}
-        </div>
-        <div class="w-fit h-fit mx-auto mt-[-4px]">
-            <p class="font-inter text-[14px] select-none">wants to access your account</p>
-        </div>
-        <div class="w-fit h-fit flex mx-auto mt-[4px]">
-            <p class="font-inter text-[14px] select-none">Signed in as&ensp;</p>
-            <p class="font-inter text-[14px] font-bold">{{ user.getNickname|length > 10 ? user.getNickname|slice(0,10) ~ '...' : user.getNickname }}</p>
-            <a href="{{ path('logout') }}">
-                <p class="font-inter text-[14px] text-[#223dd6]">&ensp;Not you?</p>
-            </a>
-        </div>
-        <div class="mx-auto h-[2px] bg-[#ebebeb] w-[94%] rounded mt-[14px] mb-[12px]"></div>
-        <div class="max-h-[200px] overflow-auto scrollbar-hide">
-            {% if client is not null and webApp is not null %}
-                <div class="w-fit h-fit mx-auto">
-                    <p class="font-inter text-[16px] font-bold select-none">This will allow {{ client.project.projectName|length > 12 ? client.project.projectName|slice(0,12) ~ '...' : client.project.projectName }} to:</p>
-                </div>
-                <div class="w-[240px] h-fit mx-auto mt-[12px]">
-                    <ul class="px-4 list-disc">
+            <div class="w-[240px] max-h-[200px] mx-auto mt-[12px] overflow-auto scrollbar scrollbar-thumb-[#464646] scrollbar-track-[#343434] scrollbar-thin">
+                <ul class="px-[20px] list-disc marker:text-white">
                     {% for scope in scopes %}
                         <li>
-                            <p class="font-inter text-[14px]">{{ scope.description }}</p>
+                            <p class="font-inter text-[15px]">{{ scope.description }}</p>
                         </li>
                     {% endfor %}
-                    </ul>
+                </ul>
+            </div>
+        </div>
+        <div class="w-[240px] h-fit mx-auto mt-[20px]">
+            <p class="text-[14px] text-center">By clicking 'Authorize', you allow this app to use and manipulate your information.</p>
+        </div>
+        <form method="POST">
+            <div class="w-fit h-fit mt-[20px] mx-auto">
+                <input type="hidden" name="token" value="{{ csrf_token('oauth') }}">
+                <div class="w-[247.5px] mx-auto h-fit mt-[20px] flex justify-between">
+                    <a href="{{ path('settings_profile') }}" class="w-[80px] h-[35px] rounded hover:bg-black transition">
+                        <div class="w-full h-full flex items-center justify-center">
+                            <p class="text-[16px] w-fit h-fit select-none">Cancel</p>
+                        </div>
+                    </a>
+                    <div class="w-fit h-fit">
+                        <button type="submit" class="submit-button">Authorize</button>
+                    </div>
                 </div>
-            {% else %}
-                <div class="w-[300px] h-[60px]"></div>
-            {% endif %}
-        </div>
-        <div class="mx-auto h-[2px] bg-[#ebebeb] w-[94%] rounded mt-[14px] mb-[20px]"></div>
-        <div class="w-[260px] h-fit mx-auto mb-[20px]">
-            <p class="font-inter text-[12px] text-center break-normal">By clicking Authorize, you allow this app to use and manipulate your information.</p>
-        </div>
-        <div class="w-[300px] h-fit flex justify-between">
-            <div class="h-[30px] w-fit ml-[18px]">
-                <a class="hover:text-grey transition inline-block align-middle" href="{{ path('home') }}">
-                    <p class="font-inter text-[16px]">Cancel</p>
-                </a>
             </div>
-            <div class="w-fit h-fit mr-[18px]">
-                {{ form(form) }}
-            </div>
-            <script src="{{ asset('js/oauth/blockAuthorization.js') }}"></script>
-        </div>
-        <div class="w-fit h-fit mx-auto mt-[16px]">
+        </form>
+        <div class="w-[240px] h-fit mx-auto mt-[20px] mb-[20px]">
             <div class="w-fit h-fit mx-auto">
-                <p class="font-inter text-[12px]">Authorizing will redirect to</p>
+                <p class="text-[14px]">Authorizing will redirect you to</p>
             </div>
-            <div class="w-fit h-fit mx-auto">
-            {% if webApp is not null %}
-                <p class="font-inter text-[12px] font-bold">{{ webApp.redirectUrl|length > 40 ? webApp.redirectUrl|slice(0,40) ~ '...' : webApp.redirectUrl }}</p>
-            {% endif %}
+            <div class="h-fit mx-auto">
+                <p class="text-[14px] font-bold text-center break-words">{{ webApp.redirectUrl }}</p>
             </div>
         </div>
     </div>

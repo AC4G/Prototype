@@ -127,7 +127,7 @@ final class SecurityController extends AbstractController
 
         if (is_null($client)) {
             return $this->render('website/oauth/error.html.twig', [
-                'error' => 'The client not found!'
+                'error' => 'The client was not found!'
             ]);
         }
 
@@ -135,7 +135,7 @@ final class SecurityController extends AbstractController
 
         if (is_null($webApp)) {
             return $this->render('website/oauth/error.html.twig', [
-                'error' => 'Web app not found!'
+                'error' => 'The web app was not found!'
             ]);
         }
 

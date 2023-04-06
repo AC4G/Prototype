@@ -36,5 +36,18 @@ class ScopeRepository extends AbstractRepository
         });
     }
 
+    public function getScopesByIds(
+        array $ids
+    ): array
+    {
+        $scopes = [];
+
+        foreach ($ids as $id) {
+            $scopes[] = $this->getScopeById($id);
+        }
+
+        return $scopes;
+    }
+
 
 }

@@ -2,43 +2,41 @@
 
 {% block body %}
     <div id="login-box">
-        <div id="login-content-box">
-            <div class="w-fit mx-auto mt-[50px]">
-                <p class="text-[22px]">Sign In</p>
+        <div class="w-fit mx-auto mt-[50px]">
+            <p class="text-[22px]">Sign In</p>
+        </div>
+        <div class="w-fit h-fit mx-auto mt-[10px]">
+            <div class="w-fit h-fit mx-auto">
+                <p class="text-[14px]">Connect to your STEXS account.</p>
             </div>
-            <div class="w-fit h-fit mx-auto mt-[10px]">
-                <div class="w-fit h-fit mx-auto">
-                    <p class="text-[14px]">Connect to your STEXS account.</p>
-                </div>
-                <div class="w-fit h-fit flex">
-                    <p class="text-[14px]">Don't have an account?&nbsp;</p>
-                    <a href="/registration" class="text-[14px] text-[#4EA8DE]">Sign up here</a>
-                </div>
+            <div class="w-fit h-fit flex">
+                <p class="text-[14px]">Don't have an account?&nbsp;</p>
+                <a href="/registration" class="text-[14px] text-[#4EA8DE]">Sign up here</a>
             </div>
-            {% if error %}
-                <div class="w-[240px] mx-auto h-fit flex justify-center border-2 border-[#ff5447] pt-[8px] pb-[8px] pl-[8px] pr-[8px] rounded mt-[20px]">
-                    <p class="text-[#ff5447] text-[14px]">{{ error.messageKey|trans(error.messageData, 'security') }}</p>
-                </div>
-            {% endif %}
-            <form action="{{ path('login') }}" method="POST" id="login">
-                <div class="w-fit h-fit mx-auto mt-[40px]">
-                    <div class="w-fit h-fit">
-                        <p class="text-[18px]">Nickname</p>
-                    </div>
-                    <input type="text" name="_username" class="input sm:w-[330px]" placeholder="Enter your nickname..." value="{{ username }}" />
-                    <div class="w-fit h-fit mt-[24px]">
-                        <p class="text-[18px]">Password</p>
-                    </div>
-                    <input type="password" name="_password" class="input sm:w-[330px]" placeholder="Enter your password..." />
-                </div>
-                <div class="w-fit h-fit mx-auto mt-[40px]">
-                    <button class="submit-button" type="submit">Log In</button>
-                </div>
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-            </form>
-            <div class="w-fit h-fit mx-auto mt-[30px] mb-[34px]">
-                <a href="/passwordForgotten" class="text-[14px] text-[#4EA8DE]">Forgot your password?</a>
+        </div>
+        {% if error %}
+            <div class="w-[240px] mx-auto h-fit flex justify-center border-2 border-[#ff5447] pt-[8px] pb-[8px] pl-[8px] pr-[8px] rounded mt-[20px]">
+                <p class="text-[#ff5447] text-[14px]">{{ error.messageKey|trans(error.messageData, 'security') }}</p>
             </div>
+        {% endif %}
+        <form action="{{ path('login') }}" method="POST" id="login">
+            <div class="w-fit h-fit mx-auto mt-[40px]">
+                <div class="w-fit h-fit">
+                    <p class="text-[18px]">Nickname</p>
+                </div>
+                <input type="text" name="_username" class="input sm:w-[330px]" placeholder="Enter your nickname..." value="{{ username }}" />
+                <div class="w-fit h-fit mt-[24px]">
+                    <p class="text-[18px]">Password</p>
+                </div>
+                <input type="password" name="_password" class="input sm:w-[330px]" placeholder="Enter your password..." />
+            </div>
+            <div class="w-fit h-fit mx-auto mt-[40px]">
+                <button class="submit-button" type="submit">Log In</button>
+            </div>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+        </form>
+        <div class="w-fit h-fit mx-auto mt-[30px] mb-[34px]">
+            <a href="/passwordForgotten" class="text-[14px] text-[#4EA8DE]">Forgot your password?</a>
         </div>
     </div>
     <script type="module">

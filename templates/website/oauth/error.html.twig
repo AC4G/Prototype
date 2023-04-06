@@ -1,0 +1,17 @@
+{% include 'base-without-components.html.twig' %}
+
+{% block body %}
+    <div class="box-center bg-[#222222] w-[300px] h-fit absolute rounded-lg drop-shadow-md px-[20px] py-[14px]">
+        <div class="w-[240px] border-2 border-[#ff5447] rounded mx-auto px-[6px] py-[14px]">
+            <div class="w-full h-fit">
+                <p class="text-[18px] text-center">{{ error }}</p>
+            </div>
+        </div>
+        <div class="w-[240px] mx-auto h-fit mt-[20px]">
+            <p class="text-center text-[16px]">Contact your client to fix this error!</p>
+        </div>
+        <div class="w-fit h-fit mx-auto mt-[20px] mb-[20px]">
+            <button class="submit-button" onclick="window.location.href='{{ path('home') }}';">Home</button>
+        </div>
+    </div>
+{% endblock %}

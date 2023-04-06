@@ -1,7 +1,7 @@
 {% extends 'base-without-components.html.twig' %}
 
 {% block body %}
-    <div class="twoFa-box">
+    <div class="twoFa-box box-center">
         <div class="w-fit mx-auto mt-[50px]">
             <p class="text-[22px]">Disable 2-Step Verification</p>
         </div>
@@ -15,7 +15,7 @@
         </div>
         <form action="{{ path('two_factor_authentication_disable') }}" method="POST" id="twoFa-disable">
             <div class="w-fit h-fit mx-auto mt-[20px]">
-                <input autocomplete="off" class="input" id="code" type="text" name="code" placeholder="Type the verification code..." autofocus/>
+                <input autocomplete="off" class="input" id="code" type="text" name="code" placeholder="XXXXXX" autofocus/>
                 <input type="hidden" name="token" value="{{ csrf_token('disable_2fa') }}">
             </div>
             <div class="w-fit h-fit mx-auto mt-[30px]">

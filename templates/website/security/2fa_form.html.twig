@@ -1,7 +1,7 @@
 {% extends 'base-without-components.html.twig' %}
 
 {% block body %}
-    <div class="twoFa-box">
+    <div class="twoFa-box box-center">
         <div class="w-fit mx-auto mt-[50px]">
             <p class="text-[22px]">2-Step Verification</p>
         </div>
@@ -15,7 +15,7 @@
         </div>
         <form action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="POST" id="twoFa">
             <div class="w-fit h-fit mx-auto mt-[20px]">
-                <input autocomplete="off" class="input" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="Type the verification code..." autofocus/>
+                <input autocomplete="off" class="input" id="_auth_code" type="text" name="{{ authCodeParameterName }}" placeholder="XXXXXX" autofocus/>
             </div>
             {% if isCsrfProtectionEnabled %}
                 <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">

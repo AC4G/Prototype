@@ -4,7 +4,7 @@
     <div class="box-center bg-[#222222] w-[300px] h-fit absolute rounded-lg drop-shadow-md px-[14px]">
         <div class="h-fit mt-[50px] flex justify-evenly">
             <div class="relative w-[90px] h-[90px] rounded-full bg-[#343434]">
-                <img src="{{ asset(client.project.organisation.organisationLogo) }}" class="mt-[2px] ml-[2px] object-cover w-[86px] h-[86px] rounded-full select-none">
+                <img src="{{ asset(client.project.projectLogo) }}" class="mt-[2px] ml-[2px] object-cover w-[86px] h-[86px] rounded-full select-none">
             </div>
             <div class="w-fit h-fit relative top-[30px]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" class="fill-[#464646]" viewBox="0 0 16 16">
@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="w-[240px] mx-auto h-fit mt-[16px]">
-            <p class="text-[18px] font-bold text-center break-words">{{ webApp.name }}</p>
+            <p class="text-[18px] font-bold text-center break-words">{{ client.project.projectName }}</p>
         </div>
         <div class="w-fit h-fit mx-auto">
             <p class="text-[14px]">wants to access your account!</p>

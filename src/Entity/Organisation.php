@@ -37,11 +37,11 @@ class Organisation
     private string $organisationEmail;
 
     /**
-     * @var string|null
+     * @var string
      *
-     * @ORM\Column(name="organisation_logo", type="string", length=255, nullable=true)
+     * @ORM\Column(name="organisation_logo", type="string", length=255, nullable=false)
      */
-    private ?string $organisationLogo;
+    private string $organisationLogo;
 
     /**
      * @var string
@@ -93,12 +93,12 @@ class Organisation
         return $this;
     }
 
-    public function getOrganisationLogo(): ?string
+    public function getOrganisationLogo(): string
     {
         return $this->organisationLogo;
     }
 
-    public function setOrganisationLogo(?string $organisationLogo): self
+    public function setOrganisationLogo(string $organisationLogo): self
     {
         $this->organisationLogo = $organisationLogo;
 

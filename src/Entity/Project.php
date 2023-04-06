@@ -30,6 +30,13 @@ class Project
     private string $projectName;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="project_logo", type="string", length=255, nullable=false)
+     */
+    private string $projectLogo;
+
+    /**
      * @var Organisation
      *
      * @ORM\ManyToOne(targetEntity="Organisation", fetch="EAGER")
@@ -73,6 +80,18 @@ class Project
     public function setProjectName(string $projectName): self
     {
         $this->projectName = $projectName;
+
+        return $this;
+    }
+
+    public function getProjectLogo(): string
+    {
+        return $this->projectLogo;
+    }
+
+    public function setProjectLogo(string $projectLogo): self
+    {
+        $this->projectLogo = $projectLogo;
 
         return $this;
     }

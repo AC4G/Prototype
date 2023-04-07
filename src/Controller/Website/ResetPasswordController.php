@@ -2,7 +2,6 @@
 
 namespace App\Controller\Website;
 
-use DateTime;
 use App\Service\ThrottlingService;
 use App\Form\ResetPassword\CodeFormType;
 use App\Form\ResetPassword\EmailFormType;
@@ -27,6 +26,10 @@ final class ResetPasswordController extends AbstractController
         Request $request
     ): Response
     {
+        if (!is_null($this->getUser())) {
+            return $this->redirectToRoute('home');
+        }
+
         $email = $request->query->get('newCode');
 
         if (!is_null($email) && str_contains($this->resetPasswordService->validateEmail(['email' => urldecode($email)]), 'Reset code already sent to this Email')) {
@@ -35,17 +38,13 @@ final class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('password_forgotten_verify');
         }
 
-        if (!is_null($this->getUser()) && $this->isGranted('IS_AUTHENTICATED_FULLY')) {
-            return $this->redirectToRoute('home');
-        }
-
         $form = $this->createForm(EmailFormType::class);
 
         if (!$request->isMethod('POST')) {
             return $this->renderForm('website/resetPassword/email.html.twig', [
                 'error' => null,
                 'form' => $form,
-                'email' => ''
+                'email' => null
             ]);
         }
 
@@ -56,7 +55,7 @@ final class ResetPasswordController extends AbstractController
             return $this->renderForm('website/resetPassword/email.html.twig', [
                 'error' => $error,
                 'form' => $form,
-                'email' => array_key_exists('email', $form->getData()) ? urlencode($form->getData()['email']) : ''
+                'email' => !is_null($form->getData()['email']) && str_contains($error, 'Reset code already sent') ? urlencode($form->getData()['email']) : null
             ]);
         }
 
@@ -70,14 +69,14 @@ final class ResetPasswordController extends AbstractController
         Request $request
     ): Response
     {
-        if (!is_null($this->getUser()) && $this->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if (!is_null($this->getUser())) {
             return $this->redirectToRoute('home');
         }
 
         $email = $request->getSession()->get('reset_password_email');
 
         if (is_null($email)) {
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('password_forgotten');
         }
 
         $form = $this->createForm(CodeFormType::class);
@@ -88,7 +87,7 @@ final class ResetPasswordController extends AbstractController
             $entryExists = $this->resetPasswordService->entryExists($email);
 
             if ($entryExists === false) {
-                $this->addFlash('error', 'Retype your Email again!');
+                $this->addFlash('error', 'Retype your email again!');
 
                 return $this->redirectToRoute('password_forgotten');
             }
@@ -144,14 +143,14 @@ final class ResetPasswordController extends AbstractController
         Request $request
     ): Response
     {
-        if (!is_null($this->getUser()) && $this->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if (!is_null($this->getUser())) {
             return $this->redirectToRoute('home');
         }
 
         $isVerified = $request->getSession()->get('is_verified_for_reset_password');
 
         if ($isVerified !== true) {
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('password_forgotten');
         }
 
         $form = $this->createForm(ResetPasswordFormType::class);

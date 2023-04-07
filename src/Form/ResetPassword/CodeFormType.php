@@ -21,21 +21,16 @@ final class CodeFormType extends AbstractType
                 'constraints' => [
                     new NotBlank(),
                 ],
-                'required' => true,
+                'required' => false,
                 'attr' => [
-                    'class' => 'r-pwd-input',
-                    'placeholder' => 'Place code here...',
+                    'placeholder' => 'XXXXXX',
                     'autocomplete' => false,
                     'inputmode' => 'numeric',
                     'pattern' => '[0-9]*'
                 ],
                 'label' => false
             ])
-            ->add('submit', SubmitType::class, [
-                'attr' => [
-                    'class' => 'r-pwd-submit'
-                ]
-            ])
+            ->add('submit', SubmitType::class)
         ;
     }
 

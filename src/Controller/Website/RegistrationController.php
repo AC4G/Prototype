@@ -4,7 +4,6 @@ namespace App\Controller\Website;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Form\Registration\RegistrationFormType;
@@ -19,8 +18,7 @@ final class RegistrationController extends AbstractController
     public function __construct(
         private readonly VerifyEmailHelperInterface $verifyEmailHelper,
         private readonly RegistrationService $registrationService,
-        private readonly UserRepository $userRepository,
-        private readonly Security $security
+        private readonly UserRepository $userRepository
     )
     {
     }
@@ -30,7 +28,7 @@ final class RegistrationController extends AbstractController
         Request $request
     ): Response
     {
-        if ($this->security->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if (!is_null($this->getUser())) {
             return $this->redirectToRoute('home');
         }
 
@@ -50,7 +48,7 @@ final class RegistrationController extends AbstractController
         Request $request
     ): Response
     {
-        if ($this->security->isGranted('IS_AUTHENTICATED_FULLY')) {
+        if (!is_null($this->getUser())) {
             return $this->redirectToRoute('home');
         }
 

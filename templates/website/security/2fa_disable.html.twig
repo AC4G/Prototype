@@ -13,6 +13,7 @@
                 <p class="text-[14px]">Use the recovery token.</p>
             </div>
         </div>
+        {% include 'website/components/formError.html.twig' %}
         <form action="{{ path('two_factor_authentication_disable') }}" method="POST" id="twoFa-disable">
             <div class="w-fit h-fit mx-auto mt-[20px]">
                 <input autocomplete="off" class="input" id="code" type="text" name="code" placeholder="XXXXXX" autofocus/>

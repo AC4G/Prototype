@@ -50,6 +50,7 @@
                     <p class="text-[14px]">Safe the recovery tokens secure, far from third parties!</p>
                 </div>
             </div>
+            {% include 'website/components/formError.html.twig' %}
             <form action="{{ path('two_factor_authentication_enable') }}" method="POST" id="twoFa-enable">
                 <div class="w-fit h-fit mt-[20px] mx-auto">
                     <div class="w-fit h-fit">

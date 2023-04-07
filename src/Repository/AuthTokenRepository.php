@@ -32,7 +32,7 @@ class AuthTokenRepository extends AbstractRepository
         return $this->cache->get('authToken_' . $code, function (ItemInterface $item) use ($code) {
             $item->expiresAfter(86400);
 
-            $this->findOneBy(['authToken' => $code]);
+            return $this->findOneBy(['authToken' => $code]);
         });
     }
 

@@ -1,39 +1,41 @@
 {% extends 'base-without-components.html.twig' %}
 
 {% block body %}
-    <div class="w-fit h-fit mx-auto mt-[300px]">
-        <div class="h-fit w-fit mx-auto">
-            <p class="text-[24px] font-inter break-normal">Reset your password</p>
+    <div class="box-center bg-[#222222] w-[300px] h-fit absolute rounded-lg drop-shadow-md px-[20px] py-[14px]">
+        <div class="h-fit w-fit mx-auto mt-[50px]">
+            <p class="text-[22px]">Reset your password</p>
         </div>
-        {% if error is not null %}
-            <div class="mx-auto mt-[20px] border-2 bg-red-100 border-red-400 rounded w-[260px] h-fit pt-[6px] pb-[6px]">
-                <p class="font-inter text-[14px] text-center break-normal opacity-[96%]">{{ error }}</p>
-            </div>
-        {% endif %}
         <div class="w-[240px] h-fit mx-auto mt-[20px]">
-            <p class="text-[14px] font-inter break-normal text-center">Enter your user verified Email address to receive a code from us.</p>
+            <p class="text-[14px] text-center">Enter your user verified Email address to receive a code from us.</p>
         </div>
-        {{ form_start(form) }}
-            <div class="h-fit w-fit mx-auto mt-[10px]">
-                {{ form_row(form.email) }}
-            </div>
-            <div class="h-[2px] w-[260px] bg-[#2e4053] rounded"></div>
-            {{ form_row(form.token) }}
-            <div class="w-[220px] h-fit flex mx-auto justify-between  mt-[40px]">
-                <div class="h-fit w-fit pt-[6px]">
-                    <a class="hover:text-grey transition inline-block align-middle" href="{{ path('login') }}">
-                        <p class="font-inter text-[16px]">Cancel</p>
-                    </a>
+        {% include 'website/components/formError.html.twig' %}
+        {{ form_start(form, { 'attr': { 'id': 'reset-password-email' } }) }}
+        <div class="h-fit w-fit mx-auto mt-[20px]">
+            {{ form_widget(form.email, { 'attr': { 'class': 'input' } }) }}
+        </div>
+        {{ form_widget(form.token) }}
+        <div class="w-[247.5px] mx-auto h-fit mt-[40px] flex justify-between {% if email is null %} mb-[50px] {% endif %}">
+            <a href="{{ path('home') }}" class="w-[80px] h-[35px] rounded hover:bg-black transition">
+                <div class="w-full h-full flex items-center justify-center">
+                    <p class="text-[16px] w-fit h-fit">Cancel</p>
                 </div>
-                <div class="h-fit w-fit">
-                    {{ form_row(form.submit) }}
-                </div>
+            </a>
+            <div class="w-fit h-fit">
+                {{ form_widget(form.submit, { 'attr': { 'class': 'submit-button' } }) }}
             </div>
+        </div>
         {{ form_end(form) }}
-        <div class="w-fit h-fit mx-auto mt-[20px]">
-            <a href="{{ path('password_forgotten') }}?newCode={{ email }}" class="hover:text-grey transition">
-                <p class="font-inter text-[14px]">Request new code</p>
+        {% if email is not null %}
+        <div class="w-fit h-fit mx-auto mt-[20px] mb-[20px]">
+            <a href="{{ path('password_forgotten') }}?newCode={{ email }}">
+                <p class="text-[14px] text-[#4EA8DE]">Request new code</p>
             </a>
         </div>
+        {% endif %}
     </div>
+    <script type="module">
+        import FormValidator from "{{ asset('build/js/FormValidator.js') }}";
+
+        const resetPasswordEmail = new FormValidator('reset-password-email', { email_form_email: 'email_form_email' })
+    </script>
 {% endblock %}

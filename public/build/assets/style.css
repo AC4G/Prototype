@@ -1609,11 +1609,6 @@ select:-webkit-autofill:focus {
   transition-duration: 150ms;
 }
 
-.input:focus {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-}
-
 @media screen and (max-width: 550px) {
   #navbar {
     display: grid;

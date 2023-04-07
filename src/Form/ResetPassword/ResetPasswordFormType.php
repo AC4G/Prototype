@@ -21,7 +21,7 @@ final class ResetPasswordFormType extends AbstractType
         $builder
             ->add('password',  RepeatedType::class, [
                 'type' => PasswordType::class,
-                'required' => true,
+                'required' => false,
                 'constraints' => [
                     new NotBlank(),
                     new Length([
@@ -31,23 +31,17 @@ final class ResetPasswordFormType extends AbstractType
                 'first_options'  => [
                     'label' => false,
                     'attr' => [
-                        'class' => 'r-pwd-input',
                         'placeholder' => 'Enter your new password..'
                     ]
                 ],
                 'second_options' => [
                     'label' => false,
                     'attr' => [
-                        'class' => 'r-pwd-input',
                         'placeholder' => 'Repeat password..'
                     ]
                 ],
             ])
-            ->add('save', SubmitType::class, [
-                'attr' => [
-                    'class' => 'r-pwd-submit'
-                ]
-            ])
+            ->add('save', SubmitType::class)
         ;
     }
 

@@ -21,18 +21,13 @@ final class EmailFormType extends AbstractType
                 'constraints' => [
                     new NotBlank(),
                 ],
-                'required' => true,
+                'required' => false,
                 'attr' => [
-                    'class' => 'r-pwd-input',
-                    'placeholder' => 'Enter your Email...'
+                    'placeholder' => 'Enter your email...'
                 ],
                 'label' => false
             ])
-            ->add('submit', SubmitType::class, [
-                'attr' => [
-                    'class' => 'r-pwd-submit'
-                ]
-            ])
+            ->add('submit', SubmitType::class)
         ;
     }
 

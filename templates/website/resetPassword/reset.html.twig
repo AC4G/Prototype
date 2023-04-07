@@ -1,16 +1,19 @@
 {% extends 'base-without-components.html.twig' %}
 
 {% block body %}
-    <div class="w-fit h-fit mx-auto mt-[280px]">
-        <div class="h-fit w-fit mx-auto">
-            <p class="text-[24px] font-inter break-normal">Change password for</p>
+    <div class="box-center bg-[#222222] w-[300px] h-fit absolute rounded-lg drop-shadow-md px-[20px] py-[14px]">
+        <div class="h-fit w-fit mx-auto mt-[50px]">
+            <p class="text-[22px]">Change password for</p>
         </div>
-        <div class="h-fit w-fit mx-auto">
-            <p class="text-[24px] font-inter break-normal">{{ email }}</p>
+        <div class="h-fit w-[240px] mx-auto mt-[10px]">
+            <p class="text-[16px] font-bold text-center break-words">{{ email }}</p>
+        </div>
+        <div class="w-[240px] h-fit mx-auto mt-[20px]">
+            <p class="text-[14px] text-center">Password must be at least 10 characters long.</p>
         </div>
         {% if error is not null or form_errors(form.password.first)|length > 0 %}
-            <div class="mx-auto mt-[20px] border-2 bg-red-100 border-red-400 rounded w-[260px] h-fit pt-[6px] pb-[6px] pl-[8px] pr-[8px]">
-                <p class="font-inter text-[14px] text-center break-normal opacity-[96%]">
+            <div class="w-[240px] mx-auto h-fit flex justify-center border-2 border-[#ff5447] pt-[8px] pb-[8px] pl-[8px] pr-[8px] rounded mt-[40px]">
+                <p class="text-[16px] text-center text-[#ff5447]">
                     {% if error is null %}
                         {{ form_errors(form.password.first) }}
                     {% else %}
@@ -19,29 +22,29 @@
                 </p>
             </div>
         {% endif %}
-        <div class="w-[240px] h-fit mx-auto mt-[20px]">
-            <p class="text-[14px] font-inter break-normal text-center">Password must be at least 10 characters long.</p>
-        </div>
-        {{ form_start(form) }}
+        {{ form_start(form, { 'attr': { 'id': 'reset-password' } }) }}
         <div class="h-fit w-fit mx-auto mt-[10px]">
-            {{ form_widget(form.password.first) }}
+            {{ form_widget(form.password.first, { 'attr': { 'class': 'input' } }) }}
         </div>
-        <div class="h-[2px] w-[260px] bg-[#2e4053] rounded"></div>
         <div class="h-fit w-fit mx-auto mt-[10px]">
-            {{ form_widget(form.password.second) }}
+            {{ form_widget(form.password.second, { 'attr': { 'class': 'input' } }) }}
         </div>
-        <div class="h-[2px] w-[260px] bg-[#2e4053] rounded"></div>
         {{ form_row(form.token) }}
-        <div class="w-[220px] h-fit flex mx-auto justify-between mt-[40px]">
-            <div class="h-fit w-fit pt-[6px]">
-                <a class="hover:text-grey transition inline-block align-middle" href="{{ path('login') }}">
-                    <p class="font-inter text-[16px]">Cancel</p>
-                </a>
-            </div>
-            <div class="h-fit w-fit">
-                {{ form_row(form.save) }}
+        <div class="w-[247.5px] mx-auto h-fit mt-[40px] mb-[50px] flex justify-between">
+            <a href="{{ path('home') }}" class="w-[80px] h-[35px] rounded hover:bg-black transition">
+                <div class="w-full h-full flex items-center justify-center">
+                    <p class="text-[16px] w-fit h-fit">Cancel</p>
+                </div>
+            </a>
+            <div class="w-fit h-fit">
+                {{ form_widget(form.save, { 'attr': { 'class': 'submit-button' } }) }}
             </div>
         </div>
         {{ form_end(form) }}
     </div>
+    <script type="module">
+        import FormValidator from "{{ asset('build/js/FormValidator.js') }}";
+
+        const resetPassword = new FormValidator('reset-password', { reset_password_form_password_first: 'reset_password_form_password_first', reset_password_form_password_second: 'reset_password_form_password_second' })
+    </script>
 {% endblock %}

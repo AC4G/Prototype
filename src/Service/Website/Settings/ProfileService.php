@@ -10,14 +10,17 @@ use App\Repository\UserTokenRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\Website\Account\AccountService;
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
 
 final class ProfileService
 {
     public function __construct(
         private readonly GoogleAuthenticatorInterface $googleAuthenticator,
+        private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly UserTokenRepository $userTokenRepository,
-        private readonly AccountService $accountService
+        private readonly AccountService $accountService,
+
     )
     {
     }
@@ -160,16 +163,17 @@ final class ProfileService
     ): void
     {
         $tokens = $request->getSession()->get('2fa_one_time_tokens');
+        $userTokens = [];
 
         foreach ($tokens as $token) {
-            $userToken = (new UserToken())
+            $userTokens[] = (new UserToken())
                 ->setUser($user)
-                ->setToken($token)
+                ->setToken($this->passwordHasher->hashPassword($user, $token))
                 ->setType('2fa-one-time')
                 ->setCreationDate(new DateTime());
-
-            $this->userTokenRepository->persistAndFlushEntity($userToken);
         }
+
+        $this->userTokenRepository->persistAndFlushEntities($userTokens);
     }
 
     public function removeTokensAndUnsetTwoFa(

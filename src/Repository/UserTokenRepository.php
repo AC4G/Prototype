@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\UserToken;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,4 +22,21 @@ class UserTokenRepository extends AbstractRepository
             $registry, UserToken::class
         );
     }
+
+    public function deleteTokenByUserAndTokenType(
+        User $user,
+        string $type
+    ): void
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->delete()
+            ->where('t.user = :user')
+            ->andWhere('t.type = :type')
+            ->setParameter('user', $user)
+            ->setParameter('type', '2fa-one-time');
+
+        $qb->getQuery()->execute();
+    }
+
+
 }

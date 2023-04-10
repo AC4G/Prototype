@@ -4,7 +4,7 @@
             <a href="{{ path('home') }}" class="block px-[6px] py-1 rounded text-[22px] a">STEXS</a>
         </div>
         <nav class="w-fit">
-            <a href="{{ path('documentation') }}" class="w-full h-full flex items-center text-[18px] px-[6px] py-1 rounded a">Documentation</a>
+            <a href="{{ path('documentation') }}" class="w-full h-full flex items-center text-[18px] px-[6px] py-1 rounded a {% if app.request.get('_route') starts with 'documentation' %} bg-[#5E60CE] {% endif %}">Documentation</a>
         </nav>
         <div class="w-fit h-fit flex gap-x-[20px] ml-auto">
             {% if is_granted('ROLE_USER') %}
@@ -22,19 +22,16 @@
                         </div>
                         <div class="w-full h-fit px-[6px] mt-[8px] mb-[8px]">
                             <div class="w-full h-[40px]">
-                                <a href="{{ path('developer_organisation_create') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a">Organisation</a>
+                                <a href="{{ path('developer_organisation_create') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a {% if app.request.get('_route') == 'developer_organisation_create' %} bg-[#5E60CE] {% endif %}">Organisation</a>
                             </div>
                             <div class="w-full h-[40px] mt-[8px]">
-                                <a href="{{ path('developer_project_create') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a">Project</a>
+                                <a href="{{ path('creator_create_item') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a {% if app.request.get('_route') == 'creator_create_item' %} bg-[#5E60CE] {% endif %}">Item</a>
                             </div>
                             <div class="w-full h-[40px] mt-[8px]">
-                                <a href="{{ path('creator_create_item') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a">Item</a>
+                                <a href="{{ path('creator_create_group') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a {% if app.request.get('_route') == 'creator_create_group' %} bg-[#5E60CE] {% endif %}">Group</a>
                             </div>
                             <div class="w-full h-[40px] mt-[8px]">
-                                <a href="{{ path('creator_create_group') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a">Group</a>
-                            </div>
-                            <div class="w-full h-[40px] mt-[8px]">
-                                <a href="{{ path('creator_create_collection') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a">Collection</a>
+                                <a href="{{ path('creator_create_collection') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a {% if app.request.get('_route') == 'creator_create_collection' %} bg-[#5E60CE] {% endif %}">Collection</a>
                             </div>
                         </div>
                     </div>
@@ -59,16 +56,16 @@
                         </div>
                         <div class="w-full h-fit px-[6px] mt-[8px] mb-[8px]">
                             <div class="w-full h-[40px]">
-                                <a href="{{ path('dashboard') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a">Dashboard</a>
+                                <a href="{{ path('dashboard') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a {% if app.request.get('_route') starts with 'dashboard' %} bg-[#5E60CE] {% endif %}">Dashboard</a>
                             </div>
                             <div class="w-full h-[40px] mt-[8px]">
-                                <a href="{{ path('developer') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a">Developer</a>
+                                <a href="{{ path('developer') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a {% if app.request.get('_route') starts with 'developer' %} bg-[#5E60CE] {% endif %}">Developer</a>
                             </div>
                             <div class="w-full h-[40px] mt-[8px]">
-                                <a href="{{ path('creator') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a">Creator</a>
+                                <a href="{{ path('creator') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a {% if app.request.get('_route') starts with 'creator' %} bg-[#5E60CE] {% endif %}">Creator</a>
                             </div>
                             <div class="w-full h-[40px] mt-[8px]">
-                                <a href="{{ path('settings_profile') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a">Settings</a>
+                                <a href="{{ path('settings_profile') }}" class="block h-full pl-[6px] flex items-center text-[16px] rounded a {% if app.request.get('_route') starts with 'settings' %} bg-[#5E60CE] {% endif %}">Settings</a>
                             </div>
                         </div>
                         <div class="h-[2px] w-full bg-white rounded-md"></div>

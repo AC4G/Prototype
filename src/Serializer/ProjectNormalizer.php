@@ -23,9 +23,9 @@ final class ProjectNormalizer
         return [
             'id' => $project->getId(),
             'projectName' => $project->getProjectName(),
-            'organisationName' => $organisation->getOrganisationName(),
-            'organisationEmail' => $organisation->getOrganisationEmail(),
-            'organisationLogo' => $organisation->getOrganisationLogo(),
+            'organisationName' => $organisation->getName(),
+            'organisationEmail' => $organisation->getEmail(),
+            'organisationLogo' => $organisation->getLogo(),
             'supportEmail' => $organisation->getSupportEmail(),
             'creationDate' => $project->getCreationDate()
         ];

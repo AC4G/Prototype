@@ -23,7 +23,7 @@ class UserTokenRepository extends AbstractRepository
         );
     }
 
-    public function deleteTokenByUserAndTokenType(
+    public function deleteTokensByUserAndTokenType(
         User $user,
         string $type
     ): void

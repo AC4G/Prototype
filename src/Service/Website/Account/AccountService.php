@@ -194,7 +194,7 @@ final class AccountService
         User $user
     ): void
     {
-        $this->userTokenRepository->deleteTokenByUserAndTokenType($user, '2fa-one-time');
+        $this->userTokenRepository->deleteTokensByUserAndTokenType($user, '2fa-one-time');
     }
 
     public function setTwoFaVerified(

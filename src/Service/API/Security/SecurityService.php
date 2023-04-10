@@ -199,6 +199,13 @@ final class SecurityService
             return false;
         }
 
+        $parameter = json_decode($request->getContent(), true);
+
+        if ((in_array('inventory.update', $scopes) && $request->isMethod('PATCH') || in_array('inventory.delete', $scopes) && $request->isMethod('DELETE'))
+                && $accessToken['user']['id'] === $user->getId() && array_key_exists('amount', $parameter) && $parameter['amount'] < 0 && count($parameter) === 1) {
+            return true;
+        }
+
         return $accessToken['user']['id'] === $user->getId() && $item['project']['id'] === $accessToken['project']['id'];
     }
 

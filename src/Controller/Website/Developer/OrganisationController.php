@@ -9,6 +9,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class OrganisationController extends AbstractController
 {
+    #[Route('/developer/organisation/{name}', name: 'developer_organisation_by_name', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function getOrganisation(
+        Request $request,
+        string $name
+    ): Response
+    {
+        return new Response();
+    }
+
     #[Route('/developer/organisation/create', name: 'developer_organisation_create', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function createOrganisation(
         Request $request

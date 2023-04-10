@@ -81,7 +81,7 @@ select:-webkit-autofill:focus {
 }
 
 .input {
-    @apply rounded select-none text-white bg-[#343434] w-[247.5px] h-[40px] pl-[12px] pr-[12px] mt-[12px] border-2 border-transparent transition
+    @apply rounded select-none text-white bg-[#343434] w-[247.5px] h-[40px] px-[12px] mt-[12px] border-2 border-transparent transition text-[16px]
 }
 
 @media screen and (max-width: 550px) {

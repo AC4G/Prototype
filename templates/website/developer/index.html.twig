@@ -1,5 +1,54 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <p>Developer</p>
+    <div class="lg:max-w-[800px] w-full mx-auto mt-[50px] py-[14px] px-[24px]">
+        <div class="w-full h-fit flex justify-between items-center">
+            <div class="w-fit h-fit">
+                <p class="text-[22px]">Organisations {{ organisations|length }}</p>
+            </div>
+            <div class="w-fit h-fit flex items-center gap-x-2">
+                <div class="w-fit h-[32px] cursor-pointer bg-[#343434] rounded" id="search-organisation-box">
+                    <form method="get" class="gap-x-1 flex items-center h-full">
+                        <input type="text" name="q" class="select-none text-white bg-[#343434] rounded px-[12px]" placeholder="Search for organisations..." id="search-organisation">
+                        <button type="submit" class="px-[8px] hover:bg-[#464646] rounded transition w-full h-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+                <div class="w-fit h-fit px-[6px]">
+                    <button onclick="location.href='{{ path('developer_organisation_create') }}'" class="rounded border-2 border-[#48BFE3] bg-[#48BFE3] bg-opacity-30 hover:bg-opacity-100 transition h-[30px] w-[40px] flex items-center">
+                        <div class="w-fit h-fit mx-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 16 16">
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="h-[2px] rounded w-full bg-[#343434] mt-[12px]"></div>
+        {% if organisations|length > 0 %}
+            <div class="max-w-[240px] md:max-w-[752px] mx-auto h-fit pt-[24px] flex flex-wrap gap-y-4 gap-x-4">
+                {% for organisation in organisations %}
+                    {% set organisation = organisation.organisation %}
+                    <div class="w-[240px] filter group hover:grayscale hover:contrast-150 transition-all shadow-md">
+                        <a class="w-fit relative h-fit" href="{{ path('developer_organisation_by_name', { 'name': organisation.name }) }}">
+                            <div class="w-[240px] h-[240px] px-[7px] py-[7px] bg-[#222222] rounded">
+                                <img class="w-full h-full rounded object-cover" src="{{ asset(organisation.logo) }}">
+                            </div>
+                            <div class="absolute rounded-b-lg bottom-[0px] w-[240px] h-[60px] px-[6px] opacity-0 group-hover:opacity-100 flex justify-center items-center bg-black">
+                                <p class="text-[22px] opacity-100 z-[10]">{{ organisation.name|length > 12 ? organisation.name|slice(0,11) ~ '...' : organisation.name }}</p>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="w-fit h-fit mx-auto mt-[50px]">
+                <p class="text-[16px] text-[#8A8A8A] text-center">You are not a member of any organizations</p>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Organisation
  *
- * @ORM\Table(name="organisation", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="organisation_name_UNIQUE", columns={"organisation_name"})}, indexes={@ORM\Index(name="organisation_name_fulltext", columns={"organisation_name"}, flags={"fulltext"})})
+ * @ORM\Table(name="organisation", uniqueConstraints={@ORM\UniqueConstraint(name="id_UNIQUE", columns={"id"}), @ORM\UniqueConstraint(name="name_UNIQUE", columns={"name"})}, indexes={@ORM\Index(name="name_fulltext", columns={"name"}, flags={"fulltext"})})
  * @ORM\Entity(repositoryClass="App\Repository\OrganisationRepository")
  */
 class Organisation
@@ -25,23 +25,23 @@ class Organisation
     /**
      * @var string
      *
-     * @ORM\Column(name="organisation_name", type="string", length=255, nullable=false)
+     * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
-    private string $organisationName;
+    private string $name;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="organisation_email", type="string", length=255, nullable=false)
+     * @ORM\Column(name="email", type="string", length=255, nullable=false)
      */
-    private string $organisationEmail;
+    private string $email;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="organisation_logo", type="string", length=255, nullable=false)
+     * @ORM\Column(name="logo", type="string", length=255, nullable=false)
      */
-    private string $organisationLogo;
+    private string $logo;
 
     /**
      * @var string
@@ -69,38 +69,38 @@ class Organisation
         return $this;
     }
 
-    public function getOrganisationName(): ?string
+    public function getName(): ?string
     {
-        return $this->organisationName;
+        return $this->name;
     }
 
-    public function setOrganisationName(string $organisationName): self
+    public function setName(string $name): self
     {
-        $this->organisationName = $organisationName;
+        $this->name = $name;
 
         return $this;
     }
 
-    public function getOrganisationEmail(): ?string
+    public function getEmail(): ?string
     {
-        return $this->organisationEmail;
+        return $this->email;
     }
 
-    public function setOrganisationEmail(string $organisationEmail): self
+    public function setEmail(string $email): self
     {
-        $this->organisationEmail = $organisationEmail;
+        $this->email = $email;
 
         return $this;
     }
 
-    public function getOrganisationLogo(): string
+    public function getLogo(): string
     {
-        return $this->organisationLogo;
+        return $this->logo;
     }
 
-    public function setOrganisationLogo(string $organisationLogo): self
+    public function setLogo(string $logo): self
     {
-        $this->organisationLogo = $organisationLogo;
+        $this->logo = $logo;
 
         return $this;
     }

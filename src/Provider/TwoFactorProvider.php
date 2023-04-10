@@ -62,7 +62,7 @@ final class TwoFactorProvider implements TwoFactorProviderInterface
         $tokens = $this->userTokenRepository->findBy(['user' => $user, 'type' => '2fa-one-time']);
 
         foreach ($tokens as $token) {
-            if (password_verify($authenticationCode, $token->getToken())) {
+            if ($authenticationCode === $token->getToken()) {
                 $this->userTokenRepository->deleteEntry($token);
 
                 return true;

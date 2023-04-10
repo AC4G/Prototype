@@ -90,6 +90,7 @@ final class InventoryController extends AbstractController
 
         $this->inventoryService->createEntryInInventory($parameter, $uuid, $itemId);
         $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
+        $this->cache->delete('inventory_'. $uuid);
 
         return $this->customResponse->notificationResponse($request, 'Item successfully added to inventory', 201);
     }
@@ -108,6 +109,7 @@ final class InventoryController extends AbstractController
         }
 
         $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
+        $this->cache->delete('inventory_'. $uuid);
 
         $this->inventoryService->updateInventory($parameter, $uuid, $itemId);
 
@@ -122,6 +124,7 @@ final class InventoryController extends AbstractController
     ): Response
     {
         $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
+        $this->cache->delete('inventory_'. $uuid);
 
         $this->inventoryService->deleteItemFromInventory($uuid, $itemId);
 
@@ -164,6 +167,7 @@ final class InventoryController extends AbstractController
 
         $this->inventoryService->deleteParameter($inventory, $parameters);
         $this->cache->delete('inventory_' . $uuid . '_item_' . $itemId);
+        $this->cache->delete('inventory_'. $uuid);
 
         return $this->customResponse->notificationResponse($request, sprintf('Inventory parameter from user %s and item %d successfully removed', $itemId, $itemId));
     }

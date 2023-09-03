@@ -28,7 +28,7 @@ final class SecurityController extends AbstractController
     {
     }
 
-    #[Route('/api/authorize', name: 'client_authorization', methods: [Request::METHOD_POST])]
+    #[Route('/api/token', name: 'client_authorization', methods: [Request::METHOD_POST])]
     public function authorizeClient(
         Request $request
     ): Response
